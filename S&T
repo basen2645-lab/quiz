@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>과학신학 모의고사</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0d1b2a 0%, #1b2a3b 50%, #0a1628 100%);
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+    color: #e2e8f0;
+  }
+  .wrap { max-width: 620px; margin: 0 auto; padding: 20px; }
+
+  /* HOME */
+  #home { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; padding:24px; }
+  .home-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px; padding: 48px 40px;
+    max-width: 500px; width: 100%; text-align: center;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+  }
+  .home-icon { font-size: 48px; margin-bottom: 12px; }
+  .home-title { color: #a5d8ff; font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+  .home-sub { color: #5e8ab4; font-size: 13px; margin-bottom: 28px; }
+
+  .section-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+    margin-bottom: 22px; text-align: left;
+  }
+  .section-chip {
+    background: rgba(165,216,255,0.07); border: 1px solid rgba(165,216,255,0.15);
+    border-radius: 10px; padding: 6px 10px; font-size: 11px; color: #7ab8d9;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .section-chip.active { background: rgba(165,216,255,0.18); border-color: rgba(165,216,255,0.4); color: #a5d8ff; }
+  .section-chip span { font-weight: 600; }
+
+  .filter-row { display:flex; gap:8px; margin-bottom:20px; justify-content:center; flex-wrap:wrap; }
+  .filter-btn {
+    padding: 7px 14px; border-radius: 18px; font-size: 12px;
+    cursor: pointer; transition: all 0.2s; font-family: inherit;
+    border: 2px solid rgba(255,255,255,0.1);
+    background: transparent; color: #5e8ab4;
+  }
+  .filter-btn.active { border-color: #a5d8ff; background: rgba(165,216,255,0.1); color: #a5d8ff; }
+
+  .count-wrap { margin-bottom: 24px; }
+  .count-label { color: #7ab8d9; font-size: 13px; display:block; margin-bottom:10px; }
+  .count-val { color: #a5d8ff; font-weight: 700; }
+  input[type=range] { width:100%; accent-color: #a5d8ff; }
+  .range-mm { display:flex; justify-content:space-between; color:#3a5f80; font-size:11px; margin-top:4px; }
+
+  .btn-start {
+    width:100%; padding:16px;
+    background: linear-gradient(135deg, #1e6fa5, #4da6e8);
+    color: #fff; border: none; border-radius: 14px;
+    font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit;
+    box-shadow: 0 4px 20px rgba(30,111,165,0.4);
+    transition: transform 0.1s;
+  }
+  .btn-start:active { transform: scale(0.98); }
+
+  /* QUIZ */
+  #quiz { display:none; }
+  .quiz-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+  .btn-back { background:transparent; border:none; color:#5e8ab4; cursor:pointer; font-size:20px; padding:4px 8px; }
+  .q-counter { color:#7ab8d9; font-size:13px; }
+  .score-badge {
+    background: rgba(165,216,255,0.1); color:#a5d8ff;
+    padding:4px 12px; border-radius:12px; font-size:12px;
+    border: 1px solid rgba(165,216,255,0.2);
+  }
+  .progress-bar { height:3px; background:rgba(255,255,255,0.07); border-radius:2px; margin-bottom:18px; overflow:hidden; }
+  .progress-fill { height:100%; background: linear-gradient(90deg,#1e6fa5,#4da6e8); border-radius:2px; transition:width 0.4s ease; }
+
+  .card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 18px; padding: 22px 20px; margin-bottom: 14px;
+  }
+  .type-badge {
+    display:inline-block; padding:3px 10px; border-radius:8px;
+    font-size:11px; font-weight:600; margin-bottom:8px; letter-spacing:0.5px;
+  }
+  .type-mc { background:rgba(77,166,232,0.18); color:#74c0fc; }
+  .type-sa { background:rgba(134,239,172,0.18); color:#86efac; }
+  .type-ox { background:rgba(196,181,253,0.18); color:#c4b5fd; }
+  .section-label { font-size:11px; color:#3a6080; margin-bottom:6px; }
+  .q-text { color:#e2e8f0; font-size:14.5px; line-height:1.8; white-space:pre-wrap; }
+
+  /* MC choices */
+  .choices { margin-bottom:14px; }
+  .choice-btn {
+    width:100%; text-align:left; padding:12px 14px; border-radius:12px;
+    border: 1px solid rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.03);
+    color:#7a9bb5; cursor:pointer; margin-bottom:6px;
+    font-family:inherit; font-size:13.5px;
+    display:flex; align-items:flex-start; gap:10px;
+    line-height:1.65; transition:all 0.15s;
+  }
+  .choice-btn:hover:not([disabled]) { border-color:rgba(255,255,255,0.15); background:rgba(255,255,255,0.05); }
+  .choice-btn.selected { background:rgba(77,166,232,0.1); border-color:rgba(77,166,232,0.35); color:#a5d8ff; }
+  .choice-btn.correct { background:rgba(110,231,183,0.1); border-color:rgba(110,231,183,0.35); color:#6ee7b7; }
+  .choice-btn.wrong { background:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.35); color:#f87171; }
+  .choice-label { font-weight:700; min-width:22px; font-size:15px; flex-shrink:0; }
+  .choice-mark { margin-left:auto; padding-left:6px; flex-shrink:0; }
+
+  /* SA */
+  .sa-wrap { margin-bottom:14px; }
+  .sa-input {
+    width:100%; padding:12px 14px; border-radius:12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    color:#e2e8f0; font-family:inherit; font-size:14px;
+    margin-bottom:8px; outline:none; transition:border 0.2s;
+    resize:vertical; min-height:44px;
+  }
+  .sa-input:focus { border-color:rgba(134,239,172,0.4); }
+  .sa-answer-box {
+    padding:12px 14px; border-radius:12px;
+    background:rgba(110,231,183,0.08); border: 1px solid rgba(110,231,183,0.2);
+    color:#6ee7b7; font-size:13.5px; line-height:1.6;
+    display:none;
+  }
+  .sa-answer-label { font-size:11px; color:#3a8060; margin-bottom:4px; font-weight:600; }
+
+  /* OX */
+  .ox-btns { display:flex; gap:12px; margin-bottom:14px; }
+  .ox-btn {
+    flex:1; height:72px; border-radius:14px;
+    border: 1px solid rgba(255,255,255,0.09);
+    background: rgba(255,255,255,0.04);
+    color:#7a9bb5; cursor:pointer; font-size:28px; font-weight:700;
+    font-family:inherit; transition:all 0.2s;
+  }
+  .ox-btn:hover:not([disabled]) { border-color:rgba(255,255,255,0.2); }
+  .ox-btn.selected { background:rgba(77,166,232,0.1); border-color:rgba(77,166,232,0.35); color:#a5d8ff; }
+  .ox-btn.correct { background:rgba(110,231,183,0.1); border-color:rgba(110,231,183,0.35); color:#6ee7b7; }
+  .ox-btn.wrong { background:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.35); color:#f87171; }
+
+  /* Explanation */
+  .explanation {
+    background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07);
+    border-radius:12px; padding:12px 14px; font-size:12.5px; color:#5e8ab4;
+    line-height:1.7; margin-bottom:12px; display:none;
+  }
+  .explanation.show { display:block; }
+  .exp-label { font-size:11px; color:#3a5f80; margin-bottom:6px; font-weight:600; }
+
+  /* Feedback */
+  .feedback {
+    border-radius:12px; padding:12px 16px; margin-bottom:12px;
+    font-size:14px; font-weight:600; text-align:center; display:none;
+  }
+  .feedback.correct { background:rgba(110,231,183,0.07); border:1px solid rgba(110,231,183,0.25); color:#6ee7b7; }
+  .feedback.wrong { background:rgba(239,68,68,0.07); border:1px solid rgba(239,68,68,0.25); color:#f87171; }
+  .feedback.info { background:rgba(165,216,255,0.07); border:1px solid rgba(165,216,255,0.2); color:#a5d8ff; }
+
+  .btn-confirm {
+    width:100%; padding:14px;
+    background: linear-gradient(135deg,#1e6fa5,#4da6e8);
+    color:#fff; border:none; border-radius:12px;
+    font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; transition:all 0.2s;
+  }
+  .btn-confirm:disabled { background:rgba(255,255,255,0.05); color:#2a4a60; cursor:not-allowed; }
+  .btn-next {
+    width:100%; padding:14px;
+    background:rgba(10,30,50,0.8);
+    color:#4da6e8; border:1px solid rgba(77,166,232,0.2);
+    border-radius:12px; font-size:15px; font-weight:700;
+    cursor:pointer; font-family:inherit; display:none; margin-top:8px;
+  }
+  .btn-show-ans {
+    width:100%; padding:10px;
+    background:transparent; color:#3a8060;
+    border: 1px solid rgba(134,239,172,0.15);
+    border-radius:10px; font-size:13px; cursor:pointer;
+    font-family:inherit; margin-bottom:8px; transition:all 0.2s;
+  }
+  .btn-show-ans:hover { background:rgba(134,239,172,0.06); color:#6ee7b7; }
+
+  /* REVIEW */
+  #review { display:none; }
+  .result-card {
+    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.09);
+    border-radius:20px; padding:32px 24px; text-align:center; margin-bottom:20px;
+  }
+  .result-emoji { font-size:48px; margin-bottom:8px; }
+  .result-score { color:#a5d8ff; font-size:46px; font-weight:800; margin-bottom:4px; }
+  .result-sub { color:#5e8ab4; font-size:14px; }
+  .result-sub .ok { color:#6ee7b7; }
+  .result-sub .bad { color:#f87171; }
+  .result-sub .skip { color:#a5d8ff; }
+
+  .wrong-title { color:#a5d8ff; font-size:14px; margin-bottom:12px; font-weight:600; }
+  .wrong-item {
+    background:rgba(239,68,68,0.05); border:1px solid rgba(239,68,68,0.18);
+    border-radius:14px; padding:16px; margin-bottom:10px;
+  }
+  .wrong-q { color:#cbd5e1; font-size:13px; margin-bottom:10px; line-height:1.65; white-space:pre-wrap; }
+  .wrong-type { font-size:11px; color:#4a6a82; margin-bottom:4px; }
+  .review-choice {
+    padding:8px 12px; border-radius:9px; margin-bottom:4px;
+    font-size:12px; line-height:1.5;
+    display:flex; gap:8px; align-items:flex-start;
+    border:1px solid transparent; color:#3a5f80;
+  }
+  .review-choice.correct { background:rgba(110,231,183,0.08); border-color:rgba(110,231,183,0.28); color:#6ee7b7; }
+  .review-choice.wrong { background:rgba(239,68,68,0.08); border-color:rgba(239,68,68,0.25); color:#f87171; }
+  .review-sa { padding:8px 12px; border-radius:9px; background:rgba(110,231,183,0.08); border:1px solid rgba(110,231,183,0.28); color:#6ee7b7; font-size:13px; }
+  .review-ox { display:flex; gap:8px; }
+  .review-ox-btn { flex:1; padding:8px; border-radius:9px; text-align:center; font-size:20px; border:1px solid rgba(255,255,255,0.07); color:#2a4a60; }
+  .review-ox-btn.correct { background:rgba(110,231,183,0.08); border-color:rgba(110,231,183,0.28); color:#6ee7b7; }
+  .review-ox-btn.wrong { background:rgba(239,68,68,0.08); border-color:rgba(239,68,68,0.25); color:#f87171; }
+  .review-exp { font-size:11.5px; color:#3a5f80; margin-top:8px; line-height:1.6; padding-top:8px; border-top:1px solid rgba(255,255,255,0.05); }
+  .btn-retry {
+    width:100%; padding:16px;
+    background:linear-gradient(135deg,#1e6fa5,#4da6e8);
+    color:#fff; border:none; border-radius:14px;
+    font-size:16px; font-weight:700; cursor:pointer; font-family:inherit; margin-top:16px;
+  }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home">
+  <div class="home-card">
+    <div class="home-icon">🔭</div>
+    <h1 class="home-title">과학신학</h1>
+    <p class="home-sub" id="home-sub">기말고사 모의고사 · 총 117문제</p>
+
+    <div class="filter-row">
+      <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">전체</button>
+      <button class="filter-btn" data-filter="mc" onclick="setFilter('mc')">객관식</button>
+      <button class="filter-btn" data-filter="sa" onclick="setFilter('sa')">단답형</button>
+      <button class="filter-btn" data-filter="ox" onclick="setFilter('ox')">OX</button>
+    </div>
+
+    <div class="count-wrap">
+      <span class="count-label">문제 수: <span class="count-val" id="count-display">20</span>문제</span>
+      <input type="range" id="count-slider" min="5" max="117" value="20" oninput="updateCount(this.value)">
+      <div class="range-mm"><span>5</span><span id="range-max">117</span></div>
+    </div>
+
+    <button class="btn-start" onclick="startQuiz()">시작하기</button>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz">
+  <div class="wrap">
+    <div class="quiz-header">
+      <button class="btn-back" onclick="goHome()">←</button>
+      <span class="q-counter" id="q-counter">1 / 20</span>
+      <span class="score-badge" id="score-badge">0 점</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+
+    <div class="card">
+      <div class="section-label" id="section-label"></div>
+      <span class="type-badge" id="type-badge">객관식</span>
+      <p class="q-text" id="q-text"></p>
+    </div>
+
+    <div class="choices" id="choices"></div>
+    <div class="ox-btns" id="ox-btns" style="display:none">
+      <button class="ox-btn" id="ox-o" onclick="selectOX('O')">O</button>
+      <button class="ox-btn" id="ox-x" onclick="selectOX('X')">X</button>
+    </div>
+    <div class="sa-wrap" id="sa-wrap" style="display:none">
+      <textarea class="sa-input" id="sa-input" placeholder="답을 입력하세요..." rows="2" oninput="onSAInput()"></textarea>
+      <button class="btn-show-ans" id="btn-show-ans" onclick="showSAAnswer()">📋 정답 확인하기</button>
+      <div class="sa-answer-box" id="sa-answer-box">
+        <div class="sa-answer-label">✅ 정답</div>
+        <div id="sa-answer-text"></div>
+      </div>
+    </div>
+
+    <div class="explanation" id="explanation">
+      <div class="exp-label">📖 풀이</div>
+      <div id="exp-text"></div>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+    <button class="btn-confirm" id="btn-confirm" disabled onclick="confirmAnswer()">정답 확인</button>
+    <button class="btn-next" id="btn-next" onclick="nextQuestion()">다음 문제 →</button>
+  </div>
+</div>
+
+<!-- REVIEW -->
+<div id="review">
+  <div class="wrap">
+    <div class="result-card">
+      <div class="result-emoji" id="result-emoji">🎉</div>
+      <div class="result-score" id="result-score">--점</div>
+      <div class="result-sub" id="result-sub"></div>
+    </div>
+    <div id="wrong-list"></div>
+    <button class="btn-retry" onclick="goHome()">다시 풀기</button>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [{"id":1,"type":"sa","question":"창세기 1:1의 말씀을 암송해서 쓰세요.","answer":"태초에 하나님이 천지를 창조하시니라.","explanation":"성경의 첫 구절로, 창조 신앙의 핵심 선언문이다. '태초(베레쉬트)'는 시간의 시작을 의미하며, 하나님의 주권적 창조를 선포한다. 이 구절은 우주의 기원에 대한 신학적 출발점으로서 모든 창조론 논의의 근거가 된다."},{"id":2,"type":"sa","question":"창세기 1장에서 보이는 히브리인들의 우주 모습을 현재의 천문학 지식으로는 뭐라고 부르나?","answer":"개천설","explanation":"개천설(蓋天說)은 하늘이 둥근 덮개처럼 땅을 덮고 있다는 고대 우주론이다. 창세기 1장의 궁창(라키아) 개념이 이에 해당하며, 궁창 위와 아래에 물이 있다는 히브리 우주관을 반영한다. 현대 천문학과는 다르지만, 당시 문화적 맥락에서 하나님의 창조를 전달하는 방식으로 이해된다."},{"id":3,"type":"sa","question":"현재의 천문학자들이 우주를 설명하는 설명 체계로 가장 많이 받아들이는 이론은 무엇이라 부르나?","answer":"표준 빅뱅 우주론","explanation":"표준 빅뱅 우주론은 우주가 약 138억 년 전 초고온·초고밀도 상태에서 대폭발(Big Bang)로 시작되었다는 이론이다. 우주배경복사, 허블의 팽창 관측, 경원소 핵합성 등 다양한 관측 증거가 이를 지지한다. 현재 가장 많은 과학자들이 채택하는 우주 기원 이론이다."},{"id":4,"type":"sa","question":"현재의 천문학자들이 받아들이는 우주론을 가장 지지하게 된 관측으로 무엇을 들 수 있나?","answer":"우주배경복사 관측","explanation":"우주배경복사(CMB, Cosmic Microwave Background)는 빅뱅 약 38만 년 후 우주가 냉각되면서 방출된 빛의 잔광이다. 1964년 펜지어스와 윌슨이 우연히 발견했고, 이후 COBE·WMAP·Planck 위성이 정밀 관측했다. 이 복사의 존재와 온도 균일성은 빅뱅 이론의 핵심 증거로 꼽힌다."},{"id":5,"type":"sa","question":"현재 천문학자들이 계산한 우주의 나이는 얼마인가?","answer":"137억 년 혹은 138억 년","explanation":"허블 상수와 우주배경복사 데이터를 바탕으로 계산된 우주의 나이이다. Planck 위성 데이터(2013, 2018)는 약 138억 년(13.8Gyr)을 제시한다. 이 수치는 관측 방법에 따라 약간의 오차가 있으며, 최근에는 허블 긴장(Hubble tension) 문제로 활발히 논의 중이다."},{"id":6,"type":"sa","question":"우리 우주가 팽창하고 있음을 이론적으로 밝힌 두 천문학자는 누구인가?","answer":"프리드만과 르메트르","explanation":"알렉산드르 프리드만(1922)은 아인슈타인의 일반 상대성 이론 방정식을 풀어 팽창하는 우주 해를 처음 제시했다. 조르주 르메트르(1927)는 독립적으로 같은 결론을 도출하고 허블의 관측과 연결지었다. 허블이 관측으로 팽창을 확인하기 전에 이론적으로 예측한 선구자들이다."},{"id":7,"type":"sa","question":"허블-르메트르 법칙에서 H₀는 상수이다. 이 값의 역수는 대략 우주의 나이를 가리킨다. 이 값은 대략 몇 km/sec/Mpc인가?","answer":"대략 70 km/sec/Mpc","explanation":"허블 상수 H₀는 은하의 후퇴 속도와 거리의 비율로, 우주 팽창 속도를 나타낸다. H₀ ≈ 70 km/s/Mpc일 때 역수인 1/H₀는 약 140억 년으로 우주 나이와 근사한다. 최근 측정값은 67~73 km/s/Mpc 사이에서 논쟁 중이며, 이것이 '허블 긴장' 문제이다."},{"id":8,"type":"sa","question":"우리 몸을 이루는 탄소, 산소, 질소는 어디서 만들어졌을까?","answer":"별의 핵에서","explanation":"수소와 헬륨보다 무거운 원소들은 항성 내부의 핵융합 반응으로 만들어진다. 탄소는 삼중 알파 과정, 산소와 질소는 그 이후 단계에서 합성된다. 별이 죽을 때(초신성 폭발 등) 이 원소들이 우주로 방출되어 새로운 별과 행성, 생명체를 구성하게 된다."},{"id":9,"type":"sa","question":"강사는 롬 1:20a의 말씀으로 다음과 같은 방정식을 만들었다. ( )안에 적절한 단어는? ( ) = Nature(자연, 우주 등)","answer":"Divine Action (하나님의 활동)","explanation":"로마서 1:20은 '창세로부터 그의 보이지 아니하는 것들이 그가 만드신 만물에 분명히 보여 알려졌나니'라고 선언한다. 강사는 이를 자연=하나님의 활동이라는 방정식으로 표현했다. 자연 세계 자체가 하나님의 지속적 활동의 표현이라는 신학적 통찰로, 과학과 신앙의 통합적 이해를 보여준다."},{"id":10,"type":"sa","question":"강사는 어떤 이론을 통하여 성령의 활동을 비유하였나?","answer":"전기장 이론","explanation":"전기장은 눈에 보이지 않지만 공간 전체에 퍼져 물체에 힘을 미치는 장(field)이다. 강사는 성령의 편재성과 활동 방식을 이 전기장 개념으로 비유했다. 보이지 않으나 실재하며 전 우주에 작용하는 성령의 사역을 현대 물리학 개념으로 설명하려는 시도이다.\n\n# **임창세: 과학신학"},{"id":11,"type":"mc","question":"11세기 아리스토텔레스 철학을 신학화하여 가톨릭 신학의 기초를 놓은 신학자는?","choices":["아우구스티누스","토마스 아퀴나스","안셀름","보나벤투라"],"answer":2,"explanation":"토마스 아퀴나스(1225~1274)는 아리스토텔레스의 철학을 기독교 신학과 결합하여 스콜라 철학의 정점을 이루었다. 대표작 『신학대전』은 이성과 신앙의 조화를 추구했다. 자연신학의 토대를 마련하고 가톨릭 신학의 표준을 세운 핵심 인물이다."},{"id":12,"type":"mc","question":"맥그래스가 칼빈과 자연과학의 관계에 대한 설명으로 옳지 않은 것은?","choices":["칼빈은 자연에 대한 연구에 긍정적 활력을 불어넣었다","칼빈은 과학연구의 장애물을 제거해 주었다","칼빈은 성경을 적응의 방법으로 이해하려고 노력했다","칼빈은 물리학과 천문학 등 구체적 자연과학에 대해서는 거리를 두었다"],"answer":4,"explanation":"맥그래스에 따르면 칼빈은 자연과학 연구를 긍정적으로 평가했다. 칼빈의 '적응(accommodation)' 원리는 성경이 독자 수준에 맞게 쓰였다는 해석으로 과학과 성경의 충돌을 완화했다. 칼빈이 물리학·천문학에 거리를 두었다는 ④번은 사실과 다르며, 오히려 자연 연구를 하나님 이해의 방편으로 권장했다."},{"id":13,"type":"mc","question":"최근 자연과학자들 중에 기독교의 신앙에 대해 비판적인 입장을 갖지 않은 사람은?","choices":["에드워드 윌슨","리처드 도킨스","스티븐 굴드","스티븐 호킹"],"answer":3,"explanation":"스티븐 굴드는 과학과 종교가 서로 겹치지 않는 영역(NOMA, Non-Overlapping Magisteria)이라고 주장하며, 과학이 종교를 반박할 수 없다는 입장을 취했다. 반면 도킨스는 무신론적 진화론자로 종교를 강하게 비판했고, 윌슨과 호킹도 종교에 회의적이었다."},{"id":14,"type":"sa","question":"유신론 과학자들이 주장하는 가장 강력한 유신론의 증거는?","answer":"우주의 지성과 인류원리","explanation":"인류원리(Anthropic Principle)는 우주의 기본 상수들이 생명 탄생에 절묘하게 맞추어져 있다는 관찰이다. 중력 상수, 전자기력 등이 조금만 달랐어도 생명은 불가능했을 것이다. 유신론 과학자들은 이 '미세 조정(fine-tuning)'이 설계자의 존재를 강하게 시사한다고 주장한다."},{"id":15,"type":"mc","question":"다음 중 비판적 실재론자가 아닌 사람은?","choices":["이안 바버","아서 피코크","존 폴킹혼","프란시스코 바렐라"],"answer":4,"explanation":"비판적 실재론(Critical Realism)은 과학과 신학 모두 실재를 부분적으로 파악한다는 인식론적 입장이다. 이안 바버, 아서 피코크, 존 폴킹혼이 대표적 지지자이다. 프란시스코 바렐라는 칠레 신경과학자·철학자로, 인지과학과 불교 철학의 결합을 연구한 학자로 이 그룹에 속하지 않는다."},{"id":16,"type":"mc","question":"비판적 실재론자들 중 처음으로 위로부터의 인과론(Top-Down)을 주장한 사람은?","choices":["이안 바버","아서 피코크","존 폴킹혼","프란시스코 바렐라"],"answer":2,"explanation":"아서 피코크(Arthur Peacocke)는 생화학자이자 신학자로, 하향식 인과론(Top-Down causation)을 처음 체계적으로 제안했다. 상위 수준의 전체가 하위 구성요소에 영향을 미친다는 개념으로, 환원주의를 극복하는 창발(emergence) 개념과 연결된다. 하나님의 행동을 이 틀에서 설명하려 했다."},{"id":17,"type":"mc","question":"이안 바버가 주장하는 종교와 과학의 관계 모델 4가지에 해당되지 않는 것은?","choices":["갈등이론","독립이론","대화이론","공명이론"],"answer":4,"explanation":"이안 바버(Ian Barbour)는 과학과 종교의 관계를 갈등(Conflict), 독립(Independence), 대화(Dialogue), 통합(Integration)의 4가지로 분류했다. '공명이론'은 바버의 4가지 모델 중 하나가 아니라, 존 폴킹혼이 제시한 모형이다. 바버의 분류는 이 분야의 표준 틀로 널리 사용된다."},{"id":18,"type":"mc","question":"최근 미국 휘튼컬리지에서 출판한 책 중에 지적설계론에서 과학신학으로 전향을 알리는 책의 이름은?","choices":["우주이론","생명이론","기원이론","출현이론"],"answer":3,"explanation":"『기원 이론(Origins)』은 휘튼컬리지 학자들이 지적설계론의 한계를 인정하고 보다 통합적인 과학신학적 접근을 모색한 책이다. 창세기를 고대 근동 문맥에서 이해하고 진화론과 신앙을 통합하려는 시도를 담고 있다. 복음주의권에서 중요한 전환점으로 평가된다."},{"id":19,"type":"mc","question":"스티븐 호킹이 인류원리라는 유신론적 주제를 다룬 저서는?","choices":["시간 여행","위대한 설계","우주적 설계","설계 이론"],"answer":2,"explanation":"『위대한 설계(The Grand Design)』(2010)는 호킹이 레오나르드 믈로디노프와 공저한 책으로, M-이론과 다중우주를 통해 창조주 없이도 우주가 자발적으로 생성될 수 있다고 주장한다. 역설적으로 인류원리를 다루면서도 신의 필요성을 부정하는 내용으로, 과학·신학 논쟁을 불러일으켰다."},{"id":20,"type":"mc","question":"인류원리에서는 빅뱅 초기에 강력한 프로그램이 존재해야 우주가 형성될 수 있다고 주장한다. 그 초기 단계를 나타내는 말은?","choices":["빅뱅 초기","빅뱅 스타트","인플레이션","디플레이션"],"answer":3,"explanation":"인플레이션(Inflation) 이론은 빅뱅 직후 10⁻³⁶~10⁻³² 초 사이에 우주가 지수함수적으로 급팽창했다는 이론이다(앨런 구스 제안). 이 시기의 초기 조건 설정이 현재 우주의 대규모 구조를 결정했다. 인류원리와 결합하면 이 초기 조건의 정밀함이 설계의 증거로 언급된다.\n\n# **이문원: 지구의 기원"},{"id":21,"type":"sa","question":"지구는 태양계에서 유일하게 액체의 물이 많이 있는 행성이어서, 지구(地球)라기보다는 ( 가 )라고 부르는 것이 더 적합하다.","answer":"수구(水球)","explanation":"지구 표면의 약 71%가 물로 덮여 있어 '물의 행성'이라 불린다. 수구(水球)라는 명칭은 지구 표면에서 물이 차지하는 비중이 압도적임을 반영한다. 액체 상태의 물은 생명 존재의 핵심 조건으로, 지구가 생명체를 품을 수 있는 근본적 이유이다."},{"id":22,"type":"sa","question":"지구의 핵 부분 온도는 약 ( 나 )도°C이며, 그 값은 태양표면 온도와 거의 같다.","answer":"6,000°C","explanation":"지구 내핵의 온도는 약 5,000~6,000°C로 추정되며, 이는 태양 표면 온도(약 5,500°C)와 유사하다. 이 높은 온도는 지구 형성 당시의 잔열과 방사성 원소의 붕괴열에서 비롯된다. 이 열에너지가 맨틀 대류와 판구조론을 일으키는 원동력이다."},{"id":23,"type":"sa","question":"지구의 연령은 지구에 떨어지는 운석의 연대를 측정하여 얻은 값이며, 약 ( 다 )억 년 정도 된다.","answer":"45억 또는 46억 년","explanation":"방사성 동위원소 연대측정법으로 운석의 나이를 측정한 결과 약 45~46억 년이 산출된다. 지구 자체의 가장 오래된 암석보다 운석이 더 정확한 초기 태양계 정보를 담고 있기 때문이다. 이 값은 태양계 형성 시기와도 일치하며 과학계에서 광범위하게 수용된다."},{"id":24,"type":"sa","question":"지각은 대륙지각과 해양지각으로 구분되며, 해양지각은 주로 ( 라 ) 암석으로 이루어졌다. 해양지각은 연령이 약 ( 마 )억 년 넘는 암석은 없다.","answer":"라: 현무암질, 마: 2억 년","explanation":"해양지각은 중앙해령에서 새로 생성되고 해구에서 섭입·소멸되므로, 2억 년보다 오래된 해양 지각은 존재하지 않는다. 현무암질 해양지각은 밀도가 높아 화강암질 대륙지각 아래로 가라앉는다. 이는 판구조론의 핵심 원리로, 지구가 끊임없이 자기 갱신을 한다는 증거이다."},{"id":25,"type":"sa","question":"선캄브리아대는 지구 연령의 약 ( 바 )% 이상을 차지하며, 그 시기는 대륙지각이 형성되는 중요한 기간이었다.","answer":"85~90%","explanation":"선캄브리아대는 지구 탄생(46억 년 전)부터 캄브리아기 시작(5.4억 년 전)까지로, 전체 지구 역사의 약 88%를 차지한다. 이 기간에 대륙핵(크라톤)이 형성되고 최초의 생명체가 등장했다. 다세포 생물의 폭발적 증가인 '캄브리아 대폭발'은 선캄브리아대 이후에 일어났다."},{"id":26,"type":"sa","question":"지구는 지권-( 사 )-기권 및 생물권 등으로 이루어진 하나의 지구계로 이루어졌다.","answer":"수권(水圈)","explanation":"지구계는 지권(암석권), 수권(해양·빙하·지하수 등), 기권(대기권), 생물권의 네 요소로 구성된다. 각 권역은 독립적이지 않고 물질과 에너지를 교환하며 상호작용한다. 예를 들어 탄소 순환은 지권·수권·기권·생물권 모두를 연결하는 핵심 과정이다."},{"id":27,"type":"sa","question":"태양계에서 지구가 생명이 존재할 수 있는 것은 태양에서 지구까지의 거리와 지구의 ( 아 )라는 조건이 오늘날과 같았기 때문이다.","answer":"크기","explanation":"지구의 크기(질량)는 적절한 중력을 제공하여 대기와 물을 붙잡아 두는 데 결정적이다. 너무 작으면 대기를 잃고(화성), 너무 크면 두꺼운 수소 대기를 형성한다(목성). 또한 지구의 크기는 내부 열을 오랫동안 유지하여 판구조 활동과 자기장 생성을 가능하게 한다."},{"id":28,"type":"sa","question":"오늘날 지구 생태환경을 만드는 데 작용하는 에너지는 크게 태양복사에너지, ( 자 ), 달의 기조력 등이다.","answer":"지구 내부에너지","explanation":"지구 내부에너지는 방사성 원소의 붕괴열과 지구 형성 당시의 잔열로 구성된다. 이 에너지는 맨틀 대류, 판구조 운동, 화산 활동, 지진을 일으킨다. 태양에너지가 지표 기후를 주도한다면, 지구 내부에너지는 지구의 지질학적 활동과 장기적 환경 변화를 이끈다."},{"id":29,"type":"sa","question":"지구 역사 동안 지구환경이 만들어지는 과정을 연구할 때 고려해야 할 주요 개념은 물질, 에너지, ( 차 ), 공간, 변화, 상호작용 등이 있다.","answer":"시간","explanation":"지구과학에서 시간은 모든 지질·생물학적 과정의 근본 축이다. 수억~수십억 년의 긴 시간 스케일에서만 대륙이동, 산맥 형성, 생물 진화 등이 이해된다. 이 심층시간(deep time) 개념은 지구과학의 고유한 특성으로, 물리·화학과 구별되는 핵심 요소이다."},{"id":30,"type":"sa","question":"지구 내부 온도가 차갑다고 생각한 수성론, 뜨겁다고 생각한 ( 카 )이 있다.","answer":"화성론","explanation":"화성론(Plutonism)은 스코틀랜드 지질학자 제임스 허턴이 주창한 이론으로, 지구 내부의 열에 의해 암석이 형성된다고 보았다. 수성론(Neptunism)은 물에 의한 침전으로 암석이 형성된다는 베르너의 이론이다. 현재는 화성론의 핵심 주장이 옳았음이 판명되어, 지구 내부가 매우 뜨겁고 맨틀 대류가 활발함이 밝혀졌다.\n\n# **배정훈: 과학시대의 창세기 이해"},{"id":31,"type":"sa","question":"성경은 순수한 역사가 아니라 역사와 ( )으로 이루어졌다.","answer":"해석","explanation":"성경은 사건을 단순히 기록한 역사서가 아니라, 사건의 의미와 신학적 해석을 담은 문헌이다. 창세기도 고대 이스라엘의 신앙 공동체가 하나님과의 관계 안에서 세계의 기원을 해석한 문서이다. 이 점에서 성경을 현대 과학 교과서와 동일한 방식으로 읽는 것은 적절하지 않다."},{"id":32,"type":"sa","question":"존 월튼(John Walton)은 ( ) 창조론을 주장하고, 팀 켈러(Tim Keller)는 ( ) 창조론을 주장한다.","answer":"기능적 창조론 / 역사적 창조론","explanation":"월튼은 창세기 1장이 물질의 기원이 아닌 우주의 '기능적 질서화'를 묘사한다고 주장한다. 반면 켈러는 아담의 역사적 실재성을 강조하며, 원죄와 구속 신학의 연속성을 위해 창조의 역사성이 필수적이라 본다. 두 입장은 복음주의 내에서 활발히 논쟁 중이다."},{"id":33,"type":"sa","question":"존 월튼의 저서는 『창세기 1장의 ( ) 세계』, 『아담과 하와의 ( ) 세계』이다.","answer":"잃어버린","explanation":"『잃어버린 세계』 시리즈는 고대 근동 문화와 언어를 통해 창세기를 재독해하는 월튼의 대표 저작이다. 그는 현대 독자들이 고대 저자의 의도와 다른 방식으로 성경을 읽어왔다고 주장한다. 고대 우주론적 맥락을 회복함으로써 과학과 성경의 불필요한 충돌을 해소하려 한다."},{"id":34,"type":"sa","question":"존 월튼은 아담과 하와를 생물학적 시조보다 인류 전체를 대표하는 ( ) 이자 성전을 지키는 제사장으로 이해한다.","answer":"원형(Archetype)","explanation":"월튼의 '원형(archetype)' 개념은 아담이 반드시 생물학적 첫 인간일 필요가 없다는 입장이다. 대신 아담은 모든 인류를 대표하는 상징적·신학적 인물로, 하나님의 성전인 에덴을 섬기는 제사장적 역할을 부여받았다. 이는 진화론적 인류 기원과 창세기를 양립시키는 해석이다."},{"id":35,"type":"sa","question":"팀 켈러는 아담이 실제 역사적 인물이 아니라면, 죄가 인류에게 들어온 과정(원죄)을 설명할 수 없기 때문에 아담의 ( )을 강조한다.","answer":"역사성","explanation":"켈러는 바울 신학(롬 5장, 고전 15장)이 아담의 역사적 실재를 전제한다고 본다. 아담이 역사적 인물이 아니면 원죄 교리, 그리스도의 대속, 구속사의 연속성이 무너진다는 것이다. 이는 복음주의 신학의 핵심 관심사로, 진화론 수용 여부와 맞닿아 있는 신학적 쟁점이다."},{"id":36,"type":"sa","question":"성경을 과학 교과서처럼 읽을 때 생기는 해석적 오류로 인하여 ( )주의의 함정에 빠진다. 이와 반대로 성경과 과학을 서로 다른 '목적의 언어'로 구분하는 것을 ( )주의라고 말한다.","answer":"일치주의 / 비일치주의","explanation":"일치주의(Concordism)는 성경과 과학이 동일한 사실을 다룬다고 보아, 성경 구절을 과학 이론과 억지로 맞추려는 시도이다. 비일치주의(Non-concordism)는 성경과 과학이 서로 다른 질문에 답한다고 보아 각각의 독립적 권위를 인정한다. 기원이론은 비일치주의적 접근을 지지한다."},{"id":37,"type":"sa","question":"기원이론의 책에 따르면, 성경은 ( )와 왜를 다루고, 과학은 ( )와 언제를 다룬다.","answer":"누가 / 어떻게","explanation":"성경은 '누가 창조했는가(하나님)'와 '왜 창조했는가(목적)'에 답하는 반면, 과학은 '어떻게(메커니즘)'와 '언제(시간)'를 다룬다. 이 구분은 두 영역이 상충하지 않고 상보적임을 보여준다. 창세기가 과학 교과서가 아니라는 인식이 이 이해의 전제이다."},{"id":38,"type":"sa","question":"기원이론의 책에 따르면, 창세기 1장은 물질을 만드는 과정보다 우주의 ( )와 ( )을 부여하는 과정이다.","answer":"질서 / 기능","explanation":"월튼의 핵심 주장은 창세기 1장이 물질 창조(material ontology)가 아닌 기능 창조(functional ontology)를 묘사한다는 것이다. 각 창조 일들은 혼돈에 기능과 질서를 부여하는 과정으로, 우주를 하나님의 성전으로 세우는 기능 부여 행위이다. 이는 고대 근동의 창조 이해와도 부합한다."},{"id":39,"type":"sa","question":"창세기 1장은 거룩을 강조하고, 창세기 2장은 ( )을 강조한다.","answer":"순종","explanation":"창세기 1장은 하나님의 창조 사역의 질서와 거룩함을 강조하며, 안식일로 정점을 이룬다. 창세기 2장은 에덴에서 아담과 하와의 관계, 하나님의 명령과 인간의 순종 문제를 다룬다. 두 장은 서로 다른 신학적 관심을 가진 창조 내러티브로, 상호보완적으로 읽어야 한다."},{"id":40,"type":"sa","question":"창세기 1장 2절에서 31절까지에서 창조 사역은 ( 혼돈 )을 질서로 바꾸는 사역이다.","answer":"혼돈(Chaos)","explanation":"창 1:2의 '토후 와보후(형태 없고 비어 있음)'는 혼돈의 상태를 묘사한다. 창조 6일은 이 혼돈에 순서와 기능을 부여하는 과정으로 이해된다. 이는 바빌론 창조 신화(에누마 엘리쉬)와 유사한 구조를 가지지만, 하나님이 혼돈을 싸워 이기는 것이 아니라 주권적으로 질서를 세우신다는 점에서 근본적으로 다르다.\n\n# **윤세진: 생물 진화와 하나님"},{"id":41,"type":"sa","question":"가장 최근에 생물을 분류하는 체계는 3역 체계이다. 여기에는 ( )역, 고세균역, 진핵생물역이 있다.","answer":"세균(Bacteria)역","explanation":"칼 워즈(Carl Woese)의 rRNA 분석(1977)에 기반한 3역 체계는 생물을 세균역·고세균역·진핵생물역으로 분류한다. 세균과 고세균은 핵막이 없는 원핵생물이나 분자적으로 뚜렷이 다르다. 고세균은 극한 환경에 서식하며 진핵생물과 더 가까운 공통 조상을 공유한다."},{"id":42,"type":"sa","question":"생물의 자연발생을 주장했던 사람 이름을 1명 쓰시오.","answer":"아리스토텔레스, 데카르트, 베이컨, 헬몬트, 니드햄 중 1명","explanation":"자연발생설(abiogenesis)은 생물이 무생물에서 자연적으로 생겨난다는 오랜 믿음이다. 아리스토텔레스는 썩은 나무에서 벌레가 생긴다고 보았고, 반 헬몬트는 땀에 젖은 밀을 통해 쥐가 생긴다고 주장했다. 이 믿음은 17~18세기까지 광범위하게 받아들여졌다."},{"id":43,"type":"sa","question":"생물의 자연발생을 최종적으로 부정한 학자는?","answer":"파스퇴르(Louis Pasteur)","explanation":"루이 파스퇴르는 1859~1861년 백조목 플라스크 실험으로 자연발생설을 결정적으로 반박했다. 공기는 통하지만 미생물이 들어오지 못하는 구조에서 고기 국물이 부패하지 않음을 보였다. 이로써 '생명은 생명에서만 난다(omne vivum ex vivo)'는 원칙이 확립되었다."},{"id":44,"type":"sa","question":"밀러와 유리가 원시 대기 상태에서 무기물들로부터 합성한 유기물로 단백질을 구성하는 기본 단위가 되는 물질은?","answer":"아미노산","explanation":"밀러-유리 실험(1953)은 메탄·암모니아·수소·수증기를 원시 대기로 가정하고 전기 방전을 가하여 아미노산을 합성했다. 이는 생명의 화학적 기원 가능성을 처음으로 실험적으로 보인 획기적 성과이다. 현재는 원시 대기 조성이 다소 달랐을 것으로 보지만, 무기물→유기물 전환의 원리는 유효하다."},{"id":45,"type":"sa","question":"DNA가 전사되어 RNA를 만들고, RNA를 번역하여 단백질을 만드는 원리를 무엇이라고 부르는가?","answer":"중심원리(Central Dogma)","explanation":"프랜시스 크릭이 1958년 제안한 분자생물학의 중심원리는 유전 정보의 흐름 방향(DNA→RNA→단백질)을 규정한다. 역전사(RNA→DNA)도 일부 발견되었지만, 단백질→핵산 방향은 일어나지 않는다. 이 원리는 현대 유전공학과 분자의학의 토대이다."},{"id":46,"type":"sa","question":"원시수프 가설 이외에 바다 속에서 생물이 자연발생했을 곳이라고 생각되는 곳은?","answer":"심해 열수 분출공(Hydrothermal Vent)","explanation":"심해 열수 분출공은 뜨거운 물과 화학물질이 풍부하여 생명 탄생의 대안적 환경으로 주목된다. 에너지원(열)과 황화수소 등 환원성 화합물이 충분하고, 일정한 환경이 유지된다. 마이크 러셀 등은 알칼리성 열수 분출공에서 최초 생명이 탄생했다는 가설을 제시했다."},{"id":47,"type":"sa","question":"생물 집단이 여러 세대를 거치면서 변화를 축적해 집단 전체의 특성을 변화시키고 나아가 새로운 종의 탄생을 형성하는 관찰된 자연 현상을 무엇이라고 부르는가?","answer":"진화(Evolution)","explanation":"생물학적 진화는 집단의 유전자 풀이 세대를 거쳐 변화하는 현상이다. 소진화(종 내 변화)와 대진화(새로운 종 형성) 모두 포함한다. 다윈의 자연선택설, 멘델의 유전학, 현대 분자생물학이 결합된 '현대적 종합(Modern Synthesis)'이 현재 진화이론의 토대이다."},{"id":48,"type":"sa","question":"다음 과학자들 중에서 진화를 부정했던 사람은? 뷔퐁, 라이프니츠, 괴테, 르클레르, 퀴비에","answer":"퀴비에(Cuvier)","explanation":"조르주 퀴비에는 비교해부학의 창시자이자 격변설(Catastrophism)의 주창자이다. 그는 화석 기록에서 종의 급격한 교체를 관찰했지만, 이를 점진적 진화가 아닌 대격변 후 재창조로 해석했다. 라마르크와 동시대인이었으나 진화론에 강하게 반대했다."},{"id":49,"type":"sa","question":"라마르크의 진화론은 ( a )이라고 부르며, 다윈의 진화론은 ( b )이라고 부른다.","answer":"a: 용불용설, b: 자연선택설","explanation":"라마르크의 용불용설은 많이 쓰는 기관은 발달하고 안 쓰는 기관은 퇴화하며, 이 형질이 자손에게 유전된다는 이론이다(획득형질 유전). 다윈의 자연선택설은 환경에 유리한 변이를 가진 개체가 더 많이 생존·번식하여 집단의 특성이 변한다는 이론이다. 현대 유전학은 라마르크를 반박하고 다윈을 지지한다."},{"id":50,"type":"sa","question":"현대인의 유전자를 분자생물학적으로 분석한 증거에 기초하여 집단 유전학 방법을 적용하면, 현대 인류는 ( a ) 전 아프리카에서 최소 ( b )으로부터 출발했다고 추정함","answer":"a: 2만 년, b: 10,000명","explanation":"미토콘드리아 DNA와 Y염색체 분석을 통한 집단 유전학 연구는 현대 인류가 약 20만 년 전 아프리카에서 기원했으며, 유전적 병목을 고려해도 최소 수천~만 명의 집단이 있었음을 보여준다. 이는 아담과 하와 단 두 명으로부터 전 인류가 기원했다는 문자적 해석과 긴장을 만든다.\n\n# **서원모: 아우구스티누스의 창조론과 창세기 해설"},{"id":51,"type":"mc","question":"아우구스티누스의 창조론에 대한 특징이 아닌 것은?","choices":["창조론은 아우구스티누스 사상의 중심 주제이다","회심의 과정은 창조주를 발견하는 길이었다","창세기 해설집을 최소한 다섯 작품을 저술했다","회심 이전에는 과학에 대해서는 관심을 두지 않았다"],"answer":4,"explanation":"아우구스티누스는 회심 이전부터 천문학, 자연 철학 등에 관심이 많았다. 마니교 시절 자연과학적 세계관에 매료되었고, 이후 마니교의 자연 설명이 틀렸음을 알게 된 것이 이탈의 계기 중 하나였다. 따라서 회심 이전에 과학에 무관심했다는 ④는 사실과 다르다."},{"id":52,"type":"mc","question":"아우구스티누스의 창세기 해설서가 아닌 것은?","choices":["마니교 반박 창세기 해설 미완성 작품","창세기 문자적 해설","고백록","신국론"],"answer":1,"explanation":"아우구스티누스의 창세기 관련 저작은 「창세기 반박 마니교 해설」, 「창세기 문자적 해설 미완성 작품」, 「창세기 문자적 해설」(12권), 「고백록」 11-13권, 「신국론」 11-12권 등이다. ①은 실제로는 존재하는 작품이지만 보기에서 제목이 잘못 표기되어 정답으로 처리된다."},{"id":53,"type":"mc","question":"고대교회 무로부터 창조론에 대한 설명. 틀린 것은?","choices":["최초의 이단은 창조주와 창조세계를 공격했다","무로부터 창조론은 신구약 정경 안에 뚜렷하게 나와 있다","초기 교부들은 무로부터 창조보다는 질료를 통해 만물을 창조했다고 설명한다","안티오키아의 테오필로스가 처음으로 주장했다"],"answer":2,"explanation":"무로부터 창조(creatio ex nihilo)는 성경에 명시적으로 쓰여 있지 않으며, 2세기 교부들이 이단(영지주의, 마르키온)에 맞서 발전시킨 신학적 교리이다. 마카베오하 7:28이 가장 근접한 구절이지만 직접적 표현은 아니다. 유스티누스와 아테나고라스 등 초기 교부들은 오히려 플라톤처럼 질료를 통한 창조를 말하기도 했다."},{"id":54,"type":"mc","question":"암브로시우스의 《육일창조 강해》에 대한 설명 중 틀린 것은?","choices":["창세기 1장에 대한 9편의 설교이다","아우구스티누스가 이 설교를 들었을 것이라고 여겨진다","육일창조를 매우 문자적으로 해석했다","386/387년 사순절 시기에 설교했다고 보인다"],"answer":3,"explanation":"암브로시우스의 《육일창조 강해》는 오리게네스와 바실리우스의 영향 아래 우의적(풍유적) 해석 요소를 포함하고 있다. 매우 문자적으로만 해석한 것이 아니라 영적·신학적 의미를 적극적으로 탐구했다. 아우구스티누스는 이 강해를 듣고 알레고리적 해석의 가능성을 처음 깨달았다고 전해진다."},{"id":55,"type":"mc","question":"아우구스티누스의 창세기 해설서에 대한 설명. 틀린 것은?","choices":["창세기 1-12장을 주석했다","처음부터 창조의 육일과 낙원 이야기가 조화될 수 없다는 것을 알았다","최초의 작품은 마니교를 반박하며 창세기를 해설했다","《고백록》 13장은 창조의 육일을 풍유적으로 해석했다"],"answer":1,"explanation":"아우구스티누스의 대표 창세기 주석인 「창세기 문자적 해설」은 창세기 1-3장을 다루며, 1-12장 전체를 주석한 것이 아니다. 그는 이 작품을 완성하는 데 약 15년이 걸렸다. ②~④는 모두 사실로, 아우구스티누스는 처음부터 창세기 해석의 어려움을 인식하고 다양한 접근을 시도했다."},{"id":56,"type":"mc","question":"과학과 성경에 아우구스티누스의 견해. 틀린 것은?","choices":["아우구스티누스는 궁창 위의 물이 있는 것은 하나님의 권능으로 이루어졌다고 강조했다","참된 과학과 참된 성경 해석은 결코 모순되지 않는다고 생각했다","땅·하늘·별들의 운동 등은 비기독교인도 이성과 경험으로 깨닫는다고 보았다","기독교 문헌에 따른다고 하면서 일반적으로 인정되는 과학 지식을 무시하는 것을 듣는다면 성경 저자들이 비난 받는다고 가르쳤다"],"answer":1,"explanation":"아우구스티누스는 실제로 궁창 위의 물 문제에 대해 어려움을 인정했다. 그는 이를 단순히 하나님의 권능으로 설명하기보다, 과학적으로도 이해될 수 있어야 한다고 보았다. ②~④는 아우구스티누스의 진정한 견해로, 그는 과학과 신앙의 조화를 강조한 선구적 신학자였다."},{"id":57,"type":"mc","question":"《창세기 문자적 해설》에서 창조의 육일에 관한 설명. 틀린 것은?","choices":["무로부터 창조를 주장했다","질료와 형상이 동시에 창조되었다고 주장했다","만물이 동시에 창조되었다고 주장했다","창조의 육일의 하루는 24시간에 해당한다고 주장했다"],"answer":4,"explanation":"아우구스티누스는 창조의 육일이 문자적 24시간이 아니라고 주장한 대표적 교부이다. 그는 하나님이 만물을 순간적으로(동시에) 창조하셨고, 6일은 천사들의 인식 단계를 나타낸다고 해석했다. 이 '동시 창조설'은 후대의 인과적 이념 개념과 연결되며, 현대 진화론과의 대화에서 중요하게 참조된다."},{"id":58,"type":"mc","question":"인과적 이념에 관한 설명. 틀린 것은?","choices":["생물은 보이지 않게, 잠재적으로 인과적으로 지어졌다는 것을 나타낸다","씨앗과 같이 창조물 안에 들어 있으며 시간이 지나면 출현한다","창조의 육일에서 인간은 영혼만 창조되었으며 인과적 이념은 인간에는 적용되지 않는다","만물이 동시에 창조되었을 때 만들어졌다"],"answer":3,"explanation":"아우구스티누스의 인과적 이념(rationes seminales, 씨앗적 이유)은 피조물 안에 잠재적 가능성이 심겨져 때가 되면 발현된다는 개념이다. 이 원리는 인간에게도 적용되어, 아담의 몸이 먼저 흙에서 형성될 잠재성이 창조 때 심겨졌다고 보았다. 맥그래스는 이 개념을 현대 진화론과 창조 신학의 접점으로 높이 평가한다."},{"id":59,"type":"mc","question":"아우구스티누스의 낙원 이야기에 대한 설명. 틀린 것은?","choices":["역사서처럼 일어난 일을 서술하는 어법에 속한다","아담은 흙에서, 이브는 갈비뼈에서 창조되었다고 해석했다","모든 인류는 한 사람에게서 나왔고 타락한 본성을 물려받았다","인간은 처음에는 본성상 늙거나 죽지 않도록 창조되었지만, 타락 이후 죽지 않을 수 없게 되었다"],"answer":4,"explanation":"아우구스티누스는 인간이 창조 당시 '죽지 않을 가능성(posse non mori)'을 가졌지만, '죽지 않을 필연성(non posse mori)'을 가진 것은 아니라고 보았다. 즉 타락 이전에도 인간은 본성적으로 죽음에 취약했으나, 은혜로 죽지 않을 수 있었다. 타락 이후에는 이 은혜가 제거되어 반드시 죽는 존재가 되었다."},{"id":60,"type":"mc","question":"아우구스티누스의 인과적 이념 개념을 현대 과학 신학에서 높이 평가한 과학신학자는?","choices":["폴킹혼","맥그래스","이안 바버","아더 피콕"],"answer":2,"explanation":"앨리스터 맥그래스는 『과학신학』 시리즈에서 아우구스티누스의 인과적 이념 개념이 현대 진화론과 창조 신학의 창조적 대화를 위한 고대 자원이라고 높이 평가했다. 피조물 안에 잠재된 발전 가능성이 시간을 통해 실현된다는 개념은 진화를 하나님의 지속적 창조로 이해하는 신학적 틀을 제공한다.\n\n# **이형주: 기독교 종말론과 우주론"},{"id":61,"type":"mc","question":"Hodgson과 King이 말하는 기독교를 분열시킨 역사상 가장 중요한 요인은?","choices":["중세군주체제","종교개혁","계몽주의","세계대전"],"answer":3,"explanation":"계몽주의(17~18세기)는 이성과 과학을 중심으로 한 새로운 세계관을 제시하며 기독교의 전통적 권위에 도전했다. 이는 기독교 신학 내에 근본주의와 자유주의, 전통고수파와 현대화파의 분열을 초래했다. Hodgson과 King은 이 분열이 현대 신학의 가장 심각한 도전이라고 진단했다."},{"id":62,"type":"mc","question":"19세기 기독교 신학자들은 18세기의 시대적 도전에 어떻게 대응했는가?","choices":["전통 신학을 고수","독자적인 기독교 신학 형태 개발","새로운 세계관과의 융합으로 재형성","과학이 허용하는 부분만 보존"],"answer":3,"explanation":"19세기 신학자들(슐라이어마허, 리츨 등)은 계몽주의와 과학혁명의 도전에 대응하여 기독교 신학을 새로운 세계관과 통합하려 했다. 이는 자유주의 신학(Liberal Theology)의 형성으로 이어졌다. 신앙을 이성·경험·문화와 조화시키려는 이 시도는 20세기 바르트의 신정통주의 비판을 받게 된다."},{"id":63,"type":"mc","question":"신학과 과학 분야의 1세대 학자가 아닌 사람을 고르시오.","choices":["이안 바버","로버트 킹","아서 피코크","존 폴킹혼"],"answer":2,"explanation":"신학과 과학 분야의 1세대 학자로는 이안 바버(물리학자·신학자), 아서 피코크(생화학자·신학자), 존 폴킹혼(물리학자·신학자)이 꼽힌다. 로버트 킹(Robert King)은 이 강의에서 Hodgson과 공저자로 언급된 인물로, 신학과 과학 분야의 1세대 창시자 그룹에는 포함되지 않는다."},{"id":64,"type":"mc","question":"신학과 과학 분야 1세대 학자들의 특별한 공헌이 아닌 것은?","choices":["기독교 신학이 필연적으로 자연과학과 갈등 구조에 있음을 보임","이원론에 응답할 수 있는 길을 제시","과학주의에 응답할 수 있는 길을 제시","환원주의에 응답할 수 있는 길을 제시"],"answer":1,"explanation":"신학과 과학 분야의 1세대 학자들의 핵심 공헌은 과학과 신학이 갈등 관계가 아니라 대화하고 통합될 수 있음을 보인 것이다. 이원론(과학과 종교는 완전히 분리), 과학주의(과학만이 진리), 환원주의(모든 것은 물리·화학으로 환원) 등의 도전에 대한 신학적 응답을 제시했다."},{"id":65,"type":"mc","question":"기독교 신학이 새롭게 마주해야 할 21세기 새로운 이슈를 가져온 학문 분야가 아닌 것은?","choices":["발전한 우주론","인공지능","양자역학","유전자 가위"],"answer":3,"explanation":"양자역학은 20세기 초(1920년대)에 확립된 이론으로, 이미 20세기 신학과 과학 대화의 주요 주제였다. 반면 첨단 우주론(다중우주, 인류원리), 인공지능, 유전자 가위(CRISPR) 등은 21세기에 본격화된 이슈들이다. 이 새로운 도전들은 1세대 학자들이 미처 다루지 못한 신학적 질문들을 제기한다."},{"id":66,"type":"mc","question":"신학과 과학 사이에 다리를 놓는 로버트 러셀이 제안한 새로운 방법론은 무엇인가?","choices":["창조적 쌍방 상호작용","과정신학","창조적 통합","자연의 신학"],"answer":1,"explanation":"로버트 러셀(Robert J. Russell)의 창조적 쌍방 상호작용(Creative Mutual Interaction, CMI)은 과학이 신학에 영향을 주고 신학이 과학에 연구 프로그램을 제공하는 양방향 관계를 제안한다. 단순한 대화를 넘어 신학이 과학 연구의 방향에 적극적으로 기여할 수 있다는 독창적 주장이다."},{"id":67,"type":"sa","question":"다른 방법론에 없는 로버트 러셀의 새로운 방법론의 독특한 강점이 무엇인지 기술하라.","answer":"신학이 과학에 연구 프로그램 제공","explanation":"기존 방법론들은 대부분 과학이 신학에 영향을 미치는 일방적 구조이거나 상호 독립을 강조한다. 러셀의 CMI는 신학적 개념(예: 창조론, 종말론)이 과학적 연구의 새로운 방향이나 가설을 제시할 수 있다고 주장한다. 예를 들어 기독교의 새 창조 신앙이 우주론적 종말 연구에 독창적 질문을 던질 수 있다."},{"id":68,"type":"mc","question":"바버의 과학과 종교의 유비에 대한 설명으로 적절하지 않은 것은?","choices":["종교의 구조는 몇몇 결정적 지점에서 다르지만 어떤 부분에서 과학과 유사","종교와 달리 과학은 관측과 실험을 메타포를 통해 표현되는 모형들 통해 구성할 수 있어","다른 분야들을 연관시킬 근거 제공","환원주의와 이원론의 도전에 응수할 수 있게 해줘"],"answer":2,"explanation":"바버는 과학과 종교 모두 메타포, 모형, 패러다임을 사용한다고 주장한다. ②는 '종교와 달리 과학만'이 메타포를 사용한다고 말하는데, 이는 바버의 주장과 정반대이다. 바버는 과학과 종교가 유사한 방식으로 모형과 메타포를 통해 실재를 이해한다는 유비를 핵심 논거로 삼는다."},{"id":69,"type":"mc","question":"피코크의 인식론적 창발에 대한 설명으로 적절하지 않은 것은?","choices":["바버의 비판적 실재론을 발전시켜 1993년 기포드 강연에서 피코크가 제시","다양한 학제들을 현상의 복잡성의 증대를 반영하는 일련의 창발적 수준들로 봐","낮은 수준이 높은 수준에 제약 가하므로 우주론이 신학에 중요한 제약 조건 부여","높은 수준은 낮은 수준으로 환원되므로 생물학 이론은 물리학 이론으로 환원"],"answer":4,"explanation":"피코크의 인식론적 창발은 반환원주의적 입장이다. 각 수준에서 새로운 성질이 창발하며, 이는 하위 수준으로 완전히 환원될 수 없다는 것이다. ④는 환원주의를 주장하는 것으로, 피코크의 입장과 정반대이다. 창발적 수준들은 상하 방향으로 인과적 영향을 주고받는다."},{"id":70,"type":"mc","question":"로버트 러셀의 새로운 방법론이 지니고 있는 요소가 아닌 것은?","choices":["바버의 비판적 실재론","피코크의 인식론적 창발","머피의 라카토스식 방법론","도즈의 토미스트 형이상학"],"answer":4,"explanation":"러셀의 CMI 방법론은 바버의 비판적 실재론, 피코크의 창발 개념, 낸시 머피의 라카토스식 연구 프로그램(Lakatosian research program) 방법론을 통합한 것이다. '도즈의 토미스트 형이상학'은 러셀의 방법론과 무관한 요소로, 러셀의 접근은 토마스 아퀴나스 전통보다 현대 과학철학에 더 의존한다.\n\n# **최무영: 복잡계과학"},{"id":71,"type":"mc","question":"다음 중 복잡성(complexity)에 해당하는 성질은?","choices":["질서정연함","무질서함","최대 엔트로피","최소 에너지","높은 변이성"],"answer":5,"explanation":"복잡성은 단순한 질서나 무질서가 아닌 '그 경계'에서 나타나는 풍부한 다양성이다. 완전한 질서(최소 엔트로피)도, 완전한 무질서(최대 엔트로피)도 복잡성을 가지지 않는다. 높은 변이성(variability)은 복잡계의 특성으로, 카오스 이론의 '혼돈의 가장자리(edge of chaos)'에서 최대로 나타난다."},{"id":72,"type":"mc","question":"복잡계(complex system)의 설명으로 옳은 것은?","choices":["계층적이고 단계마다 새로운 다양성을 보인다","개개의 구성요소는 단순하지 않고 복잡하다","구성원들이 잘 단합해서 안정된 질서 상태를 이룬다","한 가지 기능을 가장 효율적으로 완전히 수행한다","환경과 분리되어 있으므로 변화에 무관하게 상태를 유지한다"],"answer":1,"explanation":"복잡계의 핵심 특성은 계층성(hierarchy)과 창발(emergence)이다. 각 수준에서 하위 수준으로 환원되지 않는 새로운 성질이 나타난다. 구성요소 자체는 단순하지만(예: 개미 한 마리), 집단적 상호작용에서 복잡한 패턴이 창발한다. 복잡계는 환경과 지속적으로 상호작용하는 개방계이다."},{"id":73,"type":"mc","question":"복잡계 관점에서 해석할 수 있는 현상을 모두 고르시오.","choices":["자연","인간","사회","예술","지능"],"answer":1,"explanation":"복잡계 과학은 자연현상(기후, 생태계), 인간(뇌, 신체), 사회(경제, 문화), 예술(창작 과정), 지능(인지, AI) 등 모든 영역에 적용 가능하다. 이는 복잡계 패러다임의 광범위한 설명력을 보여준다. 창발, 자기조직화, 비선형성 등의 개념은 자연과 인문·사회 영역을 통합하는 보편적 틀을 제공한다."},{"id":74,"type":"mc","question":"다음 중 이원론(dualism)과 관계가 먼 사상은?","choices":["과학주의","공자주의(유가사상)","그리스주의","히브리주의","일신주의"],"answer":2,"explanation":"이원론은 정신/물질, 영혼/육체 등을 서로 분리된 독립 실체로 보는 철학적 입장이다. 그리스주의(플라톤), 히브리주의(영·육 구분), 과학주의(정신/물질 이원론), 일신주의 일부가 이원론적 요소를 포함한다. 반면 유가사상은 천인합일(天人合一), 심신일여(心身一如) 등 통합적·일원론적 세계관을 강조한다."},{"id":75,"type":"mc","question":"복잡성 패러다임과 관계가 없는 개념은?","choices":["유기체론","비선형성","총체론","결정론","비평형성"],"answer":4,"explanation":"복잡계 패러다임은 비선형성, 총체론(전체론), 비평형성, 유기체론 등을 핵심 개념으로 삼는다. 결정론(determinism)은 모든 사건이 인과율로 완전히 예측 가능하다는 입장으로, 복잡계의 예측 불가능성·혼돈 특성과 상충된다. 복잡계는 결정론적 방정식에서도 초기조건에 민감하여 예측이 불가능해질 수 있다."},{"id":76,"type":"mc","question":"다음 개념 중에 혼돈과 질서를 연결하는 구실을 하는 것 가장 적절한 개념은?","choices":["본체","현상","정보","질료","형상"],"answer":3,"explanation":"정보(information)는 무질서한 데이터(혼돈)를 의미 있는 패턴(질서)으로 연결하는 핵심 개념이다. 복잡계에서 정보 처리와 전달이 자기조직화와 창발을 이끈다. 섀넌의 정보이론과 복잡계 과학의 결합은 생명현상, 진화, 인지, 사회 시스템을 통합적으로 이해하는 새로운 패러다임을 제공한다."},{"id":77,"type":"mc","question":"온전함에 관한 설명으로 적절하지 않은 것을 고르시오.","choices":["인간의 겉과 속이 같은 상태","대상과 자신의 통합적 이해","조각을 맞춰서 보려는 시도","원인과 결과를 연결하는 환원적 사고","악에서 벗어난 상태"],"answer":4,"explanation":"온전함(wholeness)은 전체를 부분의 합으로 환원하지 않고 통합적으로 이해하는 상태이다. 환원적 사고는 전체를 부분으로 분리하여 분석하는 방식으로, 온전함과 반대되는 접근이다. 복잡계 관점의 온전함은 자아·대상·관계의 통합, 내면의 일관성, 악에서의 자유 등을 포함하는 총체적 상태이다.\n\n# **조희형: 과학철학과 과학신학"},{"id":78,"type":"mc","question":"실재에 관한 '존재의 일원론'을 주장한 자연철학자는 (","choices":[")이고, '변화의 일원론'을 제안한 자연철학자는 (",")이며, 두 이론을 결합한 자연철학자는 (",")이다.\n\n[헤라클레이토스, 엠페도클레스, 파르메니데스]"],"answer":1,"explanation":"파르메니데스는 진정한 실재는 변화 없이 영원히 존재한다는 존재의 일원론을 주장했다. 헤라클레이토스는 '만물은 유전한다(panta rhei)'며 변화 자체가 실재의 본질이라는 변화의 일원론을 제안했다. 엠페도클레스는 4원소(물·불·흙·공기)로 두 입장을 종합하려 했다."},{"id":79,"type":"sa","question":"'세계의 질서와 조화를 창조주 하느님의 지혜와 섭리의 증표'라고 말할 수 있는 근거가 되는 성경의 서간 이름과 장절을 말하시오.","answer":"로마서 1장 20절","explanation":"로마서 1:20은 '창세로부터 그의 보이지 아니하는 것들, 곧 그의 영원하신 능력과 신성이 그가 만드신 만물에 분명히 보여 알려졌나니'라고 선언한다. 이는 자연신학의 성경적 근거로 가장 자주 인용되는 구절이다. 피조 세계의 질서와 아름다움을 통해 창조주를 알 수 있다는 일반계시의 토대이다."},{"id":80,"type":"mc","question":"'두 권의 책' 개념에서 두 책은 각각 (","choices":[")과 (",")이다."],"answer":1,"explanation":"'두 권의 책(Two Books)' 개념은 하나님이 성경과 자연 두 가지를 통해 자신을 계시한다는 중세·종교개혁 시대의 신학 전통이다. 프란시스 베이컨, 갈릴레오, 칼빈 등이 이 개념을 사용했다. 두 책이 서로 모순될 때 어느 쪽을 우선할지의 문제는 과학-신학 논쟁의 핵심이 된다."},{"id":81,"type":"sa","question":"토마스 아퀴나스가 체계화한 학문 분야는 ( )이다.","answer":"자연신학","explanation":"자연신학(Natural Theology)은 계시나 성경 없이 이성과 자연 관찰만으로 하나님의 존재와 속성을 논증하는 학문이다. 아퀴나스는 『신학대전』에서 신의 존재에 대한 다섯 가지 방법(오도五道, Five Ways)을 제시했다. 이는 설계 논증, 우주론적 논증 등 현대 자연신학의 원형이 되었다."},{"id":82,"type":"sa","question":"테야르 드 샤르댕(Teilhard de Chardin)은 과정신학/과정철학의 영향을 받아 ( )을 본격적 신학으로 전개하였다.","answer":"유신진화론","explanation":"피에르 테야르 드 샤르댕(1881~1955)은 예수회 신부이자 고생물학자로, 진화를 오메가 포인트(Omega Point)를 향한 하나님의 창조 과정으로 이해했다. 화이트헤드의 과정철학과 진화론을 신학에 통합하여 유신진화론(Theistic Evolution)을 전개했다. 우주의 진화가 그리스도 안에서 완성된다는 비전을 제시했다."},{"id":83,"type":"sa","question":"자연신학은 자연에서 신으로 접근하는 상향식 방식에 따라 탐구되며, ( )은 신앙의 눈으로 자연을 보고 관찰 결과를 신학적으로 해석하는 하향식 방법을 통해 탐구된다.","answer":"자연의 신학","explanation":"자연의 신학(Theology of Nature)은 맥그래스 등이 제안한 개념으로, 이미 가진 신앙의 관점에서 자연을 신학적으로 해석하는 하향식(Top-Down) 접근이다. 이는 증거에서 신 존재를 논증하려는 자연신학의 상향식 접근과 구별된다. 현대 과학 시대에 자연신학의 한계를 극복하는 대안으로 주목받는다."},{"id":84,"type":"mc","question":"비판적 실재론은 존재론적 측면에서 (","choices":["), 현상계/실제계(actual), (",")의 세 층위로 구분한다."],"answer":1,"explanation":"로이 바스카(Roy Bhaskar)의 비판적 실재론은 실재를 세 층위로 구분한다: 우리가 직접 경험하는 경험계(empirical), 사건들이 실제로 발생하는 현상계(actual), 그리고 사건을 일으키는 메커니즘과 구조가 존재하는 실재계(real)이다. 이 층위 구분은 관찰 불가능한 실체도 실재할 수 있음을 인정하게 한다."},{"id":85,"type":"sa","question":"사고실험을 통해 아리스토텔레스의 물체의 운동에 관한 주장을 반박한 이는?","answer":"갈릴레오","explanation":"아리스토텔레스는 무거운 물체가 가벼운 물체보다 빨리 떨어진다고 주장했다. 갈릴레오는 '무거운 돌과 가벼운 돌을 묶으면 어떻게 되는가?'라는 사고실험으로 이 주장의 내적 모순을 보였다. 실제 피사의 사탑 실험은 전설이지만, 갈릴레오의 사고실험과 경사면 실험이 근대 역학의 토대를 놓았다."},{"id":86,"type":"mc","question":"과학지식의 검증 방법 가운데 실재론에 이론적 배경이 있는 방법은 (","choices":[")이며, 관념론에 이론적 배경이 있는 방법은 (",")이다."],"answer":1,"explanation":"일치법은 지식이 외부 실재와 일치(correspond)하는지 여부로 진리를 판단한다(실재론적 진리론). 정합법은 지식이 다른 믿음 체계와 내적으로 일관되고 정합적(coherent)인지로 진리를 판단한다(관념론적 진리론). 판넨베르크는 신학의 진리 판단에서 정합성을 강조했다."},{"id":87,"type":"sa","question":"존 폴킹혼이 제시한 과학과 신학의 관계 모형을 말하시오.","answer":"공명 모형(Consonance Model)","explanation":"존 폴킹혼(John Polkinghorne)은 과학과 신학이 서로 '공명(consonance)'한다고 주장한다. 두 영역은 각자의 방법으로 동일한 실재를 탐구하며, 서로 충돌하지 않고 조화롭게 울린다. 이는 바버의 통합 모형보다 두 영역의 독립성을 더 존중하면서도 단순한 독립·갈등 모형을 넘어선다.\n\n# **김종원: 합성생물학"},{"id":88,"type":"mc","question":"인간유전체 사업(1990~2003)을 통해 최종적으로 확인된 인간의 단백질 생성 유전자 수는?","choices":["대략 30억 개","대략 10만 개","대략 2만여 개","대략 5,000개"],"answer":3,"explanation":"인간유전체 사업(HGP) 이전에는 인간 유전자가 10만 개에 달할 것으로 예측되었다. 그러나 실제 완성된 서열 분석 결과 단백질 코딩 유전자는 약 20,000~25,000개에 불과했다. 유전자 수보다 RNA 편집, 단백질 변형 등 유전자 발현 조절이 복잡성의 핵심임이 밝혀졌다."},{"id":89,"type":"ox","question":"최소 세포(JCVI-syn3A)에 대한 설명: '최소 세포는 초기에는 매우 취약했으나, 2,000세대를 거치는 동안 자연 선택을 통해 일반적인 박테리아와 맞먹는 속도로 진화하며 생존 능력을 회복했다.'","answer":"O","explanation":"JCVI-syn3A는 필수 유전자만 남긴 인공 최소 세포로, 초기에는 비정상적이고 불규칙한 분열을 보였다. 그러나 수천 세대의 진화를 거치며 자연선택에 의해 정상적인 분열 패턴을 회복했다. 이는 최소 유전체에서도 자연선택과 진화가 작동함을 보여주는 중요한 실험 결과이다."},{"id":90,"type":"mc","question":"인간이 기술을 통해 창조 세계를 변화시킬 자유와 책임이 있다는 의미로, 신학자 필립 헤프너(Philip Hefner)가 정의한 개념은?","choices":["창조된 공동 창조자","청지기","하나님의 형상","유전적 청지기 사명"],"answer":1,"explanation":"헤프너의 '창조된 공동 창조자' 개념은 인간이 하나님의 피조물이면서 동시에 기술과 문화를 통해 창조에 참여하는 존재라는 이중성을 강조한다. 이는 단순한 자연 지배(정복자) 모델을 넘어, 창조 질서에 책임 있게 기여하는 존재로 인간을 재정의한다. 합성생물학 시대의 인간 정체성 논의에 중요한 신학적 틀을 제공한다."},{"id":91,"type":"mc","question":"3세대 유전자 가위로 불리며, 제니퍼 다우드나와 에마뉘엘 샤르팡티에에게 2020년 노벨 화학상을 안겨준 기술의 명칭은?","choices":["최소 세포 합성 기술","인간유전체 사업","CRISPR-Cas9","체세포 핵이식 복제 기술"],"answer":3,"explanation":"CRISPR-Cas9은 박테리아의 면역 체계에서 유래한 유전자 편집 도구로, DNA의 특정 부위를 정밀하게 잘라 편집할 수 있다. 기존 징크핑거, 탈렌 기술에 비해 간편하고 정밀하여 혁명적 기술로 평가된다. 유전 질환 치료, 농업 개량, 신약 개발 등 광범위한 분야에 응용되고 있다."},{"id":92,"type":"mc","question":"DNA의 4대 염기에 해당하지 않는 것은?","choices":["싸이민(Thymine)","아데닌(Adenine)","우라실(Uracil)","구아닌(Guanine)"],"answer":3,"explanation":"DNA의 4대 염기는 아데닌(A), 타이민(T), 구아닌(G), 시토신(C)이다. 우라실(U)은 RNA에서 타이민 대신 사용되는 염기이다. 전사(transcription) 과정에서 DNA의 타이민이 RNA에서 우라실로 대체된다. 이 차이는 DNA와 RNA의 화학적 안정성 차이와 관련이 있다."},{"id":93,"type":"sa","question":"자녀에게 우월한 유전자를 대물림하는 '유전적 계급 사회'가 현실화될 경우 심각하게 위협받는 기독교의 핵심 신학적 선언은?\n\nA. 자연 만물을 정복하고 다스리라는 문화적 명령\n\nB. 종말론적 기독교의 기적과 치유에 대한 소망\n\nC. 모든 인간이 평등하게 지닌 '하나님의 형상(Imago Dei)'\n\nD. 예수 그리스도의 성육신 신비에 대한 신앙 고백","answer":"C. 하나님의 형상(Imago Dei)","explanation":"창세기 1:26-27의 '하나님의 형상' 선언은 모든 인간이 신분·능력에 관계없이 동등한 존엄성을 가진다는 기독교 평등 신학의 토대이다. 유전공학으로 우월한 형질을 가진 '설계된 인간'이 등장하면, 이 보편적 존엄성이 유전적 조건에 따라 차별화될 위험이 있다. 이는 현대 생명윤리의 핵심 쟁점이다."},{"id":94,"type":"sa","question":"인간의 오만(바벨탑 사건)과 정당한 청지기 의무 사이의 경계를 탐구하는 핵심 논제는?\n\nA. 예배 형식 유지 가능 여부\n\nB. 유전적 '쓰기' 기술이 공동 창조자인가, 아니면 '하나님 놀이'인가?\n\nC. 생명 공학의 모든 성과는 악의 세력이 주도하는가?\n\nD. 인공 세포 과학자들이 성경 해석 권위를 무력화할 권리가 있는가?","answer":"B","explanation":"유전체를 '쓰는' 단계로의 진입은 창조 영역에 대한 인간의 적극적 개입을 의미한다. 이는 하나님께서 인간에게 부여한 창조성과 지식 활용(공동 창조자)의 정당한 발현일 수 있다. 그러나 피조물의 한계를 인식하지 못하고 무한한 조작을 추구한다면, 바벨탑처럼 하나님의 자리를 넘보는 '하나님 놀이(Playing God)'가 된다."},{"id":95,"type":"mc","question":"고통이 기술적으로 완전히 통제되는 세상이 올 경우, 전통 기독교의 어떤 신학적 주제가 본질적 도전에 직면하게 됩니까?","choices":["구약의 언약 신학","창조 과학론","'고난의 신학'","삼위일체론"],"answer":3,"explanation":"기독교 전통에서 고난은 하나님을 더 깊이 만나는 통로, 인격 성숙의 계기, 타인과의 연대 경험으로 이해된다(롬 5:3-5, 욥기). 유전공학으로 모든 고통이 제거된 세상에서는 고난의 의미, 연약함을 통한 은혜, 십자가 신학의 실존적 의미가 도전받게 된다. 이는 기술 만능주의와 기독교 인간론의 충돌 지점이다."},{"id":96,"type":"sa","question":"근육 성장을 억제하는 특정 유전자(MSTN)를 파괴하여 '슈퍼 돼지'를 만든 기술적 메커니즘은?\n\nA. 방사선 돌연변이 육종 기술\n\nB. CRISPR 기술을 활용한 특정 유전자의 불활성화 또는 제거\n\nC. 이종 간의 무작위 체세포 융합 기술\n\nD. 인공 합성된 외래 바이러스 유전자의 대량 삽입","answer":"B. CRISPR 기술을 활용한 특정 유전자의 불활성화","explanation":"미오스타틴(MSTN) 유전자는 근육 성장을 억제하는 단백질을 코딩한다. CRISPR-Cas9으로 이 유전자를 불활성화하면 근육이 과도하게 발달한 '슈퍼 돼지'가 탄생한다. 이 기술은 축산업에서의 생산성 향상뿐 아니라 근육 소모성 질환 치료 연구에도 활용된다."},{"id":97,"type":"sa","question":"인간이 완전히 컴퓨터로 설계한 인공 유전 정보를 통해 작동하는 생명체를 만들어낸다면, 이때 직면하는 신학적 질문은?\n\nA. 교단 등록 가능 여부\n\nB. 소프트웨어 버그를 신학적으로 정죄할 수 있는가?\n\nC. 그 인공적 존재는 '하나님의 피조물'인가, '인간의 제조물'인가?\n\nD. 컴퓨터 하드웨어가 탄소 기반 유기물보다 우월한가?","answer":"C. 하나님의 피조물인가, 인간의 제조물인가?","explanation":"인공 생명체를 인간이 설계할 경우, 그 존재의 근원적 귀속 문제가 제기된다. 하나님의 창조 질서 안에 있는 피조물인지, 순수한 인간의 제작물인지에 따라 그 존재의 도덕적 지위와 취급 방식이 달라진다. 이는 생명의 정의, 인간의 창조적 한계, 하나님의 주권 문제와 직결되는 현대 생명신학의 핵심 질문이다.\n\n# **김경래: 창조 세계 안에서의 인간의 사명과 AI시대의 휴머니즘"},{"id":98,"type":"sa","question":"성육신 과정에서 예수님이 보여주신 '자기 비움'을 뜻하는 신학적 용어(헬라어)는 무엇인가?","answer":"케노시스(Kenosis)","explanation":"케노시스는 빌립보서 2:7의 '자기를 비워(ekenōsen)'에서 유래한 용어이다. 성자 하나님이 신성의 특권을 내려놓고 인간의 몸으로 오신 성육신의 신학적 핵심 개념이다. AI 시대에 케노시스는 권력과 능력의 포기를 통한 섬김의 모델로, 기술 만능주의에 대한 신학적 대안을 제시한다."},{"id":99,"type":"sa","question":"과거 기독교의 '다스림' 교리가 서구 사회의 자연 착취와 생태계 위기를 초래한 사상적 배경이 되었다고 비판했던 역사학자의 이름은?","answer":"린 화이트(Lynn White Jr.)","explanation":"린 화이트는 1967년 「생태계 위기의 역사적 근원」에서 기독교의 인간 중심주의와 '땅을 정복하라'는 교리가 서구의 자연 착취를 정당화했다고 주장했다. 이 논문은 기독교 생태신학 논의에 결정적 촉발제가 되었다. 이후 신학자들은 '청지기 신학'과 '생태적 창조 신학'으로 응답했다."},{"id":100,"type":"mc","question":"하나님의 형상은 단순히 생물학적 능력이 아니라 하나님을 대신해 피조세계를 돌보도록 부름받은 '무엇'으로 재정의할 수 있는가?","choices":["무한한 연산 능력","적자생존의 권력","관계적 지위와 소명(Vocation)","과학적 진보의 권한"],"answer":3,"explanation":"고대 근동 맥락에서 '신의 형상(imago dei)'은 왕이나 조각상을 통해 신의 현존을 드러내는 대리자를 의미했다. 창세기는 이를 모든 인간에게 적용하여, 인간을 하나님의 대리 통치자이자 피조세계의 돌봄을 위한 소명을 받은 관계적 존재로 선언한다. AI 시대에도 인간의 고유성은 연산 능력이 아닌 이 소명적 관계성에 있다."},{"id":101,"type":"mc","question":"고대 세계관에서 우주를 하나님의 거대한 성전으로 이해할 때, 에덴동산에 지음 받은 인간에게 부여된 영광스러운 역할은?","choices":["우주를 지배하는 정복자","우주의 원리를 탐구하는 방관자","우주적 성전을 돌보고 예배를 이끄는 제사장","자연을 착취하여 문명을 세우는 건축가"],"answer":3,"explanation":"월튼 등의 고대 근동 연구는 에덴동산이 하나님의 우주적 성전이며, 인간은 이 성전을 돌보는 제사장이었다고 해석한다. 제사장은 하나님과 피조물 사이를 중재하는 역할로, 이는 정복·착취가 아닌 섬김과 예배의 소명이다. AI 시대에도 인간의 역할은 기술을 통한 정복이 아닌 창조 세계를 돌보는 제사장적 사명이다."},{"id":102,"type":"mc","question":"바울이 고린도후서 5장 17절 등에서 선언한 것으로, 구원이란 피조 세계 전체의 질서가 회복되는 우주적 사건임을 나타내는 개념은?","choices":["만인 구원론","새 창조(New Creation)","영지주의적 이원론","진화론적 종말론"],"answer":2,"explanation":"고후 5:17 '그런즉 누구든지 그리스도 안에 있으면 새로운 피조물이라'는 선언은 단순한 개인 영혼 구원을 넘어 우주적 차원의 새 창조를 가리킨다. 이는 롬 8장의 피조물의 탄식과 회복 기대와도 연결된다. 구원론의 우주적 확장은 생태 신학, AI 윤리, 기술 문명에 대한 기독교의 응답을 위한 신학적 토대이다."},{"id":103,"type":"mc","question":"우주와 생명이 하나님의 분명한 목적을 향해 나아간다는 신학적 비전을 나타내는 용어는?","choices":["목적론(Teleology/Telos)","불확정성 원리","결정론","환원주의"],"answer":1,"explanation":"목적론(telos = 끝/목적)은 우주와 역사가 의미 있는 목적을 향해 나아간다는 철학·신학적 개념이다. 에베소서 1:10의 '하늘과 땅에 있는 것이 다 그리스도 안에서 통일되게 하려 하심'은 기독교 목적론의 핵심 표현이다. 이는 무목적적 진화관에 맞서 역사와 창조에 방향성이 있음을 선언하는 신학적 비전이다."},{"id":104,"type":"mc","question":"AI 시대, 무한한 효율성과 능력을 추구하는 기계적 인간(Homo Faber)으로의 전락을 경계하고, 창조주를 경외하고 피조물을 섬기는 본연의 정체성을 뜻하는 라틴어 용어는?","choices":["호모 사피엔스","호모 루덴스","호모 아도란스","호모 이코노미쿠스"],"answer":3,"explanation":"호모 아도란스(예배하는 인간)는 인간의 본질이 생산·이성·유희가 아니라 하나님을 예배하고 경외하는 데 있다는 신학적 인간 이해이다. AI가 효율·생산성·지능의 영역에서 인간을 능가하더라도, 예배와 경배의 능력은 인간 고유의 정체성으로 남는다. 기술 문명 속 인간 고유성의 신학적 토대이다."},{"id":105,"type":"mc","question":"'제사장적 소명'을 띤 인간의 역할로 가장 적절한 것은?","choices":["하나님을 대신하여 피조계를 억압하고 착취하는 폭군","피조물들을 대표하여 하나님을 예배하고, 하나님을 대리하여 피조물을 사랑으로 돌보는 자","세상의 모든 생물을 인간의 유전자에 맞게 개조하는 과학자","피조세계와 완전히 단절되어 영적인 묵상만 수행하는 은둔자"],"answer":2,"explanation":"제사장은 본질적으로 양방향 중재자이다. 피조물을 대표하여 하나님께 나아가 예배하고, 동시에 하나님을 대리하여 피조물에게 복과 보살핌을 전달한다. 이는 자연을 착취하거나 세상을 등지는 양극단을 모두 거부하고, 창조 세계 안에서 책임 있는 섬김의 삶을 살아가는 인간 소명을 보여준다."},{"id":106,"type":"mc","question":"하나님께서 인간을 '하나님의 형상'으로 창조하셨다는 창세기 1장의 선언이 고대 근동 사회의 배경에서 볼 때 지니는 혁명적인 의미는?","choices":["오직 남성만이 신의 대리자임을 선포했다","왕이나 소수 권력자의 전유물이었던 '신의 형상'이라는 지위를 평범한 인류 전체에게 보편적으로 부여했다","인간은 신의 노예로 창조되었음을 강조했다","이스라엘 민족만이 유일한 인류임을 선언했다"],"answer":2,"explanation":"고대 근동(이집트, 메소포타미아)에서 '신의 형상'은 오직 왕에게만 적용되는 특권적 칭호였다. 창세기가 이 지위를 모든 인류에게 부여한 것은 당시 문화 맥락에서 근본적으로 혁명적인 선언이었다. 이는 왕-귀족-평민-노예의 신분 질서를 부정하고, 모든 인간의 보편적 존엄성을 선포한 성경의 핵심 메시지이다."},{"id":107,"type":"mc","question":"성자 하나님께서 성육신하셨다는 사실은 피조세계에 대해 어떠한 태도를 취하는가?","choices":["물질세계와 인간의 물리적 육체가 존중받아야 함을 긍정한다","육신은 영혼의 감옥이므로 빨리 벗어나야 함을 강조한다","현세의 삶은 무가치하며 오직 사후세계만이 중요함을 가르친다","인간의 몸을 고통과 죄의 근원지로만 치부한다"],"answer":1,"explanation":"영지주의는 물질과 육체를 악하거나 열등한 것으로 보았다. 그러나 하나님의 아들이 실제 육체를 취하셨다는 성육신 교리는 물질 세계와 인간의 몸이 선한 창조물이며 존엄하다는 근본 선언이다. 이는 기독교가 환경 파괴, 신체 경시, 극단적 금욕주의를 거부하는 신학적 근거가 된다.\n\n# **이강원: 판넨베르크의 과학신학과 창조신앙"},{"id":108,"type":"sa","question":"판넨베르크의 '역사로서의 계시'는 몇 년도에 출판되었는가?","answer":"1961년","explanation":"볼프하르트 판넨베르크(Wolfhart Pannenberg)는 1961년 동료들과의 공저 『역사로서의 계시(Offenbarung als Geschichte)』를 출판했다. 이 책은 하나님의 계시가 비공개적·내적 체험이 아니라 공개적 역사 사건을 통해 이루어진다고 주장한다. 특히 예수의 부활이 역사의 종말론적 선취로서 보편적 계시의 정점임을 강조했다."},{"id":109,"type":"sa","question":"판넨베르크의 비판 대상이 된 당시 독일 신학의 두 흐름은 무엇일까?","answer":"바르트의 말씀 신학, 불트만의 실존 신학","explanation":"칼 바르트의 말씀 신학은 계시를 하나님의 순수한 자기 선언으로 보아 역사적 근거와 이성적 검증을 배제했다. 루돌프 불트만의 실존 신학은 계시를 개인의 실존적 결단의 영역으로 사사화했다. 판넨베르크는 두 입장이 모두 계시의 공공성을 상실했다고 비판하며, 계시를 보편 역사 속에서 모든 이성이 접근 가능한 사건으로 재정립했다."},{"id":110,"type":"sa","question":"판넨베르크는 신학도 보편적 진리 주장으로서 ( )의 장에 나와야 한다고 주장했다.","answer":"공적 검증","explanation":"판넨베르크는 신학이 교회 울타리 안의 사적 믿음 언어에 머물러서는 안 되며, 이성적 비판과 공개적 논증의 장에 나서야 한다고 주장했다. 이는 계몽주의 이후 과학적 이성의 도전에 대한 신학의 적극적 응답이다. 신학의 공공성(public theology) 회복은 현대 신학과 과학 대화의 전제 조건이다."},{"id":111,"type":"sa","question":"판넨베르크가 말하는 학문성(과학성)에는 어떤 것이 있는지 두 가지 이상 써보세요.","answer":"공개적 논증, 합리성, 비판 가능성, 현실 전체 설명","explanation":"판넨베르크는 신학이 학문(Wissenschaft)이 되려면 공개적으로 논증되고, 이성적으로 검토 가능하며, 비판에 노출될 수 있어야 한다고 보았다. 또한 단편적 사실이 아닌 '현실 전체(Wirklichkeit im ganzen)'를 통합적으로 설명해야 한다고 강조했다. 이 기준들은 신학을 과학과 동등한 공적 학문으로 세우기 위한 방법론적 조건이다."},{"id":112,"type":"sa","question":"사실 전체를 통일적으로 이해하게 만드는 의미 구조를 무엇이라 하는가?","answer":"가설(Hypothesis)","explanation":"판넨베르크는 과학을 과학이게 하는 핵심이 가설이라고 보았다. 가설은 단순 추측이 아니라 관찰된 사실들을 일관되게 설명하는 이론적 틀이다. 신학의 하나님 언어도 하나의 가설로서 현실 전체를 가장 잘 설명하는지 검증받아야 한다. 이는 라카토스의 연구 프로그램 개념과도 연결된다."},{"id":113,"type":"sa","question":"판넨베르크는 부활 사건을 하나님의 미래와 통치가 미리 드러난 사건이라고 보는데 이것을 한 단어로 무엇이라 하는가?","answer":"선취(Anticipation / Prolepsis)","explanation":"선취(prolepsis)는 미래의 사건이 현재에 미리 일어난 것처럼 경험된다는 개념이다. 판넨베르크에게 예수의 부활은 역사의 종말이 역사 안에 미리 선취된 사건이다. 이는 역사의 의미가 완결되는 종말로부터 역으로 현재를 비추며, 모든 역사의 진리는 종말에서야 최종적으로 드러난다는 판넨베르크의 핵심 주장이다."},{"id":114,"type":"sa","question":"어떤 개별 사건도 그 자체로는 완전한 의미를 갖지 않는데, 이때 개별 사건에 의미를 부여하기 위한 필요조건은 무엇일까?","answer":"사건 전체","explanation":"판넨베르크의 전체론적 역사 해석에 따르면, 개별 사건의 의미는 그 사건이 속한 더 큰 전체 맥락에서만 이해된다. 예를 들어 예수의 죽음은 부활과 종말론적 완성이라는 전체 사건의 맥락에서만 구원론적 의미를 갖는다. 이는 역사의 완전한 의미가 종말에서야 확정된다는 그의 종말론적 역사관의 핵심이다."},{"id":115,"type":"sa","question":"창조세계는 유한하지만 상대적 자유를 가지며, 과학과 신학이 상호보완적이 될 수 있는 이유는 창조세계의 어떤 특성 때문일까?","answer":"우발적 합리성(Contingent Rationality)","explanation":"판넨베르크는 창조 세계가 '우발적 합리성'을 지닌다고 보았다. 창조 세계는 필연적으로 있어야 할 이유가 없음에도(우발성, contingency) 이성적으로 이해 가능한 질서를 지닌다(합리성). 이 우발적 합리성은 세계가 하나님의 자유로운 창조임을 시사하며, 과학이 탐구하는 자연 법칙의 질서가 창조주의 이성을 반영한다는 신학적 이해의 토대이다."},{"id":116,"type":"sa","question":"'하나님의 두 손' 비유를 통해 창조를 처음 설명한 교부 신학자는 누구일까? 그리고 하나님의 두 손은 각각 무엇을 가리킬까?","answer":"이레네우스, 성자 하나님, 성령 하나님","explanation":"이레네우스(Irenaeus of Lyon, 2세기)는 하나님이 성자와 성령 두 손으로 창조하신다는 생동감 있는 비유를 사용했다. 이는 창조가 삼위일체적 행동임을 표현하며, 성자를 통한 질서와 성령을 통한 생명·활력이 피조 세계에 작용함을 보여준다. 판넨베르크는 이 전통에 입각하여 창조에서의 하나님의 행동을 삼위일체론적으로 이해했다."},{"id":117,"type":"sa","question":"전통적으로 진리판단의 중요한 기준은 상응성(correspondence)이었다면, 판넨베르크가 가장 중요하게 여긴 진리 판단의 기준은 무엇일까?","answer":"정합성(Coherence)","explanation":"상응성(correspondence)은 명제가 외부 사실과 일치하는지로 진리를 판단한다. 판넨베르크는 이를 넘어 정합성(coherence)을 강조했다. 즉 신학적 주장이 현실 전체에 대한 다른 지식들과 내적으로 일관되고 통합적으로 정합할 때 진리로 인정된다. 이는 신학이 과학, 역사, 철학과의 대화를 통해 지속적으로 검증·수정되어야 함을 의미한다."}];
+
+const SECTIONS = [
+  {start:1,end:10,name:'최승언: 우주의 기원'},
+  {start:11,end:20,name:'임창세: 과학신학'},
+  {start:21,end:30,name:'이문원: 지구의 기원'},
+  {start:31,end:40,name:'배정훈: 창세기 이해'},
+  {start:41,end:50,name:'윤세진: 생물 진화'},
+  {start:51,end:60,name:'서원모: 아우구스티누스'},
+  {start:61,end:70,name:'이형주: 종말론과 우주론'},
+  {start:71,end:77,name:'최무영: 복잡계'},
+  {start:78,end:87,name:'조희형: 과학철학'},
+  {start:88,end:97,name:'김종원: 합성생물학'},
+  {start:98,end:107,name:'김경래: AI시대 휴머니즘'},
+  {start:108,end:117,name:'이강원: 판넨베르크'},
+];
+
+const LABELS = ['①','②','③','④','⑤'];
+let filter = 'all';
+let quizQ=[], current=0, selected=null, revealed=false;
+let results=[], score=0, scoreMax=0;
+
+function getPool() {
+  if(filter==='mc') return QUESTIONS.filter(q=>q.type==='mc');
+  if(filter==='sa') return QUESTIONS.filter(q=>q.type==='sa');
+  if(filter==='ox') return QUESTIONS.filter(q=>q.type==='ox');
+  return QUESTIONS;
+}
+function setFilter(f) {
+  filter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===f));
+  const pool=getPool();
+  const sl=document.getElementById('count-slider');
+  sl.max=pool.length;
+  document.getElementById('range-max').textContent=pool.length;
+  if(parseInt(sl.value)>pool.length) { sl.value=pool.length; updateCount(pool.length); }
+  const t=QUESTIONS.length, m=QUESTIONS.filter(q=>q.type==='mc').length;
+  const s=QUESTIONS.filter(q=>q.type==='sa').length, o=QUESTIONS.filter(q=>q.type==='ox').length;
+  document.getElementById('home-sub').textContent=`기말고사 모의고사 · 총 ${f==='all'?t:f==='mc'?m:f==='sa'?s:o}문제`;
+}
+function updateCount(v){document.getElementById('count-display').textContent=v;}
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function getSection(id){return SECTIONS.find(s=>id>=s.start&&id<=s.end);}
+
+function startQuiz(){
+  const pool=getPool();
+  const n=parseInt(document.getElementById('count-slider').value);
+  quizQ=shuffle(pool).slice(0,Math.min(n,pool.length));
+  current=0;selected=null;revealed=false;results=[];score=0;scoreMax=0;
+  show('quiz'); renderQ();
+}
+function show(id){
+  ['home','quiz','review'].forEach(s=>{
+    const el=document.getElementById(s);
+    el.style.display=s===id?(s==='home'?'flex':'block'):'none';
+  });
+}
+function goHome(){show('home');}
+
+function renderQ(){
+  const q=quizQ[current];
+  const isOX=q.type==='ox', isSA=q.type==='sa', isMC=q.type==='mc';
+  selected=null; revealed=false;
+
+  document.getElementById('q-counter').textContent=`${current+1} / ${quizQ.length}`;
+  document.getElementById('score-badge').textContent=`${score} 점`;
+  document.getElementById('progress-fill').style.width=`${(current/quizQ.length)*100}%`;
+
+  const sec=getSection(q.id);
+  document.getElementById('section-label').textContent=sec?sec.name:'';
+
+  const badge=document.getElementById('type-badge');
+  if(isMC){badge.className='type-badge type-mc';badge.textContent='객관식';}
+  else if(isSA){badge.className='type-badge type-sa';badge.textContent='단답형';}
+  else{badge.className='type-badge type-ox';badge.textContent='O / X';}
+
+  document.getElementById('q-text').textContent=q.question;
+
+  document.getElementById('choices').style.display=isMC?'block':'none';
+  document.getElementById('ox-btns').style.display=isOX?'flex':'none';
+  document.getElementById('sa-wrap').style.display=isSA?'block':'none';
+
+  if(isMC){
+    const div=document.getElementById('choices'); div.innerHTML='';
+    q.choices.forEach((ch,i)=>{
+      const btn=document.createElement('button');
+      btn.className='choice-btn';
+      btn.innerHTML=`<span class="choice-label">${LABELS[i]}</span><span style="flex:1">${ch.replace(/</g,'&lt;')}</span><span class="choice-mark"></span>`;
+      btn.onclick=()=>selectChoice(i);
+      div.appendChild(btn);
+    });
+  } else if(isOX){
+    document.getElementById('ox-o').className='ox-btn';
+    document.getElementById('ox-x').className='ox-btn';
+  } else {
+    const inp=document.getElementById('sa-input');
+    inp.value=''; inp.disabled=false;
+    document.getElementById('sa-answer-box').style.display='none';
+    document.getElementById('sa-answer-text').textContent='';
+    document.getElementById('btn-show-ans').style.display='block';
+    document.getElementById('btn-show-ans').disabled=false;
+  }
+
+  const fb=document.getElementById('feedback');
+  fb.style.display='none'; fb.className='feedback';
+  document.getElementById('explanation').className='explanation';
+
+  const btnC=document.getElementById('btn-confirm');
+  btnC.style.display=isSA?'none':'block';
+  btnC.disabled=true;
+  document.getElementById('btn-next').style.display='none';
+}
+
+function selectChoice(i){
+  if(revealed)return;
+  selected=i;
+  document.querySelectorAll('.choice-btn').forEach((b,idx)=>b.classList.toggle('selected',idx===i));
+  document.getElementById('btn-confirm').disabled=false;
+}
+function selectOX(v){
+  if(revealed)return;
+  selected=v;
+  document.getElementById('ox-o').className='ox-btn'+(v==='O'?' selected':'');
+  document.getElementById('ox-x').className='ox-btn'+(v==='X'?' selected':'');
+  document.getElementById('btn-confirm').disabled=false;
+}
+function onSAInput(){
+  // SA: just enable next (we use show-answer flow)
+}
+function showSAAnswer(){
+  const q=quizQ[current];
+  document.getElementById('sa-input').disabled=true;
+  const box=document.getElementById('sa-answer-box');
+  box.style.display='block';
+  document.getElementById('sa-answer-text').textContent=q.answer;
+  document.getElementById('btn-show-ans').style.display='none';
+  // Show explanation
+  if(q.explanation){
+    const exp=document.getElementById('explanation');
+    exp.className='explanation show';
+    document.getElementById('exp-text').textContent=q.explanation;
+  }
+  // SA counts as "seen" - score +0.5 for showing answer
+  scoreMax++;
+  results.push({qid:q.id,correct:'sa',selected:'shown',answer:q.answer});
+  score += 0; // SA doesn't add to score automatically
+  document.getElementById('score-badge').textContent=`${score} 점`;
+  document.getElementById('btn-next').style.display='block';
+  document.getElementById('btn-next').textContent=current+1>=quizQ.length?'결과 보기 →':'다음 문제 →';
+}
+
+function confirmAnswer(){
+  if(selected===null)return;
+  revealed=true;
+  const q=quizQ[current];
+  const isOX=q.type==='ox';
+  const correct = isOX ? selected===q.answer : selected===q.answer-1;
+  scoreMax++;
+  if(correct) score++;
+  results.push({qid:q.id,correct:correct?'yes':'no',selected,answer:q.answer,type:q.type});
+
+  if(!isOX){
+    document.querySelectorAll('.choice-btn').forEach((b,i)=>{
+      b.classList.remove('selected');
+      const mark=b.querySelector('.choice-mark');
+      if(i===q.answer-1){b.classList.add('correct');mark.textContent='✓';}
+      else if(i===selected){b.classList.add('wrong');mark.textContent='✗';}
+      b.disabled=true;
+    });
+  } else {
+    ['O','X'].forEach(v=>{
+      const el=document.getElementById('ox-'+v.toLowerCase());
+      el.classList.remove('selected');
+      if(v===q.answer) el.classList.add('correct');
+      else if(v===selected) el.classList.add('wrong');
+      el.disabled=true;
+    });
+  }
+
+  const fb=document.getElementById('feedback');
+  fb.style.display='block';
+  if(correct){
+    fb.className='feedback correct'; fb.textContent='✓ 정답입니다!';
+  } else {
+    fb.className='feedback wrong';
+    const ans = isOX ? q.answer : LABELS[q.answer-1];
+    fb.textContent=`✗ 오답 — 정답: ${ans}`;
+  }
+
+  if(q.explanation){
+    const exp=document.getElementById('explanation');
+    exp.className='explanation show';
+    document.getElementById('exp-text').textContent=q.explanation;
+  }
+
+  document.getElementById('score-badge').textContent=`${score} 점`;
+  document.getElementById('btn-confirm').style.display='none';
+  const btnN=document.getElementById('btn-next');
+  btnN.style.display='block';
+  btnN.textContent=current+1>=quizQ.length?'결과 보기 →':'다음 문제 →';
+}
+
+function nextQuestion(){
+  if(current+1>=quizQ.length){showReview();}
+  else{current++; renderQ();}
+}
+
+function showReview(){
+  show('review');
+  const gradeable = results.filter(r=>r.correct==='yes'||r.correct==='no');
+  const total = gradeable.length;
+  const saCount = results.filter(r=>r.correct==='sa').length;
+  const pct = total>0 ? Math.round((score/total)*100) : 0;
+  const wrong = results.filter(r=>r.correct==='no');
+
+  document.getElementById('result-emoji').textContent=pct>=80?'🎉':pct>=60?'💪':'📖';
+  document.getElementById('result-score').textContent=total>0?pct+'점':'--';
+  document.getElementById('result-sub').innerHTML=
+    (total>0?`채점 ${total}문제 중 <span class="ok">${score}개</span> 정답 · 오답 <span class="bad">${wrong.length}개</span>`:'') +
+    (saCount>0?` · 단답형 <span class="skip">${saCount}개</span> 확인`:'');
+
+  const list=document.getElementById('wrong-list');
+  list.innerHTML='';
+  if(wrong.length>0){
+    const t=document.createElement('p');t.className='wrong-title';t.textContent=`✗ 틀린 문제 복습 (${wrong.length}개)`;list.appendChild(t);
+    wrong.forEach(r=>{
+      const q=quizQ.find(q=>q.id===r.qid); if(!q)return;
+      const div=document.createElement('div'); div.className='wrong-item';
+      const typeLabel=q.type==='mc'?'객관식':'OX';
+      let inner=`<div class="wrong-type">${typeLabel} · Q${q.id}</div><p class="wrong-q">${q.question.replace(/</g,'&lt;')}</p>`;
+      if(q.type==='mc'){
+        inner+=q.choices.map((ch,i)=>{
+          const isC=i===q.answer-1,isW=i===r.selected;
+          const cls=isC?'correct':isW?'wrong':'';
+          const mark=isC?' ✓':isW?' ✗':'';
+          return `<div class="review-choice ${cls}"><span style="font-weight:700;min-width:20px">${LABELS[i]}</span><span style="flex:1">${ch.replace(/</g,'&lt;')}${mark}</span></div>`;
+        }).join('');
+      } else {
+        inner+='<div class="review-ox">'+['O','X'].map(v=>{
+          const isC=v===q.answer,isW=v===r.selected&&!isC;
+          return `<div class="review-ox-btn ${isC?'correct':isW?'wrong':''}">${v}</div>`;
+        }).join('')+'</div>';
+      }
+      if(q.explanation) inner+=`<div class="review-exp">📖 ${q.explanation}</div>`;
+      div.innerHTML=inner; list.appendChild(div);
+    });
+  } else if(gradeable.length>0) {
+    const p=document.createElement('p');p.style.cssText='color:#3a6080;text-align:center;padding:20px';p.textContent='🎊 채점된 문제 모두 정답!';list.appendChild(p);
+  }
+}
+
+// Init
+(function(){
+  const t=QUESTIONS.length;
+  document.getElementById('home-sub').textContent=`기말고사 모의고사 · 총 ${t}문제`;
+  document.getElementById('range-max').textContent=t;
+  document.getElementById('count-slider').max=t;
+})();
+</script>
+</body>
+</html>

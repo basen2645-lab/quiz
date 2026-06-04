@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>조직신학개론 모의고사</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1c1428 0%, #2a1f3d 50%, #1a0e2e 100%);
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+    color: #e2e8f0;
+  }
+  .wrap { max-width: 620px; margin: 0 auto; padding: 20px; }
+
+  #home { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; padding:24px; }
+  .home-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px; padding: 44px 36px;
+    max-width: 500px; width: 100%; text-align: center;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+  }
+  .home-icon { font-size: 48px; margin-bottom: 12px; }
+  .home-title { color: #d4b8ff; font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+  .home-sub { color: #7a6a9a; font-size: 13px; margin-bottom: 28px; }
+
+  .filter-row { display:flex; gap:7px; margin-bottom:16px; justify-content:center; flex-wrap:wrap; }
+  .filter-btn {
+    padding: 7px 13px; border-radius: 18px; font-size: 12px;
+    cursor: pointer; transition: all 0.2s; font-family: inherit;
+    border: 2px solid rgba(255,255,255,0.1);
+    background: transparent; color: #6a5a8a;
+  }
+  .filter-btn.active { border-color: #d4b8ff; background: rgba(212,184,255,0.1); color: #d4b8ff; }
+
+  .set-row { display:flex; gap:6px; margin-bottom:20px; justify-content:center; flex-wrap:wrap; }
+  .set-btn {
+    padding: 5px 11px; border-radius: 14px; font-size: 11px;
+    cursor: pointer; transition: all 0.2s; font-family: inherit;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: transparent; color: #5a4a7a;
+  }
+  .set-btn.active { border-color: rgba(212,184,255,0.5); background: rgba(212,184,255,0.1); color: #c4a8ef; }
+
+  .count-wrap { margin-bottom: 24px; }
+  .count-label { color: #8a7aaa; font-size: 13px; display:block; margin-bottom:10px; }
+  .count-val { color: #d4b8ff; font-weight: 700; }
+  input[type=range] { width:100%; accent-color: #d4b8ff; }
+  .range-mm { display:flex; justify-content:space-between; color:#3a2a5a; font-size:11px; margin-top:4px; }
+
+  .btn-start {
+    width:100%; padding:16px;
+    background: linear-gradient(135deg, #6b3fa0, #9b6de0);
+    color: #fff; border: none; border-radius: 14px;
+    font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit;
+    box-shadow: 0 4px 20px rgba(107,63,160,0.4);
+    transition: transform 0.1s;
+  }
+  .btn-start:active { transform: scale(0.98); }
+
+  #quiz { display:none; }
+  .quiz-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+  .btn-back { background:transparent; border:none; color:#6a5a8a; cursor:pointer; font-size:20px; padding:4px 8px; }
+  .q-counter { color:#8a7aaa; font-size:13px; }
+  .score-badge {
+    background: rgba(212,184,255,0.1); color:#d4b8ff;
+    padding:4px 12px; border-radius:12px; font-size:12px;
+    border: 1px solid rgba(212,184,255,0.2);
+  }
+  .progress-bar { height:3px; background:rgba(255,255,255,0.07); border-radius:2px; margin-bottom:18px; overflow:hidden; }
+  .progress-fill { height:100%; background: linear-gradient(90deg,#6b3fa0,#9b6de0); border-radius:2px; transition:width 0.4s ease; }
+
+  .card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 18px; padding: 22px 20px; margin-bottom: 14px;
+  }
+  .set-label { font-size:11px; color:#3a2a5a; margin-bottom:4px; }
+  .type-badge {
+    display:inline-block; padding:3px 10px; border-radius:8px;
+    font-size:11px; font-weight:600; margin-bottom:8px;
+  }
+  .type-mc { background:rgba(155,109,224,0.18); color:#c4a8ef; }
+  .type-sa { background:rgba(134,239,172,0.18); color:#86efac; }
+  .q-text { color:#e2e8f0; font-size:14.5px; line-height:1.8; white-space:pre-wrap; }
+
+  .choices { margin-bottom:14px; }
+  .choice-btn {
+    width:100%; text-align:left; padding:12px 14px; border-radius:12px;
+    border: 1px solid rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.03);
+    color:#7a6a9a; cursor:pointer; margin-bottom:6px;
+    font-family:inherit; font-size:13.5px;
+    display:flex; align-items:flex-start; gap:10px;
+    line-height:1.65; transition:all 0.15s;
+  }
+  .choice-btn:hover:not([disabled]) { border-color:rgba(255,255,255,0.15); background:rgba(255,255,255,0.06); }
+  .choice-btn.selected { background:rgba(155,109,224,0.1); border-color:rgba(155,109,224,0.35); color:#d4b8ff; }
+  .choice-btn.correct { background:rgba(110,231,183,0.1); border-color:rgba(110,231,183,0.35); color:#6ee7b7; }
+  .choice-btn.wrong { background:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.35); color:#f87171; }
+  .choice-label { font-weight:700; min-width:22px; font-size:15px; flex-shrink:0; }
+  .choice-mark { margin-left:auto; padding-left:6px; flex-shrink:0; }
+
+  .sa-wrap { margin-bottom:14px; }
+  .sa-input {
+    width:100%; padding:12px 14px; border-radius:12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    color:#e2e8f0; font-family:inherit; font-size:14px;
+    margin-bottom:8px; outline:none; transition:border 0.2s;
+    resize:vertical; min-height:44px;
+  }
+  .sa-input:focus { border-color:rgba(134,239,172,0.4); }
+  .sa-answer-box {
+    padding:12px 14px; border-radius:12px;
+    background:rgba(110,231,183,0.08); border: 1px solid rgba(110,231,183,0.2);
+    color:#6ee7b7; font-size:13.5px; line-height:1.7; display:none;
+  }
+  .sa-answer-label { font-size:11px; color:#3a8060; margin-bottom:4px; font-weight:600; }
+  .btn-show-ans {
+    width:100%; padding:10px;
+    background:transparent; color:#3a6050;
+    border: 1px solid rgba(134,239,172,0.15);
+    border-radius:10px; font-size:13px; cursor:pointer;
+    font-family:inherit; margin-bottom:8px; transition:all 0.2s;
+  }
+  .btn-show-ans:hover { background:rgba(134,239,172,0.06); color:#6ee7b7; }
+
+  .explanation {
+    background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07);
+    border-radius:12px; padding:12px 14px; font-size:12.5px; color:#5a4a7a;
+    line-height:1.7; margin-bottom:12px; display:none;
+  }
+  .explanation.show { display:block; }
+  .exp-label { font-size:11px; color:#3a2a5a; margin-bottom:6px; font-weight:600; }
+
+  .feedback {
+    border-radius:12px; padding:12px 16px; margin-bottom:12px;
+    font-size:14px; font-weight:600; text-align:center; display:none;
+  }
+  .feedback.correct { background:rgba(110,231,183,0.07); border:1px solid rgba(110,231,183,0.25); color:#6ee7b7; }
+  .feedback.wrong { background:rgba(239,68,68,0.07); border:1px solid rgba(239,68,68,0.25); color:#f87171; }
+
+  .btn-confirm {
+    width:100%; padding:14px;
+    background: linear-gradient(135deg,#6b3fa0,#9b6de0);
+    color:#fff; border:none; border-radius:12px;
+    font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; transition:all 0.2s;
+  }
+  .btn-confirm:disabled { background:rgba(255,255,255,0.05); color:#2a1a4a; cursor:not-allowed; }
+  .btn-next {
+    width:100%; padding:14px;
+    background:rgba(20,10,40,0.8);
+    color:#9b6de0; border:1px solid rgba(155,109,224,0.2);
+    border-radius:12px; font-size:15px; font-weight:700;
+    cursor:pointer; font-family:inherit; display:none; margin-top:8px;
+  }
+
+  #review { display:none; }
+  .result-card {
+    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.09);
+    border-radius:20px; padding:32px 24px; text-align:center; margin-bottom:20px;
+  }
+  .result-emoji { font-size:48px; margin-bottom:8px; }
+  .result-score { color:#d4b8ff; font-size:46px; font-weight:800; margin-bottom:4px; }
+  .result-sub { color:#5a4a7a; font-size:14px; }
+  .result-sub .ok { color:#6ee7b7; }
+  .result-sub .bad { color:#f87171; }
+  .result-sub .skip { color:#d4b8ff; }
+
+  .wrong-title { color:#d4b8ff; font-size:14px; margin-bottom:12px; font-weight:600; }
+  .wrong-item {
+    background:rgba(239,68,68,0.05); border:1px solid rgba(239,68,68,0.18);
+    border-radius:14px; padding:16px; margin-bottom:10px;
+  }
+  .wrong-q { color:#cbd5e1; font-size:13px; margin-bottom:10px; line-height:1.65; white-space:pre-wrap; }
+  .wrong-set { font-size:11px; color:#4a3a6a; margin-bottom:4px; }
+  .review-choice {
+    padding:8px 12px; border-radius:9px; margin-bottom:4px;
+    font-size:12px; line-height:1.5;
+    display:flex; gap:8px; align-items:flex-start;
+    border:1px solid transparent; color:#3a2a5a;
+  }
+  .review-choice.correct { background:rgba(110,231,183,0.08); border-color:rgba(110,231,183,0.28); color:#6ee7b7; }
+  .review-choice.wrong { background:rgba(239,68,68,0.08); border-color:rgba(239,68,68,0.25); color:#f87171; }
+  .review-sa { padding:8px 12px; border-radius:9px; background:rgba(110,231,183,0.08); border:1px solid rgba(110,231,183,0.28); color:#6ee7b7; font-size:13px; line-height:1.6; }
+  .review-exp { font-size:11.5px; color:#3a2a5a; margin-top:8px; line-height:1.6; padding-top:8px; border-top:1px solid rgba(255,255,255,0.05); }
+  .btn-retry {
+    width:100%; padding:16px;
+    background:linear-gradient(135deg,#6b3fa0,#9b6de0);
+    color:#fff; border:none; border-radius:14px;
+    font-size:16px; font-weight:700; cursor:pointer; font-family:inherit; margin-top:16px;
+  }
+</style>
+</head>
+<body>
+
+<div id="home">
+  <div class="home-card">
+    <div class="home-icon">📘</div>
+    <h1 class="home-title">조직신학개론</h1>
+    <p class="home-sub" id="home-sub">중간고사 기출 해설 · 총 80문제</p>
+
+    <div class="set-row">
+      <button class="set-btn active" data-set="all" onclick="setSetFilter('all')">전체</button>
+      <button class="set-btn" data-set="기출01" onclick="setSetFilter('기출01')">기출01</button>
+      <button class="set-btn" data-set="기출02" onclick="setSetFilter('기출02')">기출02</button>
+      <button class="set-btn" data-set="2023년" onclick="setSetFilter('2023년')">2023</button>
+      <button class="set-btn" data-set="2022B" onclick="setSetFilter('2022B')">2022B</button>
+      <button class="set-btn" data-set="2022추가" onclick="setSetFilter('2022추가')">2022추가</button>
+    </div>
+
+    <div class="filter-row">
+      <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">전체</button>
+      <button class="filter-btn" data-filter="mc" onclick="setFilter('mc')">객관식</button>
+      <button class="filter-btn" data-filter="sa" onclick="setFilter('sa')">단답형</button>
+    </div>
+
+    <div class="count-wrap">
+      <span class="count-label">문제 수: <span class="count-val" id="count-display">20</span>문제</span>
+      <input type="range" id="count-slider" min="5" max="80" value="20" oninput="updateCount(this.value)">
+      <div class="range-mm"><span>5</span><span id="range-max">80</span></div>
+    </div>
+
+    <button class="btn-start" onclick="startQuiz()">시작하기</button>
+  </div>
+</div>
+
+<div id="quiz">
+  <div class="wrap">
+    <div class="quiz-header">
+      <button class="btn-back" onclick="goHome()">←</button>
+      <span class="q-counter" id="q-counter">1 / 20</span>
+      <span class="score-badge" id="score-badge">0 점</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+
+    <div class="card">
+      <div class="set-label" id="set-label"></div>
+      <span class="type-badge" id="type-badge">객관식</span>
+      <p class="q-text" id="q-text"></p>
+    </div>
+
+    <div class="choices" id="choices"></div>
+    <div class="sa-wrap" id="sa-wrap" style="display:none">
+      <textarea class="sa-input" id="sa-input" placeholder="답을 입력하세요..." rows="2"></textarea>
+      <button class="btn-show-ans" id="btn-show-ans" onclick="showSAAnswer()">📋 정답 확인하기</button>
+      <div class="sa-answer-box" id="sa-answer-box">
+        <div class="sa-answer-label">✅ 정답</div>
+        <div id="sa-answer-text"></div>
+      </div>
+    </div>
+
+    <div class="explanation" id="explanation">
+      <div class="exp-label">📖 풀이</div>
+      <div id="exp-text"></div>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+    <button class="btn-confirm" id="btn-confirm" disabled onclick="confirmAnswer()">정답 확인</button>
+    <button class="btn-next" id="btn-next" onclick="nextQuestion()">다음 문제 →</button>
+  </div>
+</div>
+
+<div id="review">
+  <div class="wrap">
+    <div class="result-card">
+      <div class="result-emoji" id="result-emoji">🎉</div>
+      <div class="result-score" id="result-score">--점</div>
+      <div class="result-sub" id="result-sub"></div>
+    </div>
+    <div id="wrong-list"></div>
+    <button class="btn-retry" onclick="goHome()">다시 풀기</button>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [{"id":1,"set":"기출01","type":"mc","question":"밀리오리에 따르면 다음 중 조직신학 과제의 4가지 중심질문이 아닌 것은?","choices":["진리성","변혁성","적실성","역사성"],"answer":4,"explanation":"밀리오리는 조직신학의 4가지 중심 과제를 진리성(truth), 적실성(relevance), 변혁성(transformation)/실천성, 온전성/적합성으로 제시한다. '역사성'은 해당 목록에 포함되지 않는다."},{"id":2,"set":"기출01","type":"mc","question":"다음 중 장 칼뱅(John Calvin)과 관련이 없는 것은?","choices":["성경은 안경","신지식과 인간지식의 상관관계","번쩍이는 문장","신성에 대한 감각"],"answer":3,"explanation":"'번쩍이는 문장'은 칼뱅이 아니라 아우구스티누스와 연관된 표현이다. 나머지는 모두 칼뱅의 개념이다."},{"id":3,"set":"기출01","type":"mc","question":"다음 중에서 서로 관련이 없는 것은? (이신론 관련)","choices":["이신론(deism)","만유재신론","부재지주 하나님","시계공 하나님"],"answer":2,"explanation":"이신론, 시계공 하나님, 부재지주 하나님은 창조 후 세계에 무관심한 하나님상이다. 만유재신론(panentheism)은 하나님 안에 세계가 포함되나 하나님은 세계를 초월한다는 입장으로, 이신론과 다른 신관이다."},{"id":4,"set":"기출01","type":"mc","question":"다음 중 잘못 연결된 것은?","choices":["삼위일체의 심리학적 유비 – 아우구스티누스","풍요롭게 소통하고자 하는 성향 – 조나단 에드워즈","『십자가에 달리신 하나님』 – 칼 바르트","인격체 사이의 소통으로서의 계시 – 바질 미첼"],"answer":3,"explanation":"『십자가에 달리신 하나님(The Crucified God)』은 위르겐 몰트만의 저서이다. 칼 바르트의 대표작은 『교회교의학(Church Dogmatics)』이다."},{"id":5,"set":"기출01","type":"mc","question":"다음 중 잘못 연결된 것은?","choices":["실천적 접근의 신학 – 구스타보 구티에레즈","절대의존의 감정 – 루돌프 오토","『나이트(Night)』 – 엘리 위젤","타자의 윤리 – 임마누엘 레비나스"],"answer":2,"explanation":"'절대의존의 감정'은 슐라이어마허의 개념이다. 루돌프 오토는 '누미노제(numinous)'를 강조했다."},{"id":6,"set":"기출01","type":"mc","question":"하나님에 의해 창조된 인간이 본래 가진 긍정적인 요소가 아닌 것은?","choices":["외심성","미래개방성","자기초월성","자아중심성"],"answer":4,"explanation":"밀리오리에 따르면 하나님의 형상으로 창조된 인간의 긍정적 특성에는 외심성, 미래개방성, 자기초월성이 포함된다. 자아중심성(egocentrism)은 타락 이후 죄의 결과로 나타나는 부정적 요소이다."},{"id":7,"set":"기출01","type":"mc","question":"밀리오리에 따르면, 성경의 권위를 주장하는 부적절한 입장이 아닌 것은?","choices":["성경문자주의(biblicism)","역사실증주의(historicism)","신앙공동체의 삶에 필수불가결성","종교적 고전으로서의 성경"],"answer":3,"explanation":"밀리오리는 성경문자주의, 역사실증주의, 종교적 고전으로만 보는 태도를 부적절한 입장으로 비판한다. 신앙공동체의 삶에 필수불가결한 규범으로서의 성경 이해는 밀리오리가 지지하는 적절한 입장이다."},{"id":8,"set":"기출01","type":"mc","question":"다음 중 의미가 다른 하나는?","choices":["아르케(arche)","만유(萬有)","판타(panta)","옴니아(omnia)"],"answer":1,"explanation":"만유, 판타(πάντα), 옴니아(omnia)는 모두 '모든 것(all things)'을 의미한다. 아르케(ἀρχή)는 '태초, 근원, 시작'을 의미하여 나머지와 다르다."},{"id":9,"set":"기출01","type":"mc","question":"다음 중 의미가 다른 하나는?","choices":["이마고(imago)","에이콘(eikon)","코이노니아(koinonia)","첼렘(zelem)"],"answer":3,"explanation":"이마고(imago), 에이콘(εἰκών), 첼렘(צֶלֶם)은 모두 '형상(image)'을 의미한다. 코이노니아(κοινωνία)는 '교제, 친교, 공동체'를 의미한다."},{"id":10,"set":"기출01","type":"mc","question":"성경 읽기에서의 올바른 해석과 관련된 것이 아닌 것은?","choices":["신앙의 규범","사랑의 규범","소망의 규범","자유의 규범"],"answer":4,"explanation":"밀리오리(아우구스티누스 전통)는 성경 해석의 기준으로 신앙의 규범(regula fidei), 사랑의 규범(regula caritatis), 소망의 규범(regula spei)을 제시한다. '자유의 규범'은 이 목록에 해당하지 않는다."},{"id":11,"set":"기출01","type":"sa","question":"다니엘 밀리오리는 '신학(theology)'을 무엇이라고 정의하는가? (한글과 영어로 쓰시오)","answer":"이해를 추구하는 신앙 / Faith seeking understanding (fides quaerens intellectum)","explanation":"밀리오리는 안셀무스의 표현 'fides quaerens intellectum'(이해를 추구하는 신앙)을 신학의 정의로 채택한다."},{"id":12,"set":"기출01","type":"sa","question":"아우구스티누스의 'Deus semper maior'는 무슨 뜻인가?","answer":"하나님은 항상 더 크시다(God is always greater)","explanation":"인간의 언어와 개념으로는 하나님을 완전히 파악할 수 없다는 하나님의 초월성과 불가해성을 강조하는 표현이다."},{"id":13,"set":"기출01","type":"sa","question":"신정론(theodicy)은 무엇이며 고전적 세 입장들은 무엇인가?","answer":"세상의 악과 고통 앞에서 하나님의 주권과 선하심을 긍정하는 신학적 문제. 세 입장: ①하나님의 불가해성 ②처벌/징계 ③교육/배양(soul-making, 존 히크)","explanation":"Theos(신)+dike(정의)의 합성어. 고전적 세 입장은 불가해성(욥기), 처벌/징계, 교육/배양이다."},{"id":14,"set":"기출01","type":"sa","question":"삼위일체신학에서 '페리코레시스(perichoresis)'는 무슨 뜻인가?","answer":"성부, 성자, 성령 삼위의 상호 침투, 상호내주(內住) 관계. 라틴어로는 circumincessio","explanation":"'둘러싸며 춤추다'는 의미로, 삼위가 서로 분리되지 않고 완전히 서로 안에 내재하며 공동체적 교제를 나눈다는 것을 표현한다."},{"id":15,"set":"기출01","type":"sa","question":"삼위일체론에서 전유(appropriation)의 규칙은 무엇인가?","answer":"삼위의 모든 외적 사역은 삼위가 공동으로 행하시나, 특정 사역을 특정 위격과 연관짓는 것이 허용된다는 규칙. 창조→성부, 구원→성자, 완성→성령 (예: 사도신경)","explanation":"각 위격만이 그 사역을 한다는 의미가 아니라, 삼위 모두 함께 행하시되 특정 위격이 그 사역을 더 잘 드러낸다는 교훈적 구분이다."},{"id":16,"set":"기출01","type":"sa","question":"밀리오리에게 '삼위일체신앙의 심층문법(depth grammar)'은 무엇인가? (한글과 영어로)","answer":"하나님은 자신을 내어주고, 타자를 긍정하며, 공동체를 세우는 사랑 / God is the self-giving, other-affirming, and community-forming love","explanation":"삼위일체 신학의 가장 깊은 문법이 '하나님은 사랑이시다'라는 고백에 있다고 본다."},{"id":17,"set":"기출01","type":"sa","question":"하나님의 감동성(passibility)은 무슨 의미인가?","answer":"하나님이 피조물의 고통과 고난에 영향을 받으시고, 함께 고통받으실 수 있다는 신학적 주장. 전통적 무감동성(impassibility)에 대한 현대 신학의 대안","explanation":"몰트만, 밀리오리 등 현대 신학자들이 강조한다. 하나님의 고통은 약함이 아니라 자유로운 사랑의 표현이다."},{"id":18,"set":"기출01","type":"sa","question":"성경읽기에서의 '신뢰의 해석학'과 '의심의 해석학'은 각각 무엇을 의미하는가?","answer":"신뢰의 해석학: 성경이 살아계신 하나님의 말씀을 전달하고 있음을 신뢰하며 읽는 태도. 의심의 해석학: 역사적·문화적 한계를 인정하고 비판적으로 분별하며 읽는 태도","explanation":"밀리오리는 두 해석학 모두 필요하다고 본다."},{"id":19,"set":"기출01","type":"sa","question":"'경륜적 삼위일체'와 '내재적 삼위일체'는 각각 무슨 의미인가?","answer":"경륜적 삼위일체: 역사 속 구원 사역에서 우리에게 나타나신 삼위일체(창조-성부, 구속-성자, 성화-성령). 내재적 삼위일체: 하나님 자신 안에서 영원히 존재하시는 삼위의 관계","explanation":"라너의 규칙: '경륜적 삼위일체가 내재적 삼위일체이며, 그 역도 성립한다'"},{"id":20,"set":"기출01","type":"sa","question":"이안 바버가 분류한 종교와 과학 사이의 4가지 관계 유형들은 무엇인가?","answer":"①갈등(Conflict) ②독립(Independence) ③대화(Dialogue) ④통합(Integration)","explanation":"이안 바버의 4가지 분류는 과학-신학 논의의 표준 틀로 널리 사용된다."},{"id":21,"set":"기출01","type":"sa","question":"밀리오리가 지적하는 생태계 위기의 근저에 있는 태도/관행 5가지는 무엇인가?","answer":"①인간중심주의 ②지배로서의 권력 ③상호연관성의 부인 ④자원이 무한하리라는 가정 ⑤고삐 풀린 소비주의","explanation":"생태계 위기는 단순한 기술 문제가 아니라 신학적·윤리적 태도의 문제이다."},{"id":22,"set":"기출01","type":"sa","question":"'하나님의 형상'이 파괴된 타락한 인간에게 드러나는 다른 피조물과의 이중적 관계는?","answer":"①지배와 노예근성: 무제한적 지배·착취 충동과 피조물에 굴복하는 노예근성. ②자기 존귀와 자기 파괴: 교만한 자기중심성과 역설적 자기파괴","explanation":"타락한 인간은 피조물과의 관계에서 극단적인 양방향 왜곡을 보인다."},{"id":23,"set":"기출01","type":"sa","question":"라인홀드 니버가 『도덕적 인간과 비도덕적 사회』에서 강조한 죄의 특성은 무엇인가?","answer":"개인은 도덕적으로 행동할 수 있으나, 집단(사회·국가·계층)은 개인보다 훨씬 더 이기적이고 비도덕적으로 행동한다. 죄는 개인적 차원을 넘어 공적·구조적 차원에서도 작동한다.","explanation":"사회정의는 개인의 도덕적 개선만으로는 이루어지지 않으며, 구조적·정치적 변혁이 필요하다."},{"id":24,"set":"기출01","type":"sa","question":"325년 제1차 니케아 공의회에서 결정한 '호모우시아(homoousia)'는 무슨 의미인가?","answer":"성자(예수 그리스도)는 성부 하나님과 '동일한 본질'을 가진다","explanation":"아리우스파의 호모이우시아(유사한 본질)를 이단으로 정죄하고 호모우시아(동일 본질)를 정통 교리로 확정했다."},{"id":25,"set":"기출01","type":"sa","question":"신학에서 '유비(analogy/analogia)'는 무슨 뜻인가?","answer":"차이점 속에 존재하는 어떤 유사성. 인간의 언어로 하나님에 대해 말할 때 완전히 동일하지도 않고 완전히 다르지도 않은 관계를 통해 하나님을 묘사하는 언어 방식","explanation":"아퀴나스의 '존재의 유비(analogia entis)'와 바르트의 '신앙의 유비(analogia fidei)'가 대표적이다."},{"id":26,"set":"기출02","type":"mc","question":"다음 중 신학방법론이 잘못 연결된 것은?","choices":["그리스도 중심적 신학 – 칼 바르트","실천적 접근의 신학 – 구스타보 구티에레즈","하나님의 말씀의 신학 – 위르겐 몰트만","상관관계방법의 신학 – 폴 틸리히"],"answer":3,"explanation":"'하나님의 말씀의 신학'은 칼 바르트의 방법론이다. 위르겐 몰트만은 '희망의 신학(Theology of Hope)'으로 알려져 있다."},{"id":27,"set":"기출02","type":"mc","question":"믿음의 3가지 요소가 아닌 것은?","choices":["지식(knowledge)","동의(assent)","규범(norm)","신뢰(trust)"],"answer":3,"explanation":"종교개혁 전통에서 믿음의 세 요소는 지식(notitia), 동의(assensus), 신뢰(fiducia)이다. '규범'은 믿음의 요소가 아니다."},{"id":28,"set":"기출02","type":"mc","question":"신학의 분야들 중 조직신학에 포함되지 않는 것은?","choices":["교의학(교리학)","설교학","변증학","구성신학"],"answer":2,"explanation":"설교학(homiletics)은 실천신학의 분야이다. 조직신학의 하위 분야에는 교의학, 변증학, 구성신학, 윤리학 등이 포함된다."},{"id":29,"set":"기출02","type":"mc","question":"코이노니아(koinonia) 관점에서 '하나님의 형상'에 해당되지 않는 것은?","choices":["자율성","관계성","공동체성","교제성"],"answer":1,"explanation":"코이노니아(교제/공동체) 관점에서 하나님의 형상은 관계성, 공동체성, 교제성으로 표현된다. 자율성은 독립적 자기결정을 강조하는 개념으로 관계적 공동체성과는 거리가 있다."},{"id":30,"set":"기출02","type":"mc","question":"'타자의 윤리'를 주장한 학자는 누구인가?","choices":["칼 바르트","마르틴 부버","장 칼뱅","임마누엘 레비나스"],"answer":4,"explanation":"임마누엘 레비나스는 '타자의 얼굴(face of the Other)'을 통해 윤리가 시작된다고 주장했다."},{"id":31,"set":"기출02","type":"mc","question":"다음 중 잘못 연결된 것은?","choices":["삼위일체의 심리학적 유비 - 아우구스티누스","풍요롭게 소통하고자 하는 성향 - 조나단 에드워즈","사회적 삼위일체(social Trinity) – 칼 바르트","인격체 사이의 소통으로서의 계시 - 바질 미첼"],"answer":3,"explanation":"사회적 삼위일체론은 위르겐 몰트만과 연관된다. 칼 바르트는 삼위일체를 '존재 방식(Seinsweise)'으로 설명하며 사회적 삼위일체론에 비판적이었다."},{"id":32,"set":"기출02","type":"mc","question":"전통적 신정론 3가지에 해당되지 않는 것은?","choices":["인격형성의 신정론","하나님의 불가해성","처벌/징계","교육/배양"],"answer":1,"explanation":"'인격형성의 신정론(soul-making theodicy)'은 존 히크의 현대적 신정론이다. 전통적 신정론 세 가지는 처벌/징계, 교육/배양, 하나님의 불가해성이다."},{"id":33,"set":"기출02","type":"mc","question":"'웨슬리 4변형'이 가리키는 신학의 네 자료들에 포함되지 않는 것은?","choices":["성서(성경)","이성","전통","자연"],"answer":4,"explanation":"웨슬리 4변형(Wesleyan Quadrilateral)은 성서(Scripture), 전통(Tradition), 이성(Reason), 경험(Experience)이다. '자연'은 포함되지 않는다."},{"id":34,"set":"기출02","type":"mc","question":"다음 중 정통 신학에서 인정하는 이론은 무엇인가?","choices":["종속론","양태론","전유의 규칙","삼신론"],"answer":3,"explanation":"종속론, 양태론, 삼신론은 모두 삼위일체론의 이단적 왜곡이다. 전유의 규칙(Rule of Appropriation)만이 정통 삼위일체 신학에서 인정된다."},{"id":35,"set":"기출02","type":"mc","question":"이안 바버가 분류한 4가지 관계 유형이 아닌 것은?","choices":["갈등","독립","융합","통합"],"answer":3,"explanation":"바버의 4가지 유형은 갈등(Conflict), 독립(Independence), 대화(Dialogue), 통합(Integration)이다. '융합'은 해당 목록에 없다."},{"id":36,"set":"기출02","type":"sa","question":"요한복음 1장 1절 '태초에(en arche)'의 시간적 의미 외의 의미는?","answer":"근원(根源), 원리(原理), 기초(Foundation)의 의미 — 예수 그리스도는 시간의 시작점일 뿐 아니라 모든 존재의 근원이자 원리이다","explanation":"아르케(ἀρχή)는 철학적으로 '모든 것의 제1원리'를 의미한다."},{"id":37,"set":"기출02","type":"sa","question":"'일반계시'와 '특별계시'는 각각 무엇을 의미하는가?","answer":"일반계시: 자연, 역사, 이성과 양심을 통해 모든 사람에게 주어지는 보편적 계시. 특별계시: 성경, 예수 그리스도의 성육신, 예언자들을 통해 주어지는 구원론적 계시","explanation":"두 계시는 상호보완적이나, 구원은 특별계시를 통해서만 가능하다."},{"id":38,"set":"기출02","type":"sa","question":"오이코노미아(oikonomia)의 문자적인 뜻은 무엇인가?","answer":"집(oikos) + 법/관리(nomos) = 집안 살림의 관리, 가정 경영. 신학적으로는 하나님이 역사 안에서 구원을 이루어가시는 섭리적 계획과 경륜","explanation":"영어 'economy'의 어원이기도 하다."},{"id":39,"set":"2023년","type":"mc","question":"다음 중 서로 관련이 없는 단어는?","choices":["페리코레시스","상호내주","파라클레토스","상호침투"],"answer":3,"explanation":"페리코레시스, 상호내주, 상호침투는 삼위일체 위격의 상호 내재를 표현하는 동일한 개념이다. 파라클레토스(παράκλητος)는 '보혜사, 위로자'를 의미하는 성령의 칭호(요14:16)로 나머지와 다르다."},{"id":40,"set":"2023년","type":"mc","question":"다음 중 칼뱅과 관련이 없는 것은?","choices":["사회적 삼위일체론","신지식-인간지식 상관관계","경건의 씨앗","신성에 대한 감각"],"answer":1,"explanation":"사회적 삼위일체론(Social Trinity)은 위르겐 몰트만이 발전시킨 이론이다. 나머지는 모두 칼뱅의 개념이다."},{"id":41,"set":"2023년","type":"mc","question":"다음 중 잘못 연결된 것은?","choices":["인격체 사이의 소통으로서의 계시 – 바질 미첼","삼위일체론은 사회적 비전 – 모리스","십자가에 달리신 하나님 – 몰트만","죄성의 유전 – 아우구스티누스"],"answer":2,"explanation":"'삼위일체는 사회적 프로그램'이라는 표현은 레오나르도 보프(Leonardo Boff)와 연결된다."},{"id":42,"set":"2023년","type":"mc","question":"밀리오리에 따르면, 다음 중 조직신학 과제의 4가지 중심질문이 아닌 것은?","choices":["진리성","역사성","적실성","변혁성"],"answer":2,"explanation":"밀리오리의 4가지 중심 질문은 진리성, 적실성, 변혁성/실천성, 온전성/적합성이다. '역사성'은 목록에 없다."},{"id":43,"set":"2023년","type":"mc","question":"그리스도의 사역에 관한 고전적 3가지 입장이 아닌 것은?","choices":["승리자 그리스도","만족설","예수 그리스도의 삼중직","도덕적 감화설"],"answer":3,"explanation":"고전적 속죄론 세 입장은 승리자 그리스도(이레나이우스), 만족설(안셀무스), 도덕적 감화설(아벨라르)이다. 삼중직(선지자·제사장·왕)은 사역 방식 분류로 속죄론 유형과 다른 범주이다."},{"id":44,"set":"2023년","type":"mc","question":"하나님에 의해 창조된 인간이 본래 가진 긍정적인 요소가 아닌 것은?","choices":["자기중심성","미래개방성","자기초월성","외심성"],"answer":1,"explanation":"자기중심성은 타락한 죄의 본질적 모습이다. 긍정적 요소는 외심성, 미래개방성, 자기초월성이다."},{"id":45,"set":"2023년","type":"mc","question":"다음 중 신학방법론이 잘못 연결된 것은?","choices":["그리스도 중심적 신학 – 바르트","상관관계방법의 신학 – 틸리히","수정주의 신학 – 니버","실천적 접근의 신학 – 구티에레즈"],"answer":3,"explanation":"수정주의 신학(Revisionist Theology)은 데이비드 트레이시(David Tracy)와 연결된다. 라인홀드 니버는 기독교 현실주의(Christian Realism)와 연관된다."},{"id":46,"set":"2023년","type":"mc","question":"이안 바버가 분류한 4가지 관계 유형이 아닌 것은?","choices":["갈등","독립","융합","통합"],"answer":3,"explanation":"바버의 4가지 유형은 갈등, 독립, 대화, 통합이다. '융합'은 해당 목록에 없다."},{"id":47,"set":"2023년","type":"mc","question":"성경의 권위를 주장하는 부적절한 입장이 아닌 것은?","choices":["성경문자주의(biblicism)","역사실증주의(historicism)","신앙공동체의 삶에 필수불가결성","종교적 고전으로서의 성경"],"answer":3,"explanation":"신앙공동체의 삶에 필수불가결한 규범으로서의 성경 이해는 밀리오리가 지지하는 적절한 입장이다."},{"id":48,"set":"2023년","type":"sa","question":"칼케돈 공의회의 기독론: 예수 그리스도의 신성-인성 관계에 대한 4가지 부정 규정을 쓰시오.","answer":"①혼합되지 않고(without confusion) ②변화되지 않고(without change) ③분리되지 않고(without separation) ④나뉘지 않고(without division)","explanation":"칼케돈 공의회(451년)는 예수 그리스도가 참 하나님이며 참 인간으로 한 인격 안에 두 본성이 있다고 선언했다."},{"id":49,"set":"2023년","type":"sa","question":"아우구스티누스의 심리학적 유비(psychological analogy)에 관하여 설명하시오.","answer":"인간의 내적 정신 구조 안에서 삼위일체의 흔적(vestigia Trinitatis)을 발견하려는 시도. 기억(memoria)–지성(intellectus)–의지(voluntas)의 세 기능이 하나의 통일된 영혼 안에 존재하는 것을 삼위일체에 비유","explanation":"아우구스티누스는 『삼위일체론(De Trinitate)』에서 이 유비를 제시했다."},{"id":50,"set":"2023년","type":"sa","question":"칼뱅의 하나님의 공동성의 원리(Calvin's Principle of the Triune Togetherness)에 관하여 설명하시오.","answer":"성부는 창조, 성자는 창조의 원리, 성령은 창조의 효력. 삼위일체의 세 위격은 언제나 함께 사역하시며, 어떤 위격도 다른 위격과 분리되어 독립적으로 사역하지 않는다는 원리","explanation":"페리코레시스의 실천적 표현이며, 삼위일체의 단일성을 보호한다."},{"id":51,"set":"2023년","type":"sa","question":"칼 바르트의 삼중적 하나님의 말씀 3가지는 각각 무엇인가?","answer":"①계시된 말씀(Revealed Word): 예수 그리스도 자신 ②기록된 말씀(Written Word): 성경 ③선포된 말씀(Proclaimed Word): 교회의 설교","explanation":"바르트는 그리스도를 가장 근원적인 하나님의 말씀으로 보았다."},{"id":52,"set":"2023년","type":"sa","question":"해방신학의 신정론(liberation theology theodicy)의 입장은 무엇인가?","answer":"악과 고통에 이론적으로 답변하는 것보다, 고통받는 자들과 연대하여 불의한 구조를 변혁하는 실천적 행동이 진정한 신정론의 응답이라는 입장","explanation":"구티에레즈를 대표로, 신정론의 물음을 억압받는 가난한 자들의 현실 한가운데서 다루어야 한다고 주장한다."},{"id":53,"set":"2022B","type":"mc","question":"다음 중 신학방법론이 잘못 연결된 것은?","choices":["그리스도 중심적 신학 – 바르트","상관관계방법의 신학 – 칼뱅","수정주의 신학 – 트레이시","실천적 접근의 신학 – 구티에레즈"],"answer":2,"explanation":"상관관계방법의 신학은 폴 틸리히의 방법론이다. 칼뱅의 '상관관계'는 신지식과 인간지식의 상관이지, 틸리히식 방법론과 다르다."},{"id":54,"set":"2022B","type":"mc","question":"다음 중에서 서로 관련이 없는 것은? (이신론 관련)","choices":["이신론","시계공 하나님","부재지주 하나님","섭리론"],"answer":4,"explanation":"이신론, 시계공 하나님, 부재지주 하나님은 창조 후 세계를 방치하는 하나님상이다. 섭리론(Providence)은 하나님이 창조 세계를 지속적으로 보존하고 통치하신다는 교리로, 이신론과 정반대이다."},{"id":55,"set":"2022B","type":"mc","question":"다음 중 부정신학(apophatic theology)과 관련이 없는 것은?","choices":["하나님의 탁월성","하나님의 암흑성","하나님의 불가해성","감추어진 하나님"],"answer":1,"explanation":"'하나님의 탁월성(eminence)'은 긍정신학의 개념이다. 부정신학은 하나님이 아닌 것을 부정함으로써 하나님께 나아가는 방식이다."},{"id":56,"set":"2022B","type":"mc","question":"다음 중 그리스도의 인격에 관한 내용과 직접 관련된 것이 아닌 것은?","choices":["동일본질","참 신성과 참 인성","속성의 교류","만족설"],"answer":4,"explanation":"만족설(Satisfaction Theory)은 그리스도의 사역(속죄론)에 관한 개념이다. 나머지는 모두 그리스도의 인격(person of Christ)에 관한 기독론적 개념이다."},{"id":57,"set":"2022B","type":"mc","question":"밀리오리에 따르면 타락한 인간의 죄의 모습이 아닌 것은?","choices":["하나님의 은혜의 거부","위계질서적 인간관계","자기파괴적 노예근성","사랑으로 종노릇"],"answer":4,"explanation":"'사랑으로 종노릇'은 죄의 표현이 아니라, 그리스도인의 자유로운 섬김의 윤리를 표현하는 긍정적 개념이다(루터의 『그리스도인의 자유』 정신)."},{"id":58,"set":"2022B","type":"mc","question":"다음 중 아우구스티누스와 관련이 없는 것은?","choices":["Deus semper maior","심리학적 유비","사회적 삼위일체","삼위일체의 흔적"],"answer":3,"explanation":"사회적 삼위일체(Social Trinity)는 몰트만, 보프 등 현대 신학자들과 연관된다. 아우구스티누스는 심리학적 유비와 삼위일체의 흔적(vestigia Trinitatis)을 강조했다."},{"id":59,"set":"2022B","type":"mc","question":"다음 중 정통 신학에서 인정되는 이론은 무엇인가?","choices":["종속론","양태론","전유의 규칙","삼신론"],"answer":3,"explanation":"전유의 규칙(Rule of Appropriation)만이 정통 삼위일체 신학에서 인정되는 규칙이다."},{"id":60,"set":"2022B","type":"mc","question":"다음 중 기독론과 관련하여 정통 신학이 인정하는 입장이 아닌 것은?","choices":["속성의 교류","가현설","비위격성","내재인격성"],"answer":2,"explanation":"가현설(Docetism)은 예수의 인성이 외양에 불과하다는 이단적 주장이다. 속성의 교류, 비위격성(anhypostasis), 내재인격성(enhypostasis)은 모두 정통 교리이다."},{"id":61,"set":"2022B","type":"mc","question":"다음 중 실존주의와 거리가 먼 학자는?","choices":["몰트만","사르트르","키에르케고르","하이데거"],"answer":1,"explanation":"몰트만은 실존주의가 아니라 희망의 신학(Theology of Hope)과 삼위일체적 십자가 신학으로 분류된다. 나머지는 실존주의 대표 인물들이다."},{"id":62,"set":"2022B","type":"mc","question":"밀리오리에 따르면 하나님의 형상이 전혀 아닌 것은?","choices":["관계성","이성/합리성","자유","신체적 유사성"],"answer":4,"explanation":"신체적 유사성(physical resemblance)은 하나님의 형상에 대한 잘못된 이해이다. 하나님은 영이시기 때문이다."},{"id":63,"set":"2022B","type":"sa","question":"칼 바르트의 '삼중적 하나님의 말씀' 3가지는 각각 무엇인가?","answer":"①계시된 말씀: 예수 그리스도 자신 ②기록된 말씀: 성경 ③선포된 말씀: 교회의 설교","explanation":"바르트에게 그리스도는 가장 근원적인 하나님의 말씀이며, 성경과 설교는 이를 증언·선포한다."},{"id":64,"set":"2022B","type":"sa","question":"기독교신앙의 역동성의 두 가지 뿌리들은 각각 무엇인가?","answer":"①신앙의 대상인 하나님은 또한 주체 ②인간이 처한 상황(때로는 신의 부재)","explanation":"신앙은 하나님으로부터 오는 것이면서 동시에 인간의 실존적 상황 속에서 일어난다."},{"id":65,"set":"2022B","type":"sa","question":"성경읽기에서의 '가난한 자들의 해석학적 우선권'은 무슨 뜻인가?","answer":"성경은 가난하고 억압받는 자들의 관점에서 읽을 때 더 온전히 이해된다는 해석학적 원리. 그들은 성경의 해방적 메시지를 실존적 필요로 경험하기 때문에 특권적 해석 위치를 가진다","explanation":"해방신학(구티에레즈)에서 발전되었다."},{"id":66,"set":"2022B","type":"sa","question":"밀리오리가 말하는 '체념의 죄'와 '교만한 추정의 죄'는 각각 무슨 의미인가?","answer":"①체념의 죄(sin of sloth): 하나님이 주신 책임과 자유를 포기하고 타인/구조에 내맡기며 주체성을 상실하는 죄. ②교만한 추정의 죄(sin of pride): 피조물임에도 하나님의 자리를 차지하려 하고 자기충족성을 절대화하는 죄","explanation":"밀리오리는 죄를 단순한 도덕적 위반이 아닌 관계적 왜곡으로 이해한다."},{"id":67,"set":"2022B","type":"sa","question":"삼위일체신학에서의 '사회적 유비(social analogy)'는 무슨 뜻인가?","answer":"삼위일체를 세 위격(성부·성자·성령) 사이의 완전한 사랑과 교제의 공동체로 이해하고, 인간 공동체의 유비로 사용하는 삼위일체 이해 방식. (lover, beloved, mutual love)","explanation":"몰트만과 보프가 대표적으로 발전시켰다. 아우구스티누스의 심리학적 유비와 대조된다."},{"id":68,"set":"2022추가","type":"mc","question":"다음 중 이단적 입장이 아닌 것은?","choices":["종속론","양태론","삼신론","예정론"],"answer":4,"explanation":"종속론, 양태론, 삼신론은 삼위일체론의 이단적 왜곡이다. 예정론(Predestination)은 논쟁적이지만 기독교 정통 신학 내에서 다루어지는 교리이며 이단이 아니다."},{"id":69,"set":"2022추가","type":"mc","question":"다음 중 칼뱅과 관련이 없는 것은?","choices":["성경은 안경","번쩍이는 문장","경건의 씨앗","신성에 대한 감각"],"answer":2,"explanation":"'번쩍이는 문장'은 칼뱅이 아니라 아우구스티누스와 연관된 표현이다."},{"id":70,"set":"2022추가","type":"mc","question":"다음 중 잘못 연결된 것은?","choices":["이해를 추구하는 신앙 – 안셀무스","공동인간성 – 바르트","십자가에 달리신 하나님 – 엘리 위젤","도덕적 인간과 비도덕적 사회 – 니버"],"answer":3,"explanation":"『십자가에 달리신 하나님』은 위르겐 몰트만의 저서이다. 엘리 위젤은 홀로코스트 증언인 『나이트(Night)』의 저자이다."},{"id":71,"set":"2022추가","type":"mc","question":"데이비드 트레이시가 말하는 신학의 복수성의 세 위치가 아닌 것은?","choices":["자연","사회","학교","교회"],"answer":1,"explanation":"데이비드 트레이시는 신학의 세 가지 공공적 위치로 교회(church), 학교/학계(academy), 사회(society)를 제시했다. '자연'은 이 목록에 없다."},{"id":72,"set":"2022추가","type":"mc","question":"전통적 신정론 3가지에 해당되지 않는 것은?","choices":["하나님의 불가해성","과정신학의 신정론","처벌/징계","교육/배양"],"answer":2,"explanation":"과정신학의 신정론은 현대의 새로운 신정론이다. 전통적 신정론 세 가지는 처벌/징계, 교육/배양, 하나님의 불가해성이다."},{"id":73,"set":"2022추가","type":"mc","question":"그리스도의 사역에 관한 고전적 3가지 입장이 아닌 것은?","choices":["승리자 그리스도","만족설","동일본질","도덕적 감화설"],"answer":3,"explanation":"동일본질(homoousios)은 그리스도의 인격에 관한 개념(니케아 공의회)이지, 속죄론의 유형이 아니다."},{"id":74,"set":"2022추가","type":"mc","question":"칼 바르트가 섭리를 정의할 때 강조하는 3가지 주된 요소가 아닌 것은?","choices":["보존","동행","설득","통치"],"answer":3,"explanation":"바르트의 섭리 세 요소: 보존(conservatio), 동행(concursus), 통치(gubernatio). '설득'은 과정신학의 하나님 이해에 해당한다."},{"id":75,"set":"2022추가","type":"sa","question":"긍정신학(Cataphatic Theology)과 부정신학(Apophatic Theology)은 각각 무엇인가?","answer":"긍정신학(via positiva): 서방교회 방식, 계시에 기초하여 하나님에 대해 긍정문으로 서술('하나님은 선하시다'). 부정신학(via negativa): 동방정교회 방식, 하나님이 모든 인간적 범주를 초월하시므로 부정문으로 서술('하나님은 유한하지 않으시다')","explanation":"두 신학 방식은 하나님의 초월성과 내재성을 각각 강조하며 상호보완적이다."},{"id":76,"set":"2022추가","type":"sa","question":"섭리론이 신앙의 삶에 주는 중요한 혜택 3가지는?","answer":"①역경이 하나님의 손길로부터임을 믿고 받아들이는 겸손함 ②편안/번창할 때도 하나님께 감사 ③불필요한 염려와 근심으로부터의 자유","explanation":"칼빈이 『기독교 강요』에서 강조한 섭리론의 실천적 유익이다."},{"id":77,"set":"2022추가","type":"sa","question":"밀리오리가 창조 이해의 모형으로 제안하는 예술적 표현(artistic expression)의 세 가지 특징은?","answer":"①자유롭고 비강제적 ②자유로운 자기제한적 활동 ③예술가 자신의 이미지가 남겨진 결과물","explanation":"이 유비는 무로부터의 창조(creatio ex nihilo), 하나님의 자유, 창조의 선함을 잘 표현해 준다."},{"id":78,"set":"2022추가","type":"sa","question":"몰트만에 따르면 십자가사건에서 성부/성자/성령은 각각 어떻게 고통과 연결되는가?","answer":"①성자: 십자가에서 버림받음과 죽음의 고통을 직접 당하심 ②성부: 사랑하는 아들을 내어주시며 아들을 잃는 고통을 당하심 ③성령: 성부와 성자 사이의 찢어짐 가운데서 둘을 하나로 묶는 사랑의 능력으로 역사하심","explanation":"몰트만은 십자가를 삼위일체 안에서의 사건으로 이해한다."},{"id":79,"set":"2022추가","type":"sa","question":"칼뱅의 '그리스도의 삼중직론(munus triplex)'에서 3가지 직무는 각각 무엇인가?","answer":"①선지자직: 하나님의 완전한 진리와 말씀을 선포하시는 선지자 ②제사장직: 자기 자신을 속죄 제물로 드리시고 중보하시는 대제사장 ③왕직: 교회와 온 세계를 통치하시는 왕","explanation":"칼뱅의 삼중직은 전통적 기독론의 핵심 구조이다. 바르트는 이를 낮아지심과 높아지심의 역설로 재표현했다."},{"id":80,"set":"2022추가","type":"sa","question":"밀리오리가 새로워진 인간의 모습을 믿음/사랑/소망으로 설명하는 내용은?","answer":"①믿음: 하나님의 자비를 순전히 신뢰하고 확신하는 것 ②사랑: 타자와 함께 타자를 위한 인간이 되는 것 ③소망: 미래를 향한 하나님의 새로운 약속의 성취를 기대하는 것","explanation":"그리스도 안에서 새로워진 인간은 교만과 자기충족성을 내려놓고 하나님을 신뢰하며 이웃을 사랑하는 존재가 된다."}];
+const LABELS = ['①','②','③','④'];
+let filter='all', setFilter_='all';
+let quizQ=[], current=0, selected=null, revealed=false;
+let results=[], score=0;
+
+function getPool() {
+  let pool = QUESTIONS;
+  if(setFilter_!=='all') pool=pool.filter(q=>q.set===setFilter_);
+  if(filter==='mc') pool=pool.filter(q=>q.type==='mc');
+  else if(filter==='sa') pool=pool.filter(q=>q.type==='sa');
+  return pool;
+}
+function setSetFilter(s) {
+  setFilter_=s;
+  document.querySelectorAll('.set-btn').forEach(b=>b.classList.toggle('active',b.dataset.set===s));
+  updateHomeInfo();
+}
+function setFilter(f) {
+  filter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===f));
+  updateHomeInfo();
+}
+function updateHomeInfo() {
+  const pool=getPool();
+  const sl=document.getElementById('count-slider');
+  sl.max=Math.max(pool.length,1);
+  document.getElementById('range-max').textContent=pool.length;
+  if(parseInt(sl.value)>pool.length) { sl.value=pool.length; updateCount(pool.length); }
+  document.getElementById('home-sub').textContent=`중간고사 기출 해설 · ${pool.length}문제`;
+}
+function updateCount(v){document.getElementById('count-display').textContent=v;}
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function startQuiz(){
+  const pool=getPool();
+  const n=parseInt(document.getElementById('count-slider').value);
+  quizQ=shuffle(pool).slice(0,Math.min(n,pool.length));
+  current=0;selected=null;revealed=false;results=[];score=0;
+  show('quiz'); renderQ();
+}
+function show(id){
+  ['home','quiz','review'].forEach(s=>{
+    const el=document.getElementById(s);
+    el.style.display=s===id?(s==='home'?'flex':'block'):'none';
+  });
+}
+function goHome(){show('home');}
+
+const SET_LABELS={'기출01':'기출문제 01','기출02':'기출문제 02','2023년':'2023년 기출','2022B':'2022년 B반','2022추가':'2022년 추가분'};
+
+function renderQ(){
+  const q=quizQ[current];
+  const isSA=q.type==='sa', isMC=q.type==='mc';
+  selected=null; revealed=false;
+
+  document.getElementById('q-counter').textContent=`${current+1} / ${quizQ.length}`;
+  document.getElementById('score-badge').textContent=`${score} 점`;
+  document.getElementById('progress-fill').style.width=`${(current/quizQ.length)*100}%`;
+  document.getElementById('set-label').textContent=SET_LABELS[q.set]||q.set;
+
+  const badge=document.getElementById('type-badge');
+  if(isMC){badge.className='type-badge type-mc';badge.textContent='객관식';}
+  else{badge.className='type-badge type-sa';badge.textContent='단답형';}
+
+  document.getElementById('q-text').textContent=q.question;
+  document.getElementById('choices').style.display=isMC?'block':'none';
+  document.getElementById('sa-wrap').style.display=isSA?'block':'none';
+
+  if(isMC){
+    const div=document.getElementById('choices'); div.innerHTML='';
+    q.choices.forEach((ch,i)=>{
+      const btn=document.createElement('button');
+      btn.className='choice-btn';
+      btn.innerHTML=`<span class="choice-label">${LABELS[i]}</span><span style="flex:1">${ch.replace(/</g,'&lt;')}</span><span class="choice-mark"></span>`;
+      btn.onclick=()=>selectChoice(i);
+      div.appendChild(btn);
+    });
+  } else {
+    const inp=document.getElementById('sa-input');
+    inp.value=''; inp.disabled=false;
+    document.getElementById('sa-answer-box').style.display='none';
+    document.getElementById('btn-show-ans').style.display='block';
+    document.getElementById('btn-show-ans').disabled=false;
+  }
+
+  document.getElementById('feedback').style.display='none';
+  document.getElementById('explanation').className='explanation';
+  const btnC=document.getElementById('btn-confirm');
+  btnC.style.display=isSA?'none':'block'; btnC.disabled=true;
+  document.getElementById('btn-next').style.display='none';
+}
+
+function selectChoice(i){
+  if(revealed)return;
+  selected=i;
+  document.querySelectorAll('.choice-btn').forEach((b,idx)=>b.classList.toggle('selected',idx===i));
+  document.getElementById('btn-confirm').disabled=false;
+}
+
+function showSAAnswer(){
+  const q=quizQ[current];
+  document.getElementById('sa-input').disabled=true;
+  const box=document.getElementById('sa-answer-box');
+  box.style.display='block';
+  document.getElementById('sa-answer-text').textContent=q.answer;
+  document.getElementById('btn-show-ans').style.display='none';
+  if(q.explanation){
+    const exp=document.getElementById('explanation');
+    exp.className='explanation show';
+    document.getElementById('exp-text').textContent=q.explanation;
+  }
+  results.push({qid:q.id,correct:'sa',selected:'shown',answer:q.answer,set:q.set});
+  document.getElementById('btn-next').style.display='block';
+  document.getElementById('btn-next').textContent=current+1>=quizQ.length?'결과 보기 →':'다음 문제 →';
+}
+
+function confirmAnswer(){
+  if(selected===null)return;
+  revealed=true;
+  const q=quizQ[current];
+  const correct=selected===q.answer-1;
+  if(correct) score++;
+  results.push({qid:q.id,correct:correct?'yes':'no',selected,answer:q.answer,set:q.set,type:q.type});
+
+  document.querySelectorAll('.choice-btn').forEach((b,i)=>{
+    b.classList.remove('selected');
+    const mark=b.querySelector('.choice-mark');
+    if(i===q.answer-1){b.classList.add('correct');mark.textContent='✓';}
+    else if(i===selected){b.classList.add('wrong');mark.textContent='✗';}
+    b.disabled=true;
+  });
+
+  const fb=document.getElementById('feedback');
+  fb.style.display='block';
+  if(correct){fb.className='feedback correct';fb.textContent='✓ 정답입니다!';}
+  else{fb.className='feedback wrong';fb.textContent=`✗ 오답 — 정답: ${LABELS[q.answer-1]}`;}
+
+  if(q.explanation){
+    const exp=document.getElementById('explanation');
+    exp.className='explanation show';
+    document.getElementById('exp-text').textContent=q.explanation;
+  }
+
+  document.getElementById('score-badge').textContent=`${score} 점`;
+  document.getElementById('btn-confirm').style.display='none';
+  const btnN=document.getElementById('btn-next');
+  btnN.style.display='block';
+  btnN.textContent=current+1>=quizQ.length?'결과 보기 →':'다음 문제 →';
+}
+
+function nextQuestion(){
+  if(current+1>=quizQ.length) showReview();
+  else{current++; renderQ();}
+}
+
+function showReview(){
+  show('review');
+  const gradeable=results.filter(r=>r.correct==='yes'||r.correct==='no');
+  const saCount=results.filter(r=>r.correct==='sa').length;
+  const total=gradeable.length;
+  const pct=total>0?Math.round((score/total)*100):0;
+  const wrong=results.filter(r=>r.correct==='no');
+
+  document.getElementById('result-emoji').textContent=pct>=80?'🎉':pct>=60?'💪':'📖';
+  document.getElementById('result-score').textContent=total>0?pct+'점':'--';
+  document.getElementById('result-sub').innerHTML=
+    (total>0?`채점 ${total}문제 중 <span class="ok">${score}개</span> 정답 · 오답 <span class="bad">${wrong.length}개</span>`:'') +
+    (saCount>0?` · 단답형 <span class="skip">${saCount}개</span> 확인`:'');
+
+  const list=document.getElementById('wrong-list'); list.innerHTML='';
+  if(wrong.length>0){
+    const t=document.createElement('p');t.className='wrong-title';t.textContent=`✗ 틀린 문제 복습 (${wrong.length}개)`;list.appendChild(t);
+    wrong.forEach(r=>{
+      const q=quizQ.find(q=>q.id===r.qid); if(!q)return;
+      const div=document.createElement('div'); div.className='wrong-item';
+      let inner=`<div class="wrong-set">${SET_LABELS[q.set]||q.set} · 객관식</div><p class="wrong-q">${q.question.replace(/</g,'&lt;')}</p>`;
+      inner+=q.choices.map((ch,i)=>{
+        const isC=i===q.answer-1,isW=i===r.selected;
+        const cls=isC?'correct':isW?'wrong':'';
+        const mark=isC?' ✓':isW?' ✗':'';
+        return `<div class="review-choice ${cls}"><span style="font-weight:700;min-width:20px">${LABELS[i]}</span><span style="flex:1">${ch.replace(/</g,'&lt;')}${mark}</span></div>`;
+      }).join('');
+      if(q.explanation) inner+=`<div class="review-exp">📖 ${q.explanation}</div>`;
+      div.innerHTML=inner; list.appendChild(div);
+    });
+  } else if(gradeable.length>0) {
+    const p=document.createElement('p');p.style.cssText='color:#3a2a5a;text-align:center;padding:20px';p.textContent='🎊 채점된 문제 모두 정답!';list.appendChild(p);
+  }
+}
+</script>
+</body>
+</html>

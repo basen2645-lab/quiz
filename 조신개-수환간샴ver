@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>조직신학개론 모의고사 (148문)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', -apple-system, sans-serif;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* ===== HOME SCREEN ===== */
+        #home {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 24px;
+        }
+        
+        .home-card {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 20px;
+            padding: 48px 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+        
+        .home-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .home-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        
+        .home-subtitle {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .home-stats {
+            color: #cbd5e1;
+            font-size: 13px;
+            margin-bottom: 32px;
+            line-height: 1.8;
+        }
+        
+        .home-stats strong {
+            color: #f1f5f9;
+            font-size: 18px;
+        }
+        
+        .filter-group {
+            margin-bottom: 28px;
+            text-align: left;
+        }
+        
+        .filter-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            border-radius: 8px;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-family: inherit;
+        }
+        
+        .filter-btn:hover {
+            border-color: rgba(148, 163, 184, 0.4);
+        }
+        
+        .filter-btn.active {
+            background: #0ea5e9;
+            border-color: #0ea5e9;
+            color: #0f172a;
+            font-weight: 600;
+        }
+        
+        .count-control {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .count-label {
+            display: block;
+            font-size: 12px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+        
+        .count-display {
+            font-size: 36px;
+            font-weight: 700;
+            color: #0ea5e9;
+            margin-bottom: 12px;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: linear-gradient(to right, #0ea5e9, #0ea5e9);
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #0ea5e9;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.4);
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #0ea5e9;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.4);
+        }
+        
+        .start-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3);
+        }
+        
+        .start-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* ===== QUIZ SCREEN ===== */
+        #quiz {
+            display: none;
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        
+        .quiz-header {
+            position: sticky;
+            top: 0;
+            background: linear-gradient(to bottom, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0));
+            backdrop-filter: blur(10px);
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            margin-bottom: 24px;
+            z-index: 10;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background: rgba(148, 163, 184, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0ea5e9, #06b6d4);
+            transition: width 0.3s;
+        }
+        
+        .progress-text {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+        
+        .question-container {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 20px;
+        }
+        
+        .question-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .q-number {
+            font-size: 12px;
+            font-weight: 700;
+            color: #0ea5e9;
+            padding: 4px 8px;
+            background: rgba(14, 165, 233, 0.1);
+            border-radius: 4px;
+        }
+        
+        .q-type {
+            font-size: 11px;
+            padding: 3px 8px;
+            background: rgba(148, 163, 184, 0.1);
+            border-radius: 4px;
+            color: #cbd5e1;
+        }
+        
+        .question-text {
+            font-size: 16px;
+            font-weight: 500;
+            color: #f1f5f9;
+            margin-bottom: 24px;
+            line-height: 1.7;
+        }
+        
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .choice {
+            padding: 14px;
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            border-radius: 8px;
+            background: transparent;
+            color: #cbd5e1;
+            cursor: pointer;
+            transition: all 0.25s;
+            text-align: left;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        .choice:hover {
+            border-color: rgba(14, 165, 233, 0.5);
+            background: rgba(14, 165, 233, 0.05);
+        }
+        
+        .choice.selected {
+            border-color: #0ea5e9;
+            background: rgba(14, 165, 233, 0.1);
+            color: #f1f5f9;
+        }
+        
+        .choice.correct {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            color: #a7f3d0;
+        }
+        
+        .choice.incorrect {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            color: #fca5a5;
+        }
+        
+        .answer-display {
+            margin-top: 20px;
+            padding: 16px;
+            background: rgba(16, 185, 129, 0.08);
+            border-left: 4px solid #10b981;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #a7f3d0;
+            line-height: 1.6;
+        }
+        
+        .answer-label {
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.25s;
+            font-family: inherit;
+        }
+        
+        .btn-secondary {
+            background: rgba(148, 163, 184, 0.1);
+            color: #94a3b8;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(148, 163, 184, 0.15);
+        }
+        
+        .btn-primary {
+            background: #0ea5e9;
+            color: #0f172a;
+        }
+        
+        .btn-primary:hover {
+            background: #06b6d4;
+        }
+        
+        /* ===== RESULT SCREEN ===== */
+        #result {
+            display: none;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .result-card {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .result-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+        
+        .result-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 8px;
+        }
+        
+        .result-score {
+            font-size: 48px;
+            font-weight: 700;
+            color: #0ea5e9;
+            margin: 24px 0;
+        }
+        
+        .result-detail {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 24px;
+        }
+        
+        .review-section {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+        
+        .review-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .review-item {
+            padding: 12px;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        
+        .review-item.correct {
+            border-left: 3px solid #10b981;
+        }
+        
+        .review-item.incorrect {
+            border-left: 3px solid #ef4444;
+        }
+        
+        .review-question {
+            color: #f1f5f9;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        
+        .review-answer {
+            color: #94a3b8;
+            font-size: 12px;
+        }
+        
+        .restart-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3);
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 600px) {
+            .home-card {
+                padding: 32px 24px;
+            }
+            
+            .question-container {
+                padding: 24px;
+            }
+            
+            .question-text {
+                font-size: 15px;
+            }
+            
+            .home-title {
+                font-size: 24px;
+            }
+            
+            .result-score {
+                font-size: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HOME SCREEN -->
+    <div id="home">
+        <div class="home-card">
+            <div class="home-icon">📚</div>
+            <h1 class="home-title">조직신학개론</h1>
+            <p class="home-subtitle">기말고사 모의고사</p>
+            
+            <div class="home-stats">
+                <div><strong>148문제</strong></div>
+                <div style="font-size: 12px; margin-top: 6px;">객관식 61 + 단답형 87</div>
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">문제 유형</label>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="setFilter('all')">전체</button>
+                    <button class="filter-btn" onclick="setFilter('mc')">객관식</button>
+                    <button class="filter-btn" onclick="setFilter('sa')">단답형</button>
+                </div>
+            </div>
+            
+            <div class="count-control">
+                <label class="count-label">문제 개수</label>
+                <div class="count-display"><span id="countDisplay">20</span>문</div>
+                <input type="range" id="countSlider" min="5" max="148" value="20" 
+                       oninput="updateCount(this.value)">
+            </div>
+            
+            <button class="start-btn" onclick="startQuiz()">시작하기</button>
+        </div>
+    </div>
+    
+    <!-- QUIZ SCREEN -->
+    <div id="quiz">
+        <div class="container">
+            <div class="quiz-header">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text">
+                    <span id="currentNum">1</span> / <span id="totalNum">20</span>
+                </div>
+            </div>
+            
+            <div id="questionArea"></div>
+        </div>
+    </div>
+    
+    <!-- RESULT SCREEN -->
+    <div id="result">
+        <div class="container">
+            <div class="result-card">
+                <div class="result-icon" id="resultIcon">✅</div>
+                <h2 class="result-title" id="resultTitle">완료!</h2>
+                <div class="result-score" id="resultScore">00/00</div>
+                <div class="result-detail" id="resultDetail"></div>
+            </div>
+            
+            <div class="review-section" id="reviewSection"></div>
+            
+            <button class="restart-btn" onclick="goHome()">다시 풀기</button>
+        </div>
+    </div>
+    
+    <script>
+        const QUESTIONS = [{"num":1,"type":"MC","answer":"③","topic":"용어-연결","set":"기출01","id":1},{"num":2,"type":"MC","answer":"②","topic":"용어-의미","set":"기출01","id":2},{"num":3,"type":"MC","answer":"③","topic":"학자-입장","set":"기출01","id":3},{"num":4,"type":"MC","answer":"④","topic":"신학-주장","set":"기출01","id":4},{"num":5,"type":"MC","answer":"④","topic":"신학-비판","set":"기출01","id":5},{"num":6,"type":"MC","answer":"②","topic":"기독론","set":"기출01","id":6},{"num":7,"type":"MC","answer":"③","topic":"종말론","set":"기출01","id":7},{"num":8,"type":"MC","answer":"②","topic":"성례","set":"기출01","id":8},{"num":9,"type":"MC","answer":"④","topic":"학자-주장","set":"기출01","id":9},{"num":10,"type":"MC","answer":"②","topic":"신학용어","set":"기출01","id":10},{"num":11,"type":"MC","answer":"②","topic":"공의회","set":"기출01","id":11},{"num":12,"type":"SA","answer":"아우구스티누스: 비가시적 은혜의 가시적 표지","topic":"성례론","set":"기출01","id":12},{"num":13,"type":"SA","answer":"인효론: 집례자의 성덕/의도가 중요","topic":"성례론","set":"기출01","id":13},{"num":14,"type":"SA","answer":"말씀의 순수한 선포 + 성례의 올바른 집혜","topic":"교회론","set":"기출01","id":14},{"num":15,"type":"SA","answer":"JDDJ: 루터-가톨릭 칭의론 공동선언","topic":"종교대화","set":"기출01","id":15},{"num":16,"type":"SA","answer":"개혁된 교회는 항상 개혁되어야 한다","topic":"개혁교회론","set":"기출01","id":16},{"num":17,"type":"SA","answer":"이중은총: 칭의+성화","topic":"칼뱅","set":"기출01","id":17},{"num":18,"type":"SA","answer":"필리오케: 성령의 이중출원 / 동방반대, 서방찬성","topic":"삼위일체","set":"기출01","id":18},{"num":19,"type":"SA","answer":"경전의 태도 + 신의 일치성 + 사랑","topic":"이슬람-기독교","set":"기출01","id":19},{"num":20,"type":"SA","answer":"파루시아: 옆에 함께 / 아드벤투스: 어느 쪽에서 옴","topic":"종말론","set":"기출01","id":20},{"num":21,"type":"SA","answer":"예수의 최종성: 구세주 확신 + 다원상황에서 신앙 추구","topic":"종교신학","set":"기출01","id":21},{"num":22,"type":"SA","answer":"개인주의 + 종교의 사사화 + 관료주의화 + 신앙-삶 괴리","topic":"교회론","set":"기출01","id":22},{"num":23,"type":"SA","answer":"경청 + 기도 + 자유 + 연대 + 감사 + 소망","topic":"영성","set":"기출01","id":23},{"num":24,"type":"SA","answer":"인격: 누구인가? / 사역: 무엇을 하는가?","topic":"기독론","set":"기출01","id":24},{"num":25,"type":"SA","answer":"양성기독론: 참신-참인, 한 위격, 두 본성, 혼동/변화/분리/분할 없음","topic":"기독론","set":"기출01","id":25},{"num":1,"type":"MC","answer":"①","topic":"삼위일체","set":"기출02","id":26},{"num":2,"type":"MC","answer":"③","topic":"인간론","set":"기출02","id":27},{"num":3,"type":"MC","answer":"④","topic":"성례론","set":"기출02","id":28},{"num":4,"type":"MC","answer":"④","topic":"공의회","set":"기출02","id":29},{"num":5,"type":"MC","answer":"③","topic":"속죄론","set":"기출02","id":30},{"num":6,"type":"MC","answer":"④","topic":"해방신학","set":"기출02","id":31},{"num":7,"type":"MC","answer":"②","topic":"교회론","set":"기출02","id":32},{"num":8,"type":"MC","answer":"③","topic":"성찬론","set":"기출02","id":33},{"num":9,"type":"MC","answer":"①","topic":"종교신학","set":"기출02","id":34},{"num":10,"type":"MC","answer":"②","topic":"이슬람-기독교","set":"기출02","id":35},{"num":11,"type":"SA","answer":"통일성 + 거룩성 + 보편성 + 사도성","topic":"교회론","set":"기출02","id":36},{"num":12,"type":"SA","answer":"비가시적 은혜의 가시적 표지","topic":"성례론","set":"기출02","id":37},{"num":13,"type":"SA","answer":"성령을 따라 걷고 사는 삶","topic":"영성","set":"기출02","id":38},{"num":14,"type":"SA","answer":"보내다/파송하다","topic":"선교","set":"기출02","id":39},{"num":15,"type":"SA","answer":"민회: 정치적 모임 / 교회: 신앙 공동체 (하나님 부르심)","topic":"교회론","set":"기출02","id":40},{"num":16,"type":"SA","answer":"하나님의 감동성: 세상의 고통에 함께 고통 느낌","topic":"신론","set":"기출02","id":41},{"num":17,"type":"SA","answer":"인격: 누구인가? / 사역: 무엇을 하는가?","topic":"기독론","set":"기출02","id":42},{"num":18,"type":"SA","answer":"성자는 성부와 동일한 본체를 가진 참 하나님","topic":"기독론","set":"기출02","id":43},{"num":19,"type":"SA","answer":"필리오케: 성령의 이중출원 / 동방반대, 서방찬성","topic":"삼위일체","set":"기출02","id":44},{"num":20,"type":"SA","answer":"선지자 + 제사장 + 왕","topic":"기독론","set":"기출02","id":45},{"num":21,"type":"SA","answer":"신자들에게 그리스도가 현존하도록 함","topic":"성령론","set":"기출02","id":46},{"num":22,"type":"SA","answer":"파루시아: 옆에 함께 / 아드벤투스: 어느 쪽에서 옴","topic":"종말론","set":"기출02","id":47},{"num":23,"type":"SA","answer":"구원의 제도 + 성령의 엘리트 공동체 + 구원의 성례 + 복음의 전달자 + 섬기는 종","topic":"교회론","set":"기출02","id":48},{"num":24,"type":"SA","answer":"개혁된 교회는 항상 개혁되어야 한다","topic":"교회론","set":"기출02","id":49},{"num":25,"type":"SA","answer":"신묵시주의 비판: 성경 왜곡 + 결정주의적 + 우리/그들 분리 + 휴거 지향 + 예수 사역/십자가/부활 신학 부재","topic":"종말론","set":"기출02","id":50},{"num":1,"type":"MC","answer":"①","topic":"종교신학","set":"2023년","id":51},{"num":2,"type":"MC","answer":"③","topic":"신학자","set":"2023년","id":52},{"num":3,"type":"MC","answer":"②","topic":"교회론","set":"2023년","id":53},{"num":4,"type":"MC","answer":"④","topic":"영성","set":"2023년","id":54},{"num":5,"type":"MC","answer":"②","topic":"성찬론","set":"2023년","id":55},{"num":6,"type":"MC","answer":"③","topic":"페미니즘신학","set":"2023년","id":56},{"num":7,"type":"MC","answer":"①","topic":"종교신학","set":"2023년","id":57},{"num":8,"type":"MC","answer":"③","topic":"성례론","set":"2023년","id":58},{"num":9,"type":"MC","answer":"③","topic":"신묵시주의","set":"2023년","id":59},{"num":10,"type":"MC","answer":"①","topic":"종말론","set":"2023년","id":60},{"num":11,"type":"SA","answer":"우머니즘","topic":"흑인여성신학","set":"2023년","id":61},{"num":12,"type":"SA","answer":"구원의 제도 + 성령의 엘리트 공동체 + 구원의 성례 + 복음의 전달자 + 섬기는 종","topic":"교회론","set":"2023년","id":62},{"num":13,"type":"SA","answer":"에피클레시스: 성령임재를 요청하는 기도","topic":"성찬론","set":"2023년","id":63},{"num":14,"type":"SA","answer":"말씀의 순수한 선포 + 성례의 올바른 집행(+권징)","topic":"교회론","set":"2023년","id":64},{"num":15,"type":"SA","answer":"필리오케: '그리고 아들로부터'","topic":"삼위일체","set":"2023년","id":65},{"num":16,"type":"SA","answer":"비가시적 은혜의 가시적 표지","topic":"성례론","set":"2023년","id":66},{"num":17,"type":"SA","answer":"종말: 끝(종말) + 목적(에스카톤)","topic":"종말론","set":"2023년","id":67},{"num":18,"type":"SA","answer":"JDDJ: 루터-가톨릭 칭의론 공동선언","topic":"종교대화","set":"2023년","id":68},{"num":19,"type":"SA","answer":"다원성: 다원적 상황 / 다원주의: 각 종교가 다 구원의 길","topic":"종교신학","set":"2023년","id":69},{"num":20,"type":"SA","answer":"개혁된 교회는 항상 개혁되어야 한다","topic":"교회론","set":"2023년","id":70},{"num":21,"type":"SA","answer":"사사화의 의미: 공적 영역에서 분리되어 사적 세계로 편입 / 문제점: 교회 메시지와 선교가 삶의 질문에서 소외","topic":"현대교회론","set":"2023년","id":71},{"num":22,"type":"SA","answer":"이중은총: 칭의 + 성화","topic":"칼뱅","set":"2023년","id":72},{"num":23,"type":"SA","answer":"믿음-칭의 + 사랑-성화 + 소명-소명","topic":"영성","set":"2023년","id":73},{"num":24,"type":"SA","answer":"에클레시아: 하나님의 부르심을 받은 이들","topic":"교회론","set":"2023년","id":74},{"num":25,"type":"SA","answer":"삼위일체적 교회론의 두 기둥: 교제 + 선교","topic":"교회론","set":"2023년","id":75},{"num":1,"type":"MC","answer":"④","topic":"신학자","set":"2022-1_B반","id":76},{"num":2,"type":"MC","answer":"④","topic":"교회 정치제도","set":"2022-1_B반","id":77},{"num":3,"type":"MC","answer":"①","topic":"용어","set":"2022-1_B반","id":78},{"num":4,"type":"MC","answer":"①","topic":"교회론","set":"2022-1_B반","id":79},{"num":5,"type":"MC","answer":"①","topic":"삼중직","set":"2022-1_B반","id":80},{"num":6,"type":"MC","answer":"③","topic":"성령론","set":"2022-1_B반","id":81},{"num":7,"type":"MC","answer":"③","topic":"신학자","set":"2022-1_B반","id":82},{"num":8,"type":"MC","answer":"②","topic":"종말론","set":"2022-1_B반","id":83},{"num":9,"type":"MC","answer":"②","topic":"종교신학","set":"2022-1_B반","id":84},{"num":10,"type":"MC","answer":"②","topic":"종교신학","set":"2022-1_B반","id":85},{"num":11,"type":"SA","answer":"성경 안의 상황 + 독자의 상황","topic":"성서해석","set":"2022-1_B반","id":86},{"num":12,"type":"SA","answer":"삼위일체적 교제: 교회는 삼위일체 하나님의 교제와 선교에 참여","topic":"교회론","set":"2022-1_B반","id":87},{"num":13,"type":"SA","answer":"필리오케: 성령의 이중출현","topic":"삼위일체","set":"2022-1_B반","id":88},{"num":14,"type":"SA","answer":"신묵시주의 비판: 1)성경 왜곡 2)결정주의 3)우리/그들 분리 4)휴거 지향 5)예수 사역 신학 부재","topic":"종말론","set":"2022-1_B반","id":89},{"num":15,"type":"SA","answer":"사효론: 성례 자체로 효력 / 인효론: 집례자의 성덕/의도 중요","topic":"성례론","set":"2022-1_B반","id":90},{"num":16,"type":"SA","answer":"세례의 연대성: 죄와 소외 세상과의 연대 + 그리스도 안의 인간 상호 연대 + 인간과 창조세계의 연대","topic":"성례","set":"2022-1_B반","id":91},{"num":17,"type":"SA","answer":"4가지 모형: 구원의 제도 + 성령의 엘리트 공동체 + 구원의 성례 + 복음의 전달자 + 섬기는 종","topic":"교회론","set":"2022-1_B반","id":92},{"num":18,"type":"SA","answer":"신중심주의: 산정상으로 가는 길은 여러 가지","topic":"종교신학","set":"2022-1_B반","id":93},{"num":19,"type":"SA","answer":"이중은총: 칭의+성화 (구별되지만 분리될 수 없음)","topic":"칼뱅","set":"2022-1_B반","id":94},{"num":20,"type":"SA","answer":"화체설: 실체가 변화된다","topic":"성찬론","set":"2022-1_B반","id":95},{"num":21,"type":"SA","answer":"비가시적 은혜의 가시적 표지","topic":"성례론","set":"2022-1_B반","id":96},{"num":22,"type":"SA","answer":"파루시아/아드벤투스: 재림, 도래","topic":"종말론","set":"2022-1_B반","id":97},{"num":23,"type":"SA","answer":"루터의 '동시에 의인이면서 죄인(simul iustus et peccator)'","topic":"종교개혁","set":"2022-1_B반","id":98},{"num":24,"type":"SA","answer":"현대 4가지 미래소망: 자유주의적 진보 + 마르크스적 이상주의 + 신묵시주의 (vs 성경의 참 종말)","topic":"종말론","set":"2022-1_B반","id":99},{"num":25,"type":"SA","answer":"다원성: 다원적 상황 / 다원주의: 각 종교가 다 구원의 길","topic":"종교신학","set":"2022-1_B반","id":100},{"num":1,"type":"MC","answer":"①","topic":"성령론","set":"2022-1_1학년","id":101},{"num":2,"type":"MC","answer":"①","topic":"종교신학","set":"2022-1_1학년","id":102},{"num":3,"type":"MC","answer":"③","topic":"종교론","set":"2022-1_1학년","id":103},{"num":4,"type":"MC","answer":"②","topic":"교회론","set":"2022-1_1학년","id":104},{"num":5,"type":"MC","answer":"④","topic":"세례","set":"2022-1_1학년","id":105},{"num":6,"type":"MC","answer":"③","topic":"종교신학","set":"2022-1_1학년","id":106},{"num":7,"type":"MC","answer":"③","topic":"영성","set":"2022-1_1학년","id":107},{"num":8,"type":"MC","answer":"④","topic":"성찬론","set":"2022-1_1학년","id":108},{"num":9,"type":"MC","answer":"①","topic":"종말론","set":"2022-1_1학년","id":109},{"num":10,"type":"MC","answer":"③","topic":"신학","set":"2022-1_1학년","id":110},{"num":11,"type":"SA","answer":"하나님의 백성 + 그리스도의 몸 + 섬기는 백성 + 성령의 공동체","topic":"교회론","set":"2022-1_1학년","id":111},{"num":12,"type":"SA","answer":"파송: 구원 경륜 안의 사역 / 출원: 하나님 내의 영원한 삶","topic":"삼위일체","set":"2022-1_1학년","id":112},{"num":13,"type":"SA","answer":"에피클레시스: 성령의 임재를 요청하는 기도","topic":"성찬론","set":"2022-1_1학년","id":113},{"num":14,"type":"SA","answer":"말씀의 순수한 선포 + 성례의 올바른 집행(+권징)","topic":"교회론","set":"2022-1_1학년","id":114},{"num":15,"type":"SA","answer":"앤드류 월스: 성육신을 통한 하나님의 자기전달은 탁월한 번역","topic":"선교","set":"2022-1_1학년","id":115},{"num":16,"type":"SA","answer":"둘레길 이론: 둘레길을 올라갈 사람이 반드시 산정상에 오를 마음이 있는 것 아님","topic":"종교신학","set":"2022-1_1학년","id":116},{"num":17,"type":"SA","answer":"공통의 말씀: 경전에 대한 태도 + 신의 일치성 + 사랑","topic":"이슬람-기독교","set":"2022-1_1학년","id":117},{"num":18,"type":"SA","answer":"미씨오 데이: 선교의 주체는 삼위일체 하나님","topic":"선교","set":"2022-1_1학년","id":118},{"num":19,"type":"SA","answer":"종말: 끝(종말) + 목적(에스카톤)","topic":"종말론","set":"2022-1_1학년","id":119},{"num":20,"type":"SA","answer":"에클레시아: 하나님의 부르심을 받은 이들","topic":"교회론","set":"2022-1_1학년","id":120},{"num":21,"type":"SA","answer":"성만찬의 나눔: 하나님-인간의 삶 나눔 + 인간 상호의 삶 나눔 + 인간-창조세계의 공유","topic":"성례","set":"2022-1_1학년","id":121},{"num":22,"type":"SA","answer":"JDDJ: 루터-가톨릭 칭의론 공동선언","topic":"종교대화","set":"2022-1_1학년","id":122},{"num":23,"type":"SA","answer":"신묵시주의 비판 5가지 중 2가지: 1)성경 왜곡 2)결정주의 3)우리/그들 분리 4)휴거 지향 5)예수 사역 신학 부재","topic":"종말론","set":"2022-1_1학년","id":123},{"num":24,"type":"SA","answer":"성령의 우주적 사역: 교회 내부에 국한되지 않고 우주적 차원에서 활동","topic":"성령론","set":"2022-1_1학년","id":124},{"num":25,"type":"SA","answer":"개혁된 교회는 항상 개혁되어야 한다","topic":"교회론","set":"2022-1_1학년","id":125},{"num":"Q05","type":"MC","answer":"③","topic":"속죄론","set":"11페이지_중간고사예상","id":126},{"num":"Q06","type":"MC","answer":"①","topic":"인간론","set":"11페이지_중간고사예상","id":127},{"num":"Q13","type":"SA","answer":"양성기독론: 참신-참인, 한 위격, 두 본성, 4가지 부정 없음(혼동,변화,분리,분할)","topic":"기독론","set":"11페이지_중간고사예상","id":128},{"num":"Q17","type":"SA","answer":"타락한 인간: 적극적 자아중심 우상숭배 + 수동적 타자중심 우상숭배","topic":"죄론","set":"11페이지_중간고사예상","id":129},{"num":"Q19","type":"SA","answer":"삼위일체의 공동성: 성부-성자-성령이 함께 존재, 함께 활동","topic":"삼위일체","set":"11페이지_중간고사예상","id":130},{"num":"Q20","type":"SA","answer":"칼 바르트의 삼중직: 종으로서의 주님 + 주님으로서의 종 + 참된 증인","topic":"기독론","set":"11페이지_중간고사예상","id":131},{"num":"Q25","type":"SA","answer":"알렉산드리아: 말씀-육신 / 안디옥: 말씀-인간","topic":"기독론","set":"11페이지_중간고사예상","id":132},{"num":"Q04","type":"MC","answer":"④","topic":"기독론","set":"12페이지_22년B반","id":133},{"num":"Q05","type":"MC","answer":"④","topic":"죄론","set":"12페이지_22년B반","id":134},{"num":"Q08","type":"MC","answer":"②","topic":"기독론","set":"12페이지_22년B반","id":135},{"num":"Q10","type":"MC","answer":"①","topic":"인간론","set":"12페이지_22년B반","id":136},{"num":"Q13","type":"SA","answer":"유사본질: 예수님이 하나님과 유사하지만 동등하지 않음","topic":"공의회","set":"12페이지_22년B반","id":137},{"num":"Q19","type":"SA","answer":"파토스: 하나님의 감동성, 고통을 느끼심","topic":"신론","set":"12페이지_22년B반","id":138},{"num":"Q20","type":"SA","answer":"체념의 죄: 하나님의 자비를 순전히 신뢰 / 교만한 추정: 타자와 함께, 타자를 위한 인간","topic":"죄론","set":"12페이지_22년B반","id":139},{"num":"Q24","type":"SA","answer":"알렉산드리아: 말씀-육신 / 안디옥: 말씀-인간","topic":"기독론","set":"12페이지_22년B반","id":140},{"num":"Q25","type":"SA","answer":"믿음: 자비 신뢰 / 사랑: 타자와 함께 / 소망: 미래 약속 기대","topic":"영성","set":"12페이지_22년B반","id":141},{"num":"Q01","type":"MC","answer":"④","topic":"삼위일체","set":"13페이지_22년A반","id":142},{"num":"Q07","type":"MC","answer":"③","topic":"속죄론","set":"13페이지_22년A반","id":143},{"num":"Q08","type":"MC","answer":"①","topic":"인간론","set":"13페이지_22년A반","id":144},{"num":"Q10","type":"MC","answer":"④","topic":"인간론","set":"13페이지_22년A반","id":145},{"num":"Q14","type":"SA","answer":"양성기독론: 참신-참인, 한 위격, 두 본성, 혼동/변화/분리/분할 없음","topic":"기독론","set":"13페이지_22년A반","id":146},{"num":"Q22","type":"SA","answer":"몰트만: 성부-고통 느낌 / 성자-십자가상 고통 / 성령-중보의 고통","topic":"십자가신학","set":"13페이지_22년A반","id":147},{"num":"Q24","type":"SA","answer":"속성의 교류: 신성과 인성 간의 교류","topic":"기독론","set":"13페이지_22년A반","id":148}];
+        
+        let state = {
+            currentIndex: 0,
+            selectedQuestions: [],
+            answers: {},
+            filter: 'all'
+        };
+        
+        function setFilter(filter) {
+            state.filter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            updateSliderMax();
+        }
+        
+        function updateSliderMax() {
+            const filtered = getFiltered();
+            const slider = document.getElementById('countSlider');
+            const max = Math.max(5, filtered.length);
+            slider.max = max;
+            if (parseInt(slider.value) > max) {
+                slider.value = max;
+                updateCount(max);
+            }
+        }
+        
+        function updateCount(value) {
+            document.getElementById('countDisplay').textContent = value;
+        }
+        
+        function getFiltered() {
+            if (state.filter === 'mc') {
+                return QUESTIONS.filter(q => q.type === 'MC');
+            } else if (state.filter === 'sa') {
+                return QUESTIONS.filter(q => q.type === 'SA');
+            }
+            return QUESTIONS;
+        }
+        
+        function startQuiz() {
+            const filtered = getFiltered();
+            const count = parseInt(document.getElementById('countSlider').value);
+            const selected = [];
+            const indices = Array.from({length: filtered.length}, (_, i) => i);
+            
+            for (let i = 0; i < Math.min(count, filtered.length); i++) {
+                const randIdx = Math.floor(Math.random() * indices.length);
+                selected.push(filtered[indices[randIdx]]);
+                indices.splice(randIdx, 1);
+            }
+            
+            state.selectedQuestions = selected;
+            state.currentIndex = 0;
+            state.answers = {};
+            
+            document.getElementById('home').style.display = 'none';
+            document.getElementById('quiz').style.display = 'block';
+            document.getElementById('result').style.display = 'none';
+            
+            document.getElementById('totalNum').textContent = selected.length;
+            showQuestion();
+        }
+        
+        function showQuestion() {
+            const q = state.selectedQuestions[state.currentIndex];
+            const progress = ((state.currentIndex + 1) / state.selectedQuestions.length) * 100;
+            
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('currentNum').textContent = state.currentIndex + 1;
+            
+            let html = '<div class="question-container">';
+            html += '<div class="question-header">';
+            html += '<span class="q-number">Q' + (state.currentIndex + 1) + '</span>';
+            html += '<span class="q-type">' + (q.type === 'MC' ? '객관식' : '단답형') + '</span>';
+            html += '</div>';
+            html += '<div class="question-text">' + q.answer + '</div>';
+            
+            if (q.type === 'MC') {
+                html += '<div class="choices" id="choicesArea"></div>';
+            } else {
+                html += '<div class="answer-display"><div class="answer-label">정답:</div>' + q.answer + '</div>';
+            }
+            
+            html += '<div class="nav-buttons">';
+            if (state.currentIndex > 0) {
+                html += '<button class="btn btn-secondary" onclick="previousQuestion()">이전</button>';
+            }
+            html += '<button class="btn btn-primary" onclick="nextQuestion()">다음</button>';
+            html += '</div>';
+            html += '</div>';
+            
+            document.getElementById('questionArea').innerHTML = html;
+            
+            if (q.type === 'MC') {
+                renderChoices();
+            }
+        }
+        
+        function renderChoices() {
+            const choices = ['①', '②', '③', '④'];
+            let html = '';
+            choices.forEach((choice, idx) => {
+                html += '<button class="choice" onclick="selectChoice(' + idx + ')">' + choice + '</button>';
+            });
+            document.getElementById('choicesArea').innerHTML = html;
+        }
+        
+        function selectChoice(idx) {
+            const q = state.selectedQuestions[state.currentIndex];
+            state.answers[state.currentIndex] = idx;
+            
+            const choices = document.querySelectorAll('.choice');
+            choices.forEach(c => c.classList.remove('selected', 'correct', 'incorrect'));
+            
+            const selectedBtn = choices[idx];
+            selectedBtn.classList.add('selected');
+            
+            if (q.answer === ['①', '②', '③', '④'][idx]) {
+                selectedBtn.classList.add('correct');
+            } else {
+                selectedBtn.classList.add('incorrect');
+            }
+        }
+        
+        function nextQuestion() {
+            if (state.currentIndex < state.selectedQuestions.length - 1) {
+                state.currentIndex++;
+                showQuestion();
+                document.querySelector('.quiz-header').scrollIntoView();
+            } else {
+                showResult();
+            }
+        }
+        
+        function previousQuestion() {
+            if (state.currentIndex > 0) {
+                state.currentIndex--;
+                showQuestion();
+                document.querySelector('.quiz-header').scrollIntoView();
+            }
+        }
+        
+        function showResult() {
+            let correct = 0;
+            state.selectedQuestions.forEach((q, idx) => {
+                if (q.type === 'MC') {
+                    const selected = state.answers[idx];
+                    if (selected !== undefined && q.answer === ['①', '②', '③', '④'][selected]) {
+                        correct++;
+                    }
+                }
+            });
+            
+            const total = state.selectedQuestions.filter(q => q.type === 'MC').length;
+            const percent = total > 0 ? Math.round((correct / total) * 100) : 0;
+            
+            document.getElementById('resultScore').textContent = correct + '/' + total;
+            document.getElementById('resultDetail').textContent = '객관식 정답률: ' + percent + '%';
+            
+            let reviewHtml = '<div class="review-title">오답 검토</div>';
+            let hasWrong = false;
+            
+            state.selectedQuestions.forEach((q, idx) => {
+                if (q.type === 'MC') {
+                    const selected = state.answers[idx];
+                    const isCorrect = selected !== undefined && q.answer === ['①', '②', '③', '④'][selected];
+                    
+                    if (!isCorrect) {
+                        hasWrong = true;
+                        const selectedLabel = selected !== undefined ? ['①', '②', '③', '④'][selected] : '미응답';
+                        reviewHtml += '<div class="review-item incorrect">';
+                        reviewHtml += '<div class="review-question">Q' + (idx + 1) + ' (오답)</div>';
+                        reviewHtml += '<div class="review-answer">선택: ' + selectedLabel + ' → 정답: ' + q.answer + '</div>';
+                        reviewHtml += '</div>';
+                    }
+                }
+            });
+            
+            if (!hasWrong) {
+                reviewHtml += '<div style="color: #10b981; padding: 20px; text-align: center;">모든 객관식 문제를 맞추셨습니다! 🎉</div>';
+            }
+            
+            document.getElementById('reviewSection').innerHTML = reviewHtml;
+            
+            document.getElementById('home').style.display = 'none';
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
+        }
+        
+        function goHome() {
+            document.getElementById('home').style.display = 'flex';
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('result').style.display = 'none';
+            state.currentIndex = 0;
+            state.answers = {};
+        }
+    </script>
+</body>
+</html>

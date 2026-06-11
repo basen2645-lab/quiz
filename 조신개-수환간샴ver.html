@@ -3,768 +3,853 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>조직신학개론 모의고사 (148문)</title>
+    <title>조직신학개론 기말고사</title>
     <style>
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
-        
+
         body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #1a1f3a 0%, #2d2e4e 100%);
             min-height: 100vh;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
-            font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', -apple-system, sans-serif;
-            color: #e2e8f0;
-            line-height: 1.6;
+            padding: 0;
         }
-        
-        .container {
-            max-width: 720px;
-            margin: 0 auto;
+
+        /* 시작 화면 */
+        .start-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             padding: 20px;
         }
-        
-        /* ===== HOME SCREEN ===== */
-        #home {
+
+        .start-container {
+            width: 100%;
+            max-width: 500px;
+            background: linear-gradient(135deg, #1a1f3a 0%, #2d2e4e 100%);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .book-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, #7ee8ac 0%, #6ec5ff 50%, #9b7ee8 100%);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            padding: 24px;
+            font-size: 40px;
+            box-shadow: 0 8px 16px rgba(126, 232, 172, 0.3);
         }
-        
-        .home-card {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(148, 163, 184, 0.1);
-            border-radius: 20px;
-            padding: 48px 40px;
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-        }
-        
-        .home-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-        }
-        
-        .home-title {
-            font-size: 28px;
+
+        .title {
+            font-size: 32px;
             font-weight: 700;
-            color: #f1f5f9;
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
+            color: white;
+            margin-bottom: 10px;
         }
-        
-        .home-subtitle {
-            color: #94a3b8;
+
+        .subtitle {
             font-size: 14px;
-            margin-bottom: 8px;
+            color: #8892b0;
+            margin-bottom: 30px;
         }
-        
-        .home-stats {
-            color: #cbd5e1;
+
+        .problem-count {
+            font-size: 48px;
+            font-weight: 700;
+            color: #7ee8ac;
+            margin-bottom: 10px;
+        }
+
+        .problem-split {
             font-size: 13px;
-            margin-bottom: 32px;
-            line-height: 1.8;
+            color: #a0aec0;
+            margin-bottom: 40px;
         }
-        
-        .home-stats strong {
-            color: #f1f5f9;
-            font-size: 18px;
-        }
-        
-        .filter-group {
-            margin-bottom: 28px;
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #8892b0;
+            margin-bottom: 15px;
             text-align: left;
         }
-        
-        .filter-label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
-        }
-        
-        .filter-buttons {
+
+        .tab-buttons {
             display: flex;
-            gap: 8px;
-            justify-content: center;
-            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 30px;
         }
-        
-        .filter-btn {
-            padding: 10px 20px;
-            border: 2px solid rgba(148, 163, 184, 0.2);
-            border-radius: 8px;
-            background: transparent;
-            color: #94a3b8;
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 10px;
             font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.25s;
-            font-family: inherit;
-        }
-        
-        .filter-btn:hover {
-            border-color: rgba(148, 163, 184, 0.4);
-        }
-        
-        .filter-btn.active {
-            background: #0ea5e9;
-            border-color: #0ea5e9;
-            color: #0f172a;
             font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.1);
+            color: #a0aec0;
         }
-        
-        .count-control {
-            text-align: center;
-            margin-bottom: 32px;
+
+        .tab-btn.active {
+            background: #5dade2;
+            color: white;
         }
-        
-        .count-label {
-            display: block;
+
+        .tab-btn:hover {
+            background: rgba(93, 173, 226, 0.3);
+        }
+
+        .problem-size-label {
             font-size: 12px;
-            color: #94a3b8;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-            letter-spacing: 0.5px;
+            font-weight: 600;
+            color: #8892b0;
+            margin-bottom: 15px;
+            text-align: left;
         }
-        
-        .count-display {
-            font-size: 36px;
+
+        .problem-size-display {
+            font-size: 48px;
             font-weight: 700;
-            color: #0ea5e9;
-            margin-bottom: 12px;
+            color: #5dade2;
+            margin-bottom: 20px;
         }
-        
-        input[type="range"] {
+
+        .slider-container {
+            margin-bottom: 30px;
+        }
+
+        .slider {
             width: 100%;
             height: 6px;
             border-radius: 3px;
-            background: linear-gradient(to right, #0ea5e9, #0ea5e9);
-            background-size: 100% 100%;
-            background-repeat: no-repeat;
+            background: linear-gradient(to right, #5dade2 0%, #5dade2 var(--value), #4a5568 var(--value), #4a5568 100%);
+            outline: none;
             -webkit-appearance: none;
             appearance: none;
-            cursor: pointer;
+            padding: 0;
         }
-        
-        input[type="range"]::-webkit-slider-thumb {
+
+        .slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            background: #0ea5e9;
+            background: #5dade2;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.4);
+            box-shadow: 0 0 8px rgba(93, 173, 226, 0.5);
         }
-        
-        input[type="range"]::-moz-range-thumb {
-            width: 18px;
-            height: 18px;
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            background: #0ea5e9;
+            background: #5dade2;
             cursor: pointer;
             border: none;
-            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.4);
+            box-shadow: 0 0 8px rgba(93, 173, 226, 0.5);
         }
-        
+
         .start-btn {
             width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
-            border: none;
-            border-radius: 10px;
+            padding: 16px;
+            background: linear-gradient(135deg, #5dade2 0%, #4a90e2 100%);
             color: white;
+            border: none;
+            border-radius: 12px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            font-family: inherit;
+            box-shadow: 0 8px 16px rgba(93, 173, 226, 0.3);
         }
-        
+
         .start-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3);
+            box-shadow: 0 12px 24px rgba(93, 173, 226, 0.4);
         }
-        
+
         .start-btn:active {
             transform: translateY(0);
         }
-        
-        /* ===== QUIZ SCREEN ===== */
-        #quiz {
+
+        /* 문제 풀이 화면 */
+        .quiz-screen {
             display: none;
             min-height: 100vh;
-            padding: 20px 0;
+            padding: 20px;
         }
-        
-        .quiz-header {
-            position: sticky;
-            top: 0;
-            background: linear-gradient(to bottom, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0));
-            backdrop-filter: blur(10px);
-            padding: 16px 20px;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-            margin-bottom: 24px;
-            z-index: 10;
-        }
-        
-        .progress-bar {
-            height: 4px;
-            background: rgba(148, 163, 184, 0.1);
-            border-radius: 2px;
-            overflow: hidden;
-            margin-bottom: 12px;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #0ea5e9, #06b6d4);
-            transition: width 0.3s;
-        }
-        
-        .progress-text {
-            font-size: 12px;
-            color: #94a3b8;
-        }
-        
-        .question-container {
-            background: rgba(30, 41, 59, 0.6);
-            border: 1px solid rgba(148, 163, 184, 0.1);
-            border-radius: 16px;
-            padding: 32px;
-            margin-bottom: 20px;
-        }
-        
-        .question-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-        
-        .q-number {
-            font-size: 12px;
-            font-weight: 700;
-            color: #0ea5e9;
-            padding: 4px 8px;
-            background: rgba(14, 165, 233, 0.1);
-            border-radius: 4px;
-        }
-        
-        .q-type {
-            font-size: 11px;
-            padding: 3px 8px;
-            background: rgba(148, 163, 184, 0.1);
-            border-radius: 4px;
-            color: #cbd5e1;
-        }
-        
-        .question-text {
-            font-size: 16px;
-            font-weight: 500;
-            color: #f1f5f9;
-            margin-bottom: 24px;
-            line-height: 1.7;
-        }
-        
-        .choices {
+
+        .quiz-screen.active {
             display: flex;
             flex-direction: column;
-            gap: 10px;
         }
-        
-        .choice {
-            padding: 14px;
-            border: 2px solid rgba(148, 163, 184, 0.2);
-            border-radius: 8px;
-            background: transparent;
-            color: #cbd5e1;
-            cursor: pointer;
-            transition: all 0.25s;
-            text-align: left;
-            font-size: 14px;
-            font-family: inherit;
-        }
-        
-        .choice:hover {
-            border-color: rgba(14, 165, 233, 0.5);
-            background: rgba(14, 165, 233, 0.05);
-        }
-        
-        .choice.selected {
-            border-color: #0ea5e9;
-            background: rgba(14, 165, 233, 0.1);
-            color: #f1f5f9;
-        }
-        
-        .choice.correct {
-            border-color: #10b981;
-            background: rgba(16, 185, 129, 0.1);
-            color: #a7f3d0;
-        }
-        
-        .choice.incorrect {
-            border-color: #ef4444;
-            background: rgba(239, 68, 68, 0.1);
-            color: #fca5a5;
-        }
-        
-        .answer-display {
-            margin-top: 20px;
-            padding: 16px;
-            background: rgba(16, 185, 129, 0.08);
-            border-left: 4px solid #10b981;
-            border-radius: 8px;
-            font-size: 14px;
-            color: #a7f3d0;
-            line-height: 1.6;
-        }
-        
-        .answer-label {
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
-        
-        .nav-buttons {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
-        }
-        
-        .btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.25s;
-            font-family: inherit;
-        }
-        
-        .btn-secondary {
-            background: rgba(148, 163, 184, 0.1);
-            color: #94a3b8;
-            border: 1px solid rgba(148, 163, 184, 0.2);
-        }
-        
-        .btn-secondary:hover {
-            background: rgba(148, 163, 184, 0.15);
-        }
-        
-        .btn-primary {
-            background: #0ea5e9;
-            color: #0f172a;
-        }
-        
-        .btn-primary:hover {
-            background: #06b6d4;
-        }
-        
-        /* ===== RESULT SCREEN ===== */
-        #result {
-            display: none;
-            min-height: 100vh;
-            padding: 40px 20px;
-        }
-        
-        .result-card {
-            background: rgba(30, 41, 59, 0.6);
-            border: 1px solid rgba(148, 163, 184, 0.1);
-            border-radius: 16px;
-            padding: 40px;
-            text-align: center;
-            margin-bottom: 24px;
-        }
-        
-        .result-icon {
-            font-size: 64px;
-            margin-bottom: 16px;
-        }
-        
-        .result-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #f1f5f9;
-            margin-bottom: 8px;
-        }
-        
-        .result-score {
-            font-size: 48px;
-            font-weight: 700;
-            color: #0ea5e9;
-            margin: 24px 0;
-        }
-        
-        .result-detail {
-            font-size: 14px;
-            color: #94a3b8;
-            margin-bottom: 24px;
-        }
-        
-        .review-section {
-            background: rgba(30, 41, 59, 0.6);
-            border: 1px solid rgba(148, 163, 184, 0.1);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 16px;
-        }
-        
-        .review-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #f1f5f9;
-            margin-bottom: 16px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .review-item {
-            padding: 12px;
-            background: rgba(15, 23, 42, 0.5);
-            border-radius: 8px;
-            margin-bottom: 10px;
-            font-size: 13px;
-            line-height: 1.6;
-        }
-        
-        .review-item.correct {
-            border-left: 3px solid #10b981;
-        }
-        
-        .review-item.incorrect {
-            border-left: 3px solid #ef4444;
-        }
-        
-        .review-question {
-            color: #f1f5f9;
-            font-weight: 500;
-            margin-bottom: 6px;
-        }
-        
-        .review-answer {
-            color: #94a3b8;
-            font-size: 12px;
-        }
-        
-        .restart-btn {
+
+        .quiz-container {
+            max-width: 600px;
             width: 100%;
+            margin: 0 auto;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .progress-text {
+            font-size: 13px;
+            color: #8892b0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #7ee8ac 0%, #5dade2 100%);
+            transition: width 0.3s;
+        }
+
+        .question-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .question-number {
+            font-size: 12px;
+            color: #5dade2;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 16px;
+            color: white;
+            font-weight: 600;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
             padding: 16px;
-            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
-            border: none;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
             border-radius: 10px;
             color: white;
-            font-size: 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .option:hover {
+            border-color: #5dade2;
+            background: rgba(93, 173, 226, 0.1);
+        }
+
+        .option.selected {
+            border-color: #5dade2;
+            background: rgba(93, 173, 226, 0.15);
+        }
+
+        .option.correct {
+            border-color: #7ee8ac;
+            background: rgba(126, 232, 172, 0.15);
+            color: #7ee8ac;
+        }
+
+        .option.incorrect {
+            border-color: #f56565;
+            background: rgba(245, 101, 101, 0.15);
+            color: #f56565;
+        }
+
+        .answer-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(126, 232, 172, 0.1);
+            border-left: 4px solid #7ee8ac;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .answer-section.show {
+            display: block;
+        }
+
+        .answer-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #7ee8ac;
+            margin-bottom: 8px;
+        }
+
+        .answer-text {
+            font-size: 14px;
+            color: #cbd5e0;
+            line-height: 1.6;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            font-family: inherit;
         }
-        
-        .restart-btn:hover {
+
+        .next-btn {
+            background: linear-gradient(135deg, #5dade2 0%, #4a90e2 100%);
+            color: white;
+        }
+
+        .next-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3);
+            box-shadow: 0 8px 16px rgba(93, 173, 226, 0.3);
         }
-        
-        /* ===== RESPONSIVE ===== */
+
+        .next-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .exit-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #8892b0;
+        }
+
+        .exit-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .answer-indicator {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .correct-indicator {
+            background: rgba(126, 232, 172, 0.3);
+            color: #7ee8ac;
+        }
+
+        .incorrect-indicator {
+            background: rgba(245, 101, 101, 0.3);
+            color: #f56565;
+        }
+
         @media (max-width: 600px) {
-            .home-card {
-                padding: 32px 24px;
+            .start-container {
+                padding: 30px 20px;
             }
-            
-            .question-container {
-                padding: 24px;
+
+            .title {
+                font-size: 28px;
             }
-            
+
+            .problem-count {
+                font-size: 40px;
+            }
+
+            .question-card {
+                padding: 20px;
+            }
+
             .question-text {
                 font-size: 15px;
-            }
-            
-            .home-title {
-                font-size: 24px;
-            }
-            
-            .result-score {
-                font-size: 40px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- HOME SCREEN -->
-    <div id="home">
-        <div class="home-card">
-            <div class="home-icon">📚</div>
-            <h1 class="home-title">조직신학개론</h1>
-            <p class="home-subtitle">기말고사 모의고사</p>
+    <!-- 시작 화면 -->
+    <div class="start-screen" id="startScreen">
+        <div class="start-container">
+            <div class="book-icon">📚</div>
+            <h1 class="title">조직신학개론</h1>
+            <p class="subtitle">기말고사 모의고사</p>
             
-            <div class="home-stats">
-                <div><strong>148문제</strong></div>
-                <div style="font-size: 12px; margin-top: 6px;">객관식 61 + 단답형 87</div>
+            <div class="problem-count">148문제</div>
+            <p class="problem-split">객관식 61 + 단답형 87</p>
+
+            <div class="section-label">문제 유형</div>
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="selectType('all')">전체</button>
+                <button class="tab-btn" onclick="selectType('multiple')">객관식</button>
+                <button class="tab-btn" onclick="selectType('short')">단답형</button>
             </div>
-            
-            <div class="filter-group">
-                <label class="filter-label">문제 유형</label>
-                <div class="filter-buttons">
-                    <button class="filter-btn active" onclick="setFilter('all')">전체</button>
-                    <button class="filter-btn" onclick="setFilter('mc')">객관식</button>
-                    <button class="filter-btn" onclick="setFilter('sa')">단답형</button>
-                </div>
+
+            <div class="problem-size-label">문제 개수</div>
+            <div class="problem-size-display" id="sizeDisplay">20문</div>
+            <div class="slider-container">
+                <input type="range" min="5" max="148" value="20" class="slider" id="problemSlider" 
+                       oninput="updateSize(this.value)">
             </div>
-            
-            <div class="count-control">
-                <label class="count-label">문제 개수</label>
-                <div class="count-display"><span id="countDisplay">20</span>문</div>
-                <input type="range" id="countSlider" min="5" max="148" value="20" 
-                       oninput="updateCount(this.value)">
-            </div>
-            
+
             <button class="start-btn" onclick="startQuiz()">시작하기</button>
         </div>
     </div>
-    
-    <!-- QUIZ SCREEN -->
-    <div id="quiz">
-        <div class="container">
-            <div class="quiz-header">
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
-                <div class="progress-text">
-                    <span id="currentNum">1</span> / <span id="totalNum">20</span>
-                </div>
+
+    <!-- 문제 풀이 화면 -->
+    <div class="quiz-screen" id="quizScreen">
+        <div class="quiz-container">
+            <div class="progress-header">
+                <span class="progress-text" id="progressText">1 / 20</span>
+                <button class="exit-btn btn" onclick="exitQuiz()" style="width: auto; flex: 0;">나가기</button>
             </div>
             
-            <div id="questionArea"></div>
-        </div>
-    </div>
-    
-    <!-- RESULT SCREEN -->
-    <div id="result">
-        <div class="container">
-            <div class="result-card">
-                <div class="result-icon" id="resultIcon">✅</div>
-                <h2 class="result-title" id="resultTitle">완료!</h2>
-                <div class="result-score" id="resultScore">00/00</div>
-                <div class="result-detail" id="resultDetail"></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
             </div>
-            
-            <div class="review-section" id="reviewSection"></div>
-            
-            <button class="restart-btn" onclick="goHome()">다시 풀기</button>
+
+            <div class="question-card">
+                <div class="question-number" id="questionNumber">질문 1)</div>
+                <div class="question-text" id="questionText"></div>
+                <div class="options-container" id="optionsContainer"></div>
+                <div class="answer-section" id="answerSection">
+                    <div class="answer-label">정답 풀이</div>
+                    <div class="answer-text" id="answerText"></div>
+                </div>
+                <div class="button-group" id="buttonGroup"></div>
+            </div>
         </div>
     </div>
-    
+
     <script>
-        const QUESTIONS = [{"num":1,"type":"MC","answer":"③","topic":"용어-연결","set":"기출01","id":1},{"num":2,"type":"MC","answer":"②","topic":"용어-의미","set":"기출01","id":2},{"num":3,"type":"MC","answer":"③","topic":"학자-입장","set":"기출01","id":3},{"num":4,"type":"MC","answer":"④","topic":"신학-주장","set":"기출01","id":4},{"num":5,"type":"MC","answer":"④","topic":"신학-비판","set":"기출01","id":5},{"num":6,"type":"MC","answer":"②","topic":"기독론","set":"기출01","id":6},{"num":7,"type":"MC","answer":"③","topic":"종말론","set":"기출01","id":7},{"num":8,"type":"MC","answer":"②","topic":"성례","set":"기출01","id":8},{"num":9,"type":"MC","answer":"④","topic":"학자-주장","set":"기출01","id":9},{"num":10,"type":"MC","answer":"②","topic":"신학용어","set":"기출01","id":10},{"num":11,"type":"MC","answer":"②","topic":"공의회","set":"기출01","id":11},{"num":12,"type":"SA","answer":"아우구스티누스: 비가시적 은혜의 가시적 표지","topic":"성례론","set":"기출01","id":12},{"num":13,"type":"SA","answer":"인효론: 집례자의 성덕/의도가 중요","topic":"성례론","set":"기출01","id":13},{"num":14,"type":"SA","answer":"말씀의 순수한 선포 + 성례의 올바른 집혜","topic":"교회론","set":"기출01","id":14},{"num":15,"type":"SA","answer":"JDDJ: 루터-가톨릭 칭의론 공동선언","topic":"종교대화","set":"기출01","id":15},{"num":16,"type":"SA","answer":"개혁된 교회는 항상 개혁되어야 한다","topic":"개혁교회론","set":"기출01","id":16},{"num":17,"type":"SA","answer":"이중은총: 칭의+성화","topic":"칼뱅","set":"기출01","id":17},{"num":18,"type":"SA","answer":"필리오케: 성령의 이중출원 / 동방반대, 서방찬성","topic":"삼위일체","set":"기출01","id":18},{"num":19,"type":"SA","answer":"경전의 태도 + 신의 일치성 + 사랑","topic":"이슬람-기독교","set":"기출01","id":19},{"num":20,"type":"SA","answer":"파루시아: 옆에 함께 / 아드벤투스: 어느 쪽에서 옴","topic":"종말론","set":"기출01","id":20},{"num":21,"type":"SA","answer":"예수의 최종성: 구세주 확신 + 다원상황에서 신앙 추구","topic":"종교신학","set":"기출01","id":21},{"num":22,"type":"SA","answer":"개인주의 + 종교의 사사화 + 관료주의화 + 신앙-삶 괴리","topic":"교회론","set":"기출01","id":22},{"num":23,"type":"SA","answer":"경청 + 기도 + 자유 + 연대 + 감사 + 소망","topic":"영성","set":"기출01","id":23},{"num":24,"type":"SA","answer":"인격: 누구인가? / 사역: 무엇을 하는가?","topic":"기독론","set":"기출01","id":24},{"num":25,"type":"SA","answer":"양성기독론: 참신-참인, 한 위격, 두 본성, 혼동/변화/분리/분할 없음","topic":"기독론","set":"기출01","id":25},{"num":1,"type":"MC","answer":"①","topic":"삼위일체","set":"기출02","id":26},{"num":2,"type":"MC","answer":"③","topic":"인간론","set":"기출02","id":27},{"num":3,"type":"MC","answer":"④","topic":"성례론","set":"기출02","id":28},{"num":4,"type":"MC","answer":"④","topic":"공의회","set":"기출02","id":29},{"num":5,"type":"MC","answer":"③","topic":"속죄론","set":"기출02","id":30},{"num":6,"type":"MC","answer":"④","topic":"해방신학","set":"기출02","id":31},{"num":7,"type":"MC","answer":"②","topic":"교회론","set":"기출02","id":32},{"num":8,"type":"MC","answer":"③","topic":"성찬론","set":"기출02","id":33},{"num":9,"type":"MC","answer":"①","topic":"종교신학","set":"기출02","id":34},{"num":10,"type":"MC","answer":"②","topic":"이슬람-기독교","set":"기출02","id":35},{"num":11,"type":"SA","answer":"통일성 + 거룩성 + 보편성 + 사도성","topic":"교회론","set":"기출02","id":36},{"num":12,"type":"SA","answer":"비가시적 은혜의 가시적 표지","topic":"성례론","set":"기출02","id":37},{"num":13,"type":"SA","answer":"성령을 따라 걷고 사는 삶","topic":"영성","set":"기출02","id":38},{"num":14,"type":"SA","answer":"보내다/파송하다","topic":"선교","set":"기출02","id":39},{"num":15,"type":"SA","answer":"민회: 정치적 모임 / 교회: 신앙 공동체 (하나님 부르심)","topic":"교회론","set":"기출02","id":40},{"num":16,"type":"SA","answer":"하나님의 감동성: 세상의 고통에 함께 고통 느낌","topic":"신론","set":"기출02","id":41},{"num":17,"type":"SA","answer":"인격: 누구인가? / 사역: 무엇을 하는가?","topic":"기독론","set":"기출02","id":42},{"num":18,"type":"SA","answer":"성자는 성부와 동일한 본체를 가진 참 하나님","topic":"기독론","set":"기출02","id":43},{"num":19,"type":"SA","answer":"필리오케: 성령의 이중출원 / 동방반대, 서방찬성","topic":"삼위일체","set":"기출02","id":44},{"num":20,"type":"SA","answer":"선지자 + 제사장 + 왕","topic":"기독론","set":"기출02","id":45},{"num":21,"type":"SA","answer":"신자들에게 그리스도가 현존하도록 함","topic":"성령론","set":"기출02","id":46},{"num":22,"type":"SA","answer":"파루시아: 옆에 함께 / 아드벤투스: 어느 쪽에서 옴","topic":"종말론","set":"기출02","id":47},{"num":23,"type":"SA","answer":"구원의 제도 + 성령의 엘리트 공동체 + 구원의 성례 + 복음의 전달자 + 섬기는 종","topic":"교회론","set":"기출02","id":48},{"num":24,"type":"SA","answer":"개혁된 교회는 항상 개혁되어야 한다","topic":"교회론","set":"기출02","id":49},{"num":25,"type":"SA","answer":"신묵시주의 비판: 성경 왜곡 + 결정주의적 + 우리/그들 분리 + 휴거 지향 + 예수 사역/십자가/부활 신학 부재","topic":"종말론","set":"기출02","id":50},{"num":1,"type":"MC","answer":"①","topic":"종교신학","set":"2023년","id":51},{"num":2,"type":"MC","answer":"③","topic":"신학자","set":"2023년","id":52},{"num":3,"type":"MC","answer":"②","topic":"교회론","set":"2023년","id":53},{"num":4,"type":"MC","answer":"④","topic":"영성","set":"2023년","id":54},{"num":5,"type":"MC","answer":"②","topic":"성찬론","set":"2023년","id":55},{"num":6,"type":"MC","answer":"③","topic":"페미니즘신학","set":"2023년","id":56},{"num":7,"type":"MC","answer":"①","topic":"종교신학","set":"2023년","id":57},{"num":8,"type":"MC","answer":"③","topic":"성례론","set":"2023년","id":58},{"num":9,"type":"MC","answer":"③","topic":"신묵시주의","set":"2023년","id":59},{"num":10,"type":"MC","answer":"①","topic":"종말론","set":"2023년","id":60},{"num":11,"type":"SA","answer":"우머니즘","topic":"흑인여성신학","set":"2023년","id":61},{"num":12,"type":"SA","answer":"구원의 제도 + 성령의 엘리트 공동체 + 구원의 성례 + 복음의 전달자 + 섬기는 종","topic":"교회론","set":"2023년","id":62},{"num":13,"type":"SA","answer":"에피클레시스: 성령임재를 요청하는 기도","topic":"성찬론","set":"2023년","id":63},{"num":14,"type":"SA","answer":"말씀의 순수한 선포 + 성례의 올바른 집행(+권징)","topic":"교회론","set":"2023년","id":64},{"num":15,"type":"SA","answer":"필리오케: '그리고 아들로부터'","topic":"삼위일체","set":"2023년","id":65},{"num":16,"type":"SA","answer":"비가시적 은혜의 가시적 표지","topic":"성례론","set":"2023년","id":66},{"num":17,"type":"SA","answer":"종말: 끝(종말) + 목적(에스카톤)","topic":"종말론","set":"2023년","id":67},{"num":18,"type":"SA","answer":"JDDJ: 루터-가톨릭 칭의론 공동선언","topic":"종교대화","set":"2023년","id":68},{"num":19,"type":"SA","answer":"다원성: 다원적 상황 / 다원주의: 각 종교가 다 구원의 길","topic":"종교신학","set":"2023년","id":69},{"num":20,"type":"SA","answer":"개혁된 교회는 항상 개혁되어야 한다","topic":"교회론","set":"2023년","id":70},{"num":21,"type":"SA","answer":"사사화의 의미: 공적 영역에서 분리되어 사적 세계로 편입 / 문제점: 교회 메시지와 선교가 삶의 질문에서 소외","topic":"현대교회론","set":"2023년","id":71},{"num":22,"type":"SA","answer":"이중은총: 칭의 + 성화","topic":"칼뱅","set":"2023년","id":72},{"num":23,"type":"SA","answer":"믿음-칭의 + 사랑-성화 + 소명-소명","topic":"영성","set":"2023년","id":73},{"num":24,"type":"SA","answer":"에클레시아: 하나님의 부르심을 받은 이들","topic":"교회론","set":"2023년","id":74},{"num":25,"type":"SA","answer":"삼위일체적 교회론의 두 기둥: 교제 + 선교","topic":"교회론","set":"2023년","id":75},{"num":1,"type":"MC","answer":"④","topic":"신학자","set":"2022-1_B반","id":76},{"num":2,"type":"MC","answer":"④","topic":"교회 정치제도","set":"2022-1_B반","id":77},{"num":3,"type":"MC","answer":"①","topic":"용어","set":"2022-1_B반","id":78},{"num":4,"type":"MC","answer":"①","topic":"교회론","set":"2022-1_B반","id":79},{"num":5,"type":"MC","answer":"①","topic":"삼중직","set":"2022-1_B반","id":80},{"num":6,"type":"MC","answer":"③","topic":"성령론","set":"2022-1_B반","id":81},{"num":7,"type":"MC","answer":"③","topic":"신학자","set":"2022-1_B반","id":82},{"num":8,"type":"MC","answer":"②","topic":"종말론","set":"2022-1_B반","id":83},{"num":9,"type":"MC","answer":"②","topic":"종교신학","set":"2022-1_B반","id":84},{"num":10,"type":"MC","answer":"②","topic":"종교신학","set":"2022-1_B반","id":85},{"num":11,"type":"SA","answer":"성경 안의 상황 + 독자의 상황","topic":"성서해석","set":"2022-1_B반","id":86},{"num":12,"type":"SA","answer":"삼위일체적 교제: 교회는 삼위일체 하나님의 교제와 선교에 참여","topic":"교회론","set":"2022-1_B반","id":87},{"num":13,"type":"SA","answer":"필리오케: 성령의 이중출현","topic":"삼위일체","set":"2022-1_B반","id":88},{"num":14,"type":"SA","answer":"신묵시주의 비판: 1)성경 왜곡 2)결정주의 3)우리/그들 분리 4)휴거 지향 5)예수 사역 신학 부재","topic":"종말론","set":"2022-1_B반","id":89},{"num":15,"type":"SA","answer":"사효론: 성례 자체로 효력 / 인효론: 집례자의 성덕/의도 중요","topic":"성례론","set":"2022-1_B반","id":90},{"num":16,"type":"SA","answer":"세례의 연대성: 죄와 소외 세상과의 연대 + 그리스도 안의 인간 상호 연대 + 인간과 창조세계의 연대","topic":"성례","set":"2022-1_B반","id":91},{"num":17,"type":"SA","answer":"4가지 모형: 구원의 제도 + 성령의 엘리트 공동체 + 구원의 성례 + 복음의 전달자 + 섬기는 종","topic":"교회론","set":"2022-1_B반","id":92},{"num":18,"type":"SA","answer":"신중심주의: 산정상으로 가는 길은 여러 가지","topic":"종교신학","set":"2022-1_B반","id":93},{"num":19,"type":"SA","answer":"이중은총: 칭의+성화 (구별되지만 분리될 수 없음)","topic":"칼뱅","set":"2022-1_B반","id":94},{"num":20,"type":"SA","answer":"화체설: 실체가 변화된다","topic":"성찬론","set":"2022-1_B반","id":95},{"num":21,"type":"SA","answer":"비가시적 은혜의 가시적 표지","topic":"성례론","set":"2022-1_B반","id":96},{"num":22,"type":"SA","answer":"파루시아/아드벤투스: 재림, 도래","topic":"종말론","set":"2022-1_B반","id":97},{"num":23,"type":"SA","answer":"루터의 '동시에 의인이면서 죄인(simul iustus et peccator)'","topic":"종교개혁","set":"2022-1_B반","id":98},{"num":24,"type":"SA","answer":"현대 4가지 미래소망: 자유주의적 진보 + 마르크스적 이상주의 + 신묵시주의 (vs 성경의 참 종말)","topic":"종말론","set":"2022-1_B반","id":99},{"num":25,"type":"SA","answer":"다원성: 다원적 상황 / 다원주의: 각 종교가 다 구원의 길","topic":"종교신학","set":"2022-1_B반","id":100},{"num":1,"type":"MC","answer":"①","topic":"성령론","set":"2022-1_1학년","id":101},{"num":2,"type":"MC","answer":"①","topic":"종교신학","set":"2022-1_1학년","id":102},{"num":3,"type":"MC","answer":"③","topic":"종교론","set":"2022-1_1학년","id":103},{"num":4,"type":"MC","answer":"②","topic":"교회론","set":"2022-1_1학년","id":104},{"num":5,"type":"MC","answer":"④","topic":"세례","set":"2022-1_1학년","id":105},{"num":6,"type":"MC","answer":"③","topic":"종교신학","set":"2022-1_1학년","id":106},{"num":7,"type":"MC","answer":"③","topic":"영성","set":"2022-1_1학년","id":107},{"num":8,"type":"MC","answer":"④","topic":"성찬론","set":"2022-1_1학년","id":108},{"num":9,"type":"MC","answer":"①","topic":"종말론","set":"2022-1_1학년","id":109},{"num":10,"type":"MC","answer":"③","topic":"신학","set":"2022-1_1학년","id":110},{"num":11,"type":"SA","answer":"하나님의 백성 + 그리스도의 몸 + 섬기는 백성 + 성령의 공동체","topic":"교회론","set":"2022-1_1학년","id":111},{"num":12,"type":"SA","answer":"파송: 구원 경륜 안의 사역 / 출원: 하나님 내의 영원한 삶","topic":"삼위일체","set":"2022-1_1학년","id":112},{"num":13,"type":"SA","answer":"에피클레시스: 성령의 임재를 요청하는 기도","topic":"성찬론","set":"2022-1_1학년","id":113},{"num":14,"type":"SA","answer":"말씀의 순수한 선포 + 성례의 올바른 집행(+권징)","topic":"교회론","set":"2022-1_1학년","id":114},{"num":15,"type":"SA","answer":"앤드류 월스: 성육신을 통한 하나님의 자기전달은 탁월한 번역","topic":"선교","set":"2022-1_1학년","id":115},{"num":16,"type":"SA","answer":"둘레길 이론: 둘레길을 올라갈 사람이 반드시 산정상에 오를 마음이 있는 것 아님","topic":"종교신학","set":"2022-1_1학년","id":116},{"num":17,"type":"SA","answer":"공통의 말씀: 경전에 대한 태도 + 신의 일치성 + 사랑","topic":"이슬람-기독교","set":"2022-1_1학년","id":117},{"num":18,"type":"SA","answer":"미씨오 데이: 선교의 주체는 삼위일체 하나님","topic":"선교","set":"2022-1_1학년","id":118},{"num":19,"type":"SA","answer":"종말: 끝(종말) + 목적(에스카톤)","topic":"종말론","set":"2022-1_1학년","id":119},{"num":20,"type":"SA","answer":"에클레시아: 하나님의 부르심을 받은 이들","topic":"교회론","set":"2022-1_1학년","id":120},{"num":21,"type":"SA","answer":"성만찬의 나눔: 하나님-인간의 삶 나눔 + 인간 상호의 삶 나눔 + 인간-창조세계의 공유","topic":"성례","set":"2022-1_1학년","id":121},{"num":22,"type":"SA","answer":"JDDJ: 루터-가톨릭 칭의론 공동선언","topic":"종교대화","set":"2022-1_1학년","id":122},{"num":23,"type":"SA","answer":"신묵시주의 비판 5가지 중 2가지: 1)성경 왜곡 2)결정주의 3)우리/그들 분리 4)휴거 지향 5)예수 사역 신학 부재","topic":"종말론","set":"2022-1_1학년","id":123},{"num":24,"type":"SA","answer":"성령의 우주적 사역: 교회 내부에 국한되지 않고 우주적 차원에서 활동","topic":"성령론","set":"2022-1_1학년","id":124},{"num":25,"type":"SA","answer":"개혁된 교회는 항상 개혁되어야 한다","topic":"교회론","set":"2022-1_1학년","id":125},{"num":"Q05","type":"MC","answer":"③","topic":"속죄론","set":"11페이지_중간고사예상","id":126},{"num":"Q06","type":"MC","answer":"①","topic":"인간론","set":"11페이지_중간고사예상","id":127},{"num":"Q13","type":"SA","answer":"양성기독론: 참신-참인, 한 위격, 두 본성, 4가지 부정 없음(혼동,변화,분리,분할)","topic":"기독론","set":"11페이지_중간고사예상","id":128},{"num":"Q17","type":"SA","answer":"타락한 인간: 적극적 자아중심 우상숭배 + 수동적 타자중심 우상숭배","topic":"죄론","set":"11페이지_중간고사예상","id":129},{"num":"Q19","type":"SA","answer":"삼위일체의 공동성: 성부-성자-성령이 함께 존재, 함께 활동","topic":"삼위일체","set":"11페이지_중간고사예상","id":130},{"num":"Q20","type":"SA","answer":"칼 바르트의 삼중직: 종으로서의 주님 + 주님으로서의 종 + 참된 증인","topic":"기독론","set":"11페이지_중간고사예상","id":131},{"num":"Q25","type":"SA","answer":"알렉산드리아: 말씀-육신 / 안디옥: 말씀-인간","topic":"기독론","set":"11페이지_중간고사예상","id":132},{"num":"Q04","type":"MC","answer":"④","topic":"기독론","set":"12페이지_22년B반","id":133},{"num":"Q05","type":"MC","answer":"④","topic":"죄론","set":"12페이지_22년B반","id":134},{"num":"Q08","type":"MC","answer":"②","topic":"기독론","set":"12페이지_22년B반","id":135},{"num":"Q10","type":"MC","answer":"①","topic":"인간론","set":"12페이지_22년B반","id":136},{"num":"Q13","type":"SA","answer":"유사본질: 예수님이 하나님과 유사하지만 동등하지 않음","topic":"공의회","set":"12페이지_22년B반","id":137},{"num":"Q19","type":"SA","answer":"파토스: 하나님의 감동성, 고통을 느끼심","topic":"신론","set":"12페이지_22년B반","id":138},{"num":"Q20","type":"SA","answer":"체념의 죄: 하나님의 자비를 순전히 신뢰 / 교만한 추정: 타자와 함께, 타자를 위한 인간","topic":"죄론","set":"12페이지_22년B반","id":139},{"num":"Q24","type":"SA","answer":"알렉산드리아: 말씀-육신 / 안디옥: 말씀-인간","topic":"기독론","set":"12페이지_22년B반","id":140},{"num":"Q25","type":"SA","answer":"믿음: 자비 신뢰 / 사랑: 타자와 함께 / 소망: 미래 약속 기대","topic":"영성","set":"12페이지_22년B반","id":141},{"num":"Q01","type":"MC","answer":"④","topic":"삼위일체","set":"13페이지_22년A반","id":142},{"num":"Q07","type":"MC","answer":"③","topic":"속죄론","set":"13페이지_22년A반","id":143},{"num":"Q08","type":"MC","answer":"①","topic":"인간론","set":"13페이지_22년A반","id":144},{"num":"Q10","type":"MC","answer":"④","topic":"인간론","set":"13페이지_22년A반","id":145},{"num":"Q14","type":"SA","answer":"양성기독론: 참신-참인, 한 위격, 두 본성, 혼동/변화/분리/분할 없음","topic":"기독론","set":"13페이지_22년A반","id":146},{"num":"Q22","type":"SA","answer":"몰트만: 성부-고통 느낌 / 성자-십자가상 고통 / 성령-중보의 고통","topic":"십자가신학","set":"13페이지_22년A반","id":147},{"num":"Q24","type":"SA","answer":"속성의 교류: 신성과 인성 간의 교류","topic":"기독론","set":"13페이지_22년A반","id":148}];
-        
-        let state = {
-            currentIndex: 0,
-            selectedQuestions: [],
-            answers: {},
-            filter: 'all'
+        let allQuestions = [];
+        let selectedQuestions = [];
+        let currentIndex = 0;
+        let selectedType = 'all';
+        let selectedCount = 20;
+        let userAnswers = {};
+
+        // 모든 문제 데이터
+        const questionsData = {
+            multiple: [
+                // 기출문제 01 - 객관식
+                { id: 'q1-1', text: '다음 중 연결이 잘못된 것은?', options: ['파토스(pathos)=고난', '뮈스테리온(mysteion)=신비/비밀', '에스카톤(eschaton)=회개', '도케티즘(docetism)=가현설(假現說)'], correct: 2, answer: '에스카톤은 회개가 아니라 종말 또는 마지막 때를 의미합니다.' },
+                { id: 'q1-2', text: '다음 중 "전능자(全能者)"를 의미하는 단어는 무엇인가?', options: ['파라클레토스(parakletos)', '판토크라토르(pantokrator)', '선교사 하나님(the missionary God)', '네페쉬 하야(nephesh haya)'], correct: 1, answer: '판토크라토르(pantokrator)는 "모든 것의 지배자"라는 의미로 전능자를 뜻합니다.' },
+                { id: 'q1-3', text: '다음 중 연결이 바르게 된 것은?', options: ['멜랑히톤 - 화체설(transubstantiation)', '루터 - 공재설(consubstantiation)', '츠빙글리 - 영적 임재설(spiritual presence)', '칼뱅 - 기념설(memorialism)'], correct: 1, answer: '루터는 공재설(consubstantiation)을 주장했습니다.' },
+                { id: 'q1-4', text: '다음 중 "가난한 자들을 위한 선택적 우선권"을 주장하는 신학은?', options: ['여성신학(페미니즘신학)', '흑인신학', '히스패닉신학', '남미해방신학'], correct: 3, answer: '남미해방신학은 가난한 자들을 위한 선택적 우선권을 강조합니다.' },
+                { id: 'q1-5', text: '백충현의 "둘레길 이론"이 비판하는 입장은 무엇인가?', options: ['조지 린드벡의 종교간 특수성', '폴 니터의 4가지 유형론', '칼 라너의 익명의 그리스도인', '존 힉의 다원주의'], correct: 3, answer: '백충현의 둘레길 이론은 존 힉의 다원주의를 비판합니다.' },
+                { id: 'q1-6', text: '칼뱅의 예수 그리스도의 삼중직(munus triplex)의 3가지 직무가 아닌 것은?', options: ['왕', '사도', '제사장', '예언자/선지자'], correct: 1, answer: '삼중직은 왕, 제사장, 선지자입니다. 사도는 해당하지 않습니다.' },
+                { id: 'q1-7', text: '다음 중 신묵시주의(neo-apocalypticism)에 대한 비판이 아닌 것은?', options: ['성경에 대한 왜곡된 해석임', '종말사건들의 시간예정표가 결정주의적임', '신실한 제자도에 집중함', '예수 그리스도의 십자가/부활의 신학이 부재함'], correct: 2, answer: '신묵시주의 비판: 1)성경 왜곡 2)결정주의 3)우리와 그들 분리 4)휴거 지향 5)예수 사역/십자가/부활 신학 부재' },
+                { id: 'q1-8', text: '성찬에서의 성령임재를 요청하는 기도는 무엇인가?', options: ['아남네시스(anamnesis)', '에피클레시스(epic(k)lesis)', '연대(solidarity)', '환대(hospitality)'], correct: 1, answer: '에피클레시스(epiclesis)는 성령의 임재를 요청하는 기도입니다.' },
+                { id: 'q1-9', text: '다음 중 연결이 잘못된 것은?', options: ['앤드류 월스 - 세계기독교', '구티에레즈 – 해방신학', '송천성(C. S. Song) - 이야기신학', '제임스 콘 - 여성신학'], correct: 3, answer: '제임스 콘은 흑인신학의 주요 학자이며, 여성신학과는 다릅니다.' },
+                { id: 'q1-10', text: '다음 중 연결이 잘못된 것은?', options: ['속성의 교류 – communicatio idiomatum', '존귀 – kenosis(케노시스)', '하나님의어머니 – theotokos(테오토코스)', '위격적 연합 – hypostatic union'], correct: 1, answer: '케노시스(kenosis)는 존귀가 아니라 자기비움(self-emptying)을 의미합니다.' },
+
+                // 기출문제 02 - 객관식
+                { id: 'q2-1', text: '삼위일체신학에서 강조하는 "하나님의 형상(imago Dei)"은 무엇인가?', options: ['관계성', '이성/합리성', '자유', '신체적 유사성'], correct: 0, answer: '삼위일체신학: 하나님의 형상은 관계성' },
+                { id: 'q2-2', text: '하나님에 의해 창조된 인간이 본래 가진 긍정적인 요소가 아닌 것은?', options: ['자기초월성', '미래개방성', '자기중심성', '외심성'], correct: 2, answer: '자기중심성은 긍정적 요소가 아니라 타락의 결과입니다.' },
+                { id: 'q2-3', text: '성례의 효력이 성례 자체에 의해 발생한다고 여기는 주장은 무엇인가?', options: ['신앙론', '승리자 그리스도론', '인효론(人效論, ex opere operantis)', '사효론(事效論, ex opere operato)'], correct: 3, answer: '사효론(ex opere operato): 성례 자체로 효력을 지님' },
+                { id: 'q2-4', text: '기독론과 관련하여 다음 중 연결이 잘못된 것은?', options: ['알렉산드리아학파 – 말씀-육신 기독론', '안디옥학파 – 말씀-인간 기독론', '제4차 칼케돈공의회 - 양성기독론', '제5차 콘스탄티노플공의회 – 속성의 교류'], correct: 3, answer: '속성의 교류는 칼케돈 공의회와 관련이 있습니다.' },
+                { id: 'q2-5', text: '안셀무스의 Cur Deus Homo가 주장하는 속죄론의 입장은?', options: ['도덕적 감화설', '대속형벌설', '만족설', '승리자 그리스도론'], correct: 2, answer: '안셀무스: 만족설(Satisfaction Theory)' },
+                { id: 'q2-6', text: '다음 중 "가난한 자들을 위한 선택적 우선권"을 주장하는 신학은?', options: ['여성신학(페미니즘신학)', '흑인신학', '히스패닉신학', '남미해방신학'], correct: 3, answer: '남미해방신학은 가난한 자들을 위한 선택적 우선권을 강조합니다.' },
+                { id: 'q2-7', text: '교회에 대한 이해를 가로막는 장애물이 아닌 것은?', options: ['그리스도인의 신앙과 삶의 괴리', '참된 공동체성에 관한 관심', '종교의 관료주의화 및 사사화', '개인주의'], correct: 1, answer: '참된 공동체성에 관한 관심은 오히려 긍정적 요소입니다.' },
+                { id: 'q2-8', text: '다음 중 연결이 바르게 된 것은?', options: ['루터 - 화체설(transubstantiation)', '츠빙글리 - 공재설(consubstantiation)', '칼뱅 - 영적 임재설(spiritual presence)', '멜랑히톤 - 기념설(memorialism)'], correct: 2, answer: '칼뱅: 영적 실재적 임재설(spiritual real presence)' },
+                { id: 'q2-9', text: '백충현의 "둘레길 이론"이 비판하는 입장은 무엇인가?', options: ['존 힉의 다원주의', '폴 니터의 4가지 유형론', '칼 라너의 익명의 그리스도인', '조지 린드벡의 종교간 특수성'], correct: 0, answer: '백충현의 둘레길 이론: 존 힉의 다원주의 비판' },
+                { id: 'q2-10', text: '이슬람교/기독교 공통말씀(A Common Word)이 말하는 공통점이 아닌 것은?', options: ['경전에 대한 태도', '삼위일체론', '신의 하나됨', '사랑'], correct: 1, answer: '삼위일체론은 기독교만의 독특한 교리입니다.' },
+
+                // 2023년 - 객관식
+                { id: 'q3-1', text: '종교신학에서 폴 니터의 4가지 유형이 아닌 것은?', options: ['배타', '성취', '상호성', '비교불가능성(incommensurability)'], correct: 2, answer: '폴 니터의 유형: 배타, 성취, 포용, 다원주의' },
+                { id: 'q3-2', text: '다음 중 연결이 잘못된 것은?', options: ['이상현–경계성', '구스타보 구티에레즈-해방신학', '존 소브리노–흑인신학', '고수케 고야마-물소신학(water buffalo theology)'], correct: 2, answer: '존 소브리노는 해방신학 학자입니다. 제임스 콘이 흑인신학을 주도했습니다.' },
+                { id: 'q3-3', text: '니케아신조에서의 교회의 고전적 표지들 4가지가 아닌 것은?', options: ['통일성', '도덕성', '보편성', '사도성'], correct: 1, answer: '고전적 표지 4가지: 통일성, 거룩성, 보편성, 사도성 (도덕성 아님)' },
+                { id: 'q3-4', text: '밀리오리에게서 그리스도인의 삶의 성장을 나타내는 6가지 표지가 아닌 것은?', options: ['성숙한 경청', '성숙한 기도', '성숙한 감사', '성숙한 개인주의'], correct: 3, answer: '6가지 표지: 경청, 기도, 자유, 연대, 감사/기쁨, 소망 (개인주의 아님)' },
+                { id: 'q3-5', text: '다음 중 연결이 잘못된 것은?', options: ['천주교의 화체설(transubstantiation)', '안셀무스의 공재설(consubstantiation)', '칼뱅의 영적 실재적 임재설(spiritual real presence)', '츠빙글리의 기념설(memorialism)'], correct: 1, answer: '안셀무스는 속죄론의 만족설을 주장한 신학자입니다. 루터가 공재설.' },
+                { id: 'q3-6', text: '다음 중 페미니즘신학이 주로 비판하는 것은 무엇인가?', options: ['인종차별(racism)', '정치적 경제적 억압', '가부장제(patriarchy)', '민족적 문화적 혼종성(hybrid)'], correct: 2, answer: '페미니즘신학은 가부장제(patriarchy)를 주로 비판합니다.' },
+                { id: 'q3-7', text: '기독교적 종교신학에서 백충현의 "둘레길 이론"이 비판하는 것은?', options: ['존 힉(John Hick)의 신중심주의(theocentricism)', '마크 하임 "삼위일체적 포용주의"', '칼 라너의 "익명의 그리스도인(anonymous Christian)"', '조지 린드벡(George Lindbeck)의 "종교간 특수성을 강조"'], correct: 0, answer: '백충현의 둘레길 이론: 존 힉의 신중심주의(다원주의) 비판' },
+                { id: 'q3-8', text: '성례의 효력이 집례자의 자격과 덕에 의존한다는 주장은 무엇인가?', options: ['사효론(事效論, ex opere operato)', '성례론', '인효론(人效論, ex opere operantis)', '만족설'], correct: 2, answer: '인효론(ex opere operantis): 집례자의 성덕 또는 의도가 중요' },
+                { id: 'q3-9', text: '다음 중 신묵시주의(neo-apocalypticism)의 예에 해당하지 않는 것은?', options: ['할 린제이 "대유성지구의 종말"', '재림의 날짜를 특정하는 시한부 종말론', '마르틴 루터 "내일 지구 종말이 온다면…오늘 사과나무 심겠다!"', '"레프트 비하인드" 시리즈'], correct: 2, answer: '루터의 말은 신실한 제자도를 강조하며 신묵시주의 비판에 해당합니다.' },
+                { id: 'q3-10', text: '다음 중 서로 관련이 없는 용어는?', options: ['보편구원설(universalism)', '재림(second-coming)', '파루시아(parousia)', '도래/아드벤트(advent)'], correct: 0, answer: '보편구원설은 종말론과 직접 연관이 없고, 나머지는 그리스도의 재림을 의미합니다.' },
+
+                // 2022-1 B반 - 객관식
+                { id: 'q4-1', text: '다음 중 연결이 잘못된 것은?', options: ['디트리히 본회퍼 - 타자를 위한 교회', '칼 라너 - 익명의 그리스도인', '조지 린드벡 - 종교의 특수성 강조', '마르틴 루터 - 값싼 은혜'], correct: 3, answer: '본회퍼가 "값싼 은혜"를 비판했습니다. 루터와는 다릅니다.' },
+                { id: 'q4-2', text: '다음 중 교회의 3가지 주요한 정치제도에 속하지 않는 것은?', options: ['장로제', '감독제', '회중제', '만인제사장제'], correct: 3, answer: '만인제사장제는 정치 제도가 아니라 종교개혁의 원리입니다.' },
+                { id: 'q4-3', text: '다음 용어들 중 가리키는 의미가 다른 하나는?', options: ['뮈스테리온(mysterion)=신비', '에피클레시스(epic(k)lesis)=성령임재 기도', '사크라멘쿰(sacramentum)=성례', '(sacrament)=성례'], correct: 1, answer: '에피클레시스는 특정 행위를 지칭하고, 나머지는 성례의 개념입니다.' },
+                { id: 'q4-4', text: '밀리오리에 따르면, 오늘날 교회이해를 가로막는 장애물이 아닌 것은?', options: ['민족주의', '종교의 사사화', '관료주의적 조직', '신앙고백과 실천 사이의 괴리'], correct: 0, answer: '민족주의는 명시된 주요 장애물에 포함되지 않습니다. (개인주의, 사사화, 관료주의, 괴리)' },
+                { id: 'q4-5', text: '예수 그리스도의 삼중직무에 해당되지 않는 것은?', options: ['심판자', '예언자', '왕', '제사장'], correct: 0, answer: '삼중직은 예언자, 제사장, 왕입니다. 심판자는 포함되지 않습니다.' },
+                { id: 'q4-6', text: '오늘날 성령에 대한 관심이 증대되는 원인들이 아닌 것은?', options: ['현대의 비인격화와 관료체제화에 대한 항의', '영적 자원에 대한 광범위한 갈망', '근대의식의 냉정한 객관성과 역사성의 확산', '현대 에큐메니칼 교회의 발전과 오순절교회의 확장'], correct: 2, answer: '근대의식의 냉정한 객관성은 오히려 성령에 대한 관심을 감소시킵니다.' },
+                { id: 'q4-7', text: '다음 중 연결이 잘못된 것은?', options: ['이정용 - 주변성', '구스타보 쿠티에레즈 - 해방신학', '존 소브리노 - 흑인신학', '고수케 고야마 - 물소신학'], correct: 2, answer: '존 소브리노는 해방신학 학자입니다. 제임스 콘이 흑인신학을 주도했습니다.' },
+                { id: 'q4-8', text: '다음 중 참된 기독교적 종말론이 제시하는 소망의 정신이 아닌 것은?', options: ['폭력과 죽음의 세력에 맞섬', '세상에 대한 혐오와 도피', '정의와 자유와 평화를 위한 부담 감수', '하나님의 목적의 완성 재촉 및 기다림'], correct: 1, answer: '세상에 대한 혐오와 도피는 참된 기독교 종말론과 모순됩니다.' },
+                { id: 'q4-9', text: '다음 중 흑인여성신학을 가리키는 용어는 무엇인가?', options: ['페미니즘', '뮤헤리스타신학', '우머니즘', '메스티사헤'], correct: 2, answer: '우머니즘(Womanism)은 흑인여성신학을 의미합니다.' },
+                { id: 'q4-10', text: '종교신학에서 통상적으로 사용되는 3-선택 틀(3-option frame)이 아닌 것은?', options: ['다원주의', '그리스도의 최종성', '포용주의', '배타주의'], correct: 1, answer: '"그리스도의 최종성"은 3-선택 틀에 포함되지 않습니다. (배타, 포용, 다원)' },
+
+                // 2022-1 1학년 - 객관식
+                { id: 'q5-1', text: '신약에서의 성령의 사역의 6가지 측면들에 속하지 않는 것은?', options: ['예수 그리스도를 넘어서는 신비', '새로운 삶의 권능', '새로운 자유의 권능', '새로운 공동체의 권능'], correct: 0, answer: '성령의 사역은 예수 그리스도를 중심으로 함. (신비 아님)' },
+                { id: 'q5-2', text: '종교신학에서 폴 니터의 4가지 유형이 아닌 것은?', options: ['배타', '성취', '상호성', '비교불가능성'], correct: 3, answer: '폴 니터의 유형: 배타, 성취, 포용, 다원주의 (상호성 아님)' },
+                { id: 'q5-3', text: '다음 중 학자와 종교에 대한 이해가 잘못 연결된 것은?', options: ['포이어바흐 - 종교투사론', '칼 마르크스 - 종교는 아편', '칼 바르트 - 종교는 하나님의 계시', '프로이트 - 종교는 유아기적 환영'], correct: 2, answer: '칼 바르트는 "종교는 하나님의 계시의 반대"라고 주장했습니다.' },
+                { id: 'q5-4', text: '니케아 신조에서의 교회의 고전적 표지들 4가지가 아닌 것은?', options: ['통일성', '도덕성', '보편성', '사도성'], correct: 1, answer: '고전적 표지 4가지: 통일성, 거룩성, 보편성, 사도성 (도덕성 아님)' },
+                { id: 'q5-5', text: '다음 중 세례의 의미와 관련이 가장 먼 것은?', options: ['예수 그리스도와의 연합', '죄로 물든 삶을 씻는 것', '성령으로 다시 태어나는 것', '교인수의 확보와 교회성장'], correct: 3, answer: '교인수 확보는 세례의 의미와 무관합니다.' },
+                { id: 'q5-6', text: '다음 중 연결이 잘못된 것은?', options: ['조지 린드벡 - 종교의 차이점/특수성 강조', '칼 라너 - 익명의 그리스도인', '존 힉 - 포용주의', '밀리오리 - 삼위일체적 종교신학'], correct: 2, answer: '존 힉은 다원주의자이며, 포용주의는 아닙니다.' },
+                { id: 'q5-7', text: '밀리오리가 말하는 그리스도인의 삶의 성장을 나타내는 6가지 기준/표지가 아닌 것은?', options: ['성숙한 소망', '성숙한 기도', '성숙한 개인주의', '성숙한 연대'], correct: 2, answer: '개인주의는 성장의 표지가 아닙니다. (경청, 기도, 자유, 연대, 감사/기쁨, 소망)' },
+                { id: 'q5-8', text: '다음 중 연결이 잘못된 것은?', options: ['천주교 - 화체설', '루터 - 공재설', '칼뱅 - 영적 실재적 임재설', '안셀무스 - 기념설'], correct: 3, answer: '안셀무스는 속죄론의 만족설을 주장한 신학자입니다. 츠빙글리가 기념설.' },
+                { id: 'q5-9', text: '기독교의 소망을 표현하는 고전적 상징들이 아닌 것은?', options: ['보편구원설', '예수 그리스도의 재림', '죽은 자들의 부활', '최후의 심판'], correct: 0, answer: '보편구원설은 기독교의 표준적 소망이 아닙니다.' },
+                { id: 'q5-10', text: '다음 중 연결이 잘못된 것은?', options: ['흑인신학 - 인종차별', '페미니즘신학 - 가부장제', '히스패닉신학 - 민족적 문화적 정체성', '해방신학 - 정치적 경제적 억압'], correct: 2, answer: '히스패닉신학은 이민자 신학이고, 다른 것들은 정확합니다.' },
+
+                // 뒷부분 객관식 (11-13페이지)
+                // 11페이지 (중간고사 예상문제 중 기말범위) 객관식
+                { id: 'q6-1', text: '그리스도의 사역에 관한 고전적 3가지 입장이 아닌 것은?', options: ['승리자 그리스도', '만족설', '예수 그리스도의 삼중직', '도덕적 감화설'], correct: 2, answer: '예수 그리스도의 삼중직은 기독론의 인격에 관한 것이고, 나머지는 사역(속죄론)입니다.' },
+                { id: 'q6-2', text: '하나님에 의해 창조된 인간이 본래 가진 긍정적인 요소가 아닌 것은?', options: ['자기중심성', '미래개방성', '자기초월', '외심성'], correct: 0, answer: '자기중심성은 긍정적 요소가 아니라 타락의 결과입니다.' },
+
+                // 12페이지 (22년도 B반) 객관식
+                { id: 'q7-1', text: '밀리오리에 따르면 타락한 인간의 죄의 모습이 아닌 것은?', options: ['하나님의 은혜의 거부', '위계질서적 인간관계', '자기파괴적 노예근성', '사랑으로 종노릇함'], correct: 3, answer: '사랑으로 종노릇함은 그리스도인의 긍정적 모습입니다.' },
+                { id: 'q7-2', text: '다음 중 기독론과 관련하여 정통 신학이 인정하는 입장이 아닌 것은?', options: ['속성의 교류', '가현설', '비위격성(anhypostasia)', '내재인격성(enhypostasia)'], correct: 1, answer: '가현설(도케티즘)은 기독론의 이단입니다.' },
+                { id: 'q7-3', text: '밀리오리에 따르면 하나님의 형상이 전혀 아닌 것은?', options: ['관계성', '이성/합리성', '자유', '신체적 유사성'], correct: 3, answer: '신체적 유사성은 하나님의 형상의 의미가 아닙니다.' },
+                { id: 'q7-4', text: '기독론에서 알렉산드리아 학파와 안디옥 학파의 다양성(차이점)은?', options: ['강조점이 같음', '알렉산드리아는 말씀-육신, 안디옥은 말씀-인간 기독론', '반대 의미', '중요하지 않음'], correct: 1, answer: '알렉산드리아학파: 말씀-육신 기독론 | 안디옥학파: 말씀-인간 기독론' },
+
+                // 13페이지 (22년도 A반) 객관식
+                { id: 'q8-1', text: '다음 중 이단적 입장이 아닌 것은?', options: ['종속론', '양태론', '삼신론', '예정론'], correct: 3, answer: '예정론은 종교개혁자들이 주장한 정통 교리입니다.' },
+                { id: 'q8-2', text: '그리스도의 사역에 관한 고전적 3가지 입장이 아닌 것은?', options: ['승리자 그리스도(Christus Victor)', '만족설', '동일본질', '도덕적 감화설'], correct: 2, answer: '동일본질은 기독론의 인격에 관한 것입니다.' },
+                { id: 'q8-3', text: '하나님에 의해 창조된 인간이 본래 가진 긍정적인 요소가 아닌 것은?', options: ['자기중심성', '미래개방성', '자기초월', '외심성'], correct: 0, answer: '자기중심성은 타락의 결과입니다.' },
+                { id: 'q8-4', text: '밀리오리에 따르면 하나님의 형상은 무엇을 가리키는가?', options: ['신체적 유사성', '이성/합리성', '자유', '관계성'], correct: 3, answer: '삼위일체신학에서의 하나님의 형상: 관계성' }
+            ],
+            short: [
+                // 기출문제 01 - 단답형
+                { id: 's1-1', text: '325년 니케아공의회가 결정한 "동일본질(homoousia)"은 무엇을 의미하는가?', answer: '성자는 성부와 동일한 본체를 가진 참 하나님.' },
+                { id: 's1-2', text: '성례에 대한 아우구스티누스의 정의는 무엇인가?', answer: '비가시적 은혜에 대한 가시적 표지들(visible signs of an invisible grace)' },
+                { id: 's1-3', text: '성례론에서 인효론(人效論, ex opere operantis)은 무엇을 주장하는가?', answer: '성례 집례자의 성덕 또는 의도가 중요' },
+                { id: 's1-4', text: '칼뱅의 교회의 표지 주요 2가지는 무엇인가?', answer: '1) 말씀의 순수한 선포 2) 성례의 올바른 집행(+권징)' },
+                { id: 's1-5', text: '"칭의 교리에 대한 공동선언서(JDDJ)"는 무엇인가?', answer: '루터교회와 로마교회가 칭의에 있어서 공통점과 차이점을 같이 정리해서 공동으로 선언한 것.' },
+                { id: 's1-6', text: '개혁교회 교회론의 주요표어인 "ecclesia reformata semper reformanda"는 무슨 의미인가?', answer: '개혁된 교회는 항상 개혁되어야 한다' },
+                { id: 's1-7', text: '칼뱅의 이중은총(double grace)은 무엇과 무엇을 가리키는가?', answer: '칭의와 성화' },
+                { id: 's1-8', text: '"필리오케(filioque)"는 무엇을 의미하며 동방교회와 서방교회의 입장은 무엇인가?', answer: '성령의 이중출원(from the Father and from the Son), 동방-반대, 서방-찬성' },
+                { id: 's1-9', text: '"이슬람교-기독교 공통말씀(A Common Word)"이 말하는 공통점 3가지는?', answer: '1) 경전에 대한 태도 2) 신의 일치성 3) 사랑' },
+                { id: 's1-10', text: '그리스도의 재림/강림을 가리키는 그리스어 파루시아(parousia)와 라틴어 아드벤투스(adventus)의 문자적인 뜻은?', answer: '파루시아 - 옆에 함께 존재함, 아드벤투스 - 어느 쪽으로 오는 것' },
+                { id: 's1-11', text: '종교신학에서 "예수 그리스도의 최종성(finality)"이라는 개념은 무엇을 의미하는가?', answer: '예수 그리스도가 세상의 구세주라는 확신, 다원적 상황에서 예수 그리스도를 잘 믿게 할 방법' },
+                { id: 's1-12', text: '밀리오리에 따르면, 교회에 대한 이해를 가로막는 장애물 네 가지는 무엇인가?', answer: '1) 개인주의 2) 종교의 사사화 3) 교회의 관료주의화 4) 그리스도인의 신앙과 삶의 괴리' },
+                { id: 's1-13', text: '밀리오리가 제시하는 성화의 6가지 표지들은 무엇인가?', answer: '1) 성숙한 경청 2) 기도 3) 자유 4) 연대 5) 감사/기쁨 6) 소망' },
+                { id: 's1-14', text: '기독론에서 예수 그리스도의 "인격"과 "사역"은 각각 무엇을 의미하는가?', answer: '인격 - 예수 그리스도는 누구인가?, 사역 - 예수 그리스도는 무엇을 하시는가?' },
+                { id: 's1-15', text: '451년 칼케돈 공의회에서 결정한 양성기독론은 무엇인지 설명하시오.', answer: '예수 그리스도는 참 하나님이시며 참 인간이시며, 한 위격 안에 두 본성이 있되, 혼동이나 변화나 분리나 분할이 없다' },
+
+                // 기출문제 02 - 단답형
+                { id: 's2-1', text: '성례에 대한 아우구스티누스의 정의는 무엇인가?', answer: '비가시적 은혜에 대한 가시적 표지(visible signs of an invisible grace)' },
+                { id: 's2-2', text: '영성(spirituality)을 일반적으로는 "자기초월의 경험"으로 정의하지만 기독교적 정의의 핵심은 무엇인가?', answer: '성령을 따라 걷고 사는 삶' },
+                { id: 's2-3', text: '선교(mission)의 일차적인 뜻은 무엇인가?', answer: '보내다/파송하다' },
+                { id: 's2-4', text: '에클레시아(ecclesia)가 그리스 정치에서는 "민회"로, 기독교 성경에서는 "교회"로 번역되는데 민회와 교회의 차이점을 적어도 2가지 쓰시오.', answer: '1) 민회는 정치적 모임, 교회는 신앙공동체 2) 민회는 자발적 모임, 교회는 하나님의 부르심을 받은 이들' },
+                { id: 's2-5', text: '예수 그리스도의 "감동성(passibility)"은 무엇을 의미하는가?', answer: '하나님이 세상의 아픔에 함께 고통을 느낄 수 있음' },
+                { id: 's2-6', text: '기독론 주요주제들에서 예수 그리스도의 "인격"과 "사역"은 각각 무엇을 의미하는가?', answer: '인격 - 누구인가?, 사역 - 무엇을 하시는가?' },
+                { id: 's2-7', text: '기독론과 관련하여 니케아공의회가 결정한 "동일본질(homoousia)"은 무엇을 의미하는가?', answer: '성자는 성부와 동일한 본체를 가진 참 하나님' },
+                { id: 's2-8', text: '성령과 관련하여 필리오케(filioque)는 무엇을 의미하며, 동방교회와 서방교회의 입장은 각각 무엇인가?', answer: '필리오케 - 성령의 이중출원 | 동방교회 - 반대, 서방교회 - 찬성' },
+                { id: 's2-9', text: '장 칼뱅의 예수 그리스도의 삼중직(munus triplex)에서 3가지 직무는 무엇인가?', answer: '1) 선지자 2) 제사장 3) 왕' },
+                { id: 's2-10', text: '성령의 "재현적(representative) 사역"은 무엇을 의미하는가?', answer: '신자들에게 그리스도가 현존하도록 하심' },
+                { id: 's2-11', text: '그리스도의 재림/강림을 가리키는 그리스어 파루시아(parousia)와 라틴어 아드벤투스(adventus)의 문자적인 뜻은?', answer: '파루시아 - 옆에 함께 존재함, 아드벤투스 - 어느 쪽으로 오는 것' },
+                { id: 's2-12', text: '애버리 덜레스가 제시하는 교회의 5가지 모델(모형)들은 무엇인가?', answer: '1) 구원의 제도 2) 성령의 엘리트 공동체 3) 구원의 성례 4) 복음의 전달자 5) 섬기는 종' },
+                { id: 's2-13', text: '개혁교회/장로교회 교회론의 표어 "ecclesia reformata semper reformanda"는 무슨 뜻인가?', answer: '개혁된 교회는 항상 개혁되어야 한다' },
+                { id: 's2-14', text: '밀리오리가 신묵시주의(neo-apocalypticism)를 비판하는 이유들을 적어도 2가지 쓰시오.', answer: '1) 성경에 대한 왜곡된 해석 2) 결정주의적 3) 세계를 우리와 그들로 분리 4) 지향점이 나의 휴거 5) 예수의 사역/십자가/부활 신학 부재' },
+
+                // 2023년 - 단답형
+                { id: 's3-1', text: '흑인여성신학을 가리키는 용어는 무엇인가?', answer: '우머니즘' },
+                { id: 's3-2', text: '성만찬에서 에피클레시스(epiclesis/epiklesis)는 무슨 뜻인가?', answer: '성령의 임재를 요청하는 기도' },
+                { id: 's3-3', text: '칼뱅의 교회의 표지 2가지는 무엇인가?', answer: '1) 말씀의 순수한 선포 2) 성례의 올바른 집행(+권징)' },
+                { id: 's3-4', text: '"필리오케(filioque)"는 문자적으로 무슨 뜻인가?', answer: '"그리고 아들로부터(and from the Son)"' },
+                { id: 's3-5', text: '성례에 대한 아우구스티누스의 정의는 무엇인가?', answer: '비가시적 은혜에 대한 가시적 표지들' },
+                { id: 's3-6', text: '종말(eschaton)의 두 가지 의미는 무엇인가?', answer: '1) 끝 2) 목적' },
+                { id: 's3-7', text: '"칭의 교리에 대한 공동선언서(JDDJ)"는 무엇인가?', answer: '루터교회와 로마교회의 칭의 관련 공동 선언' },
+                { id: 's3-8', text: '종교신학에서 다원성(plurality)과 다원주의(pluralism)의 개념적 차이는 무엇인가?', answer: '다원성 - 다원적 상황, 다원주의 - 각 종교들이 다 구원의 길에 이른다' },
+                { id: 's3-9', text: '개혁교회 교회론의 주요표어인 "ecclesia reformata semper reformanda"는 무슨 의미인가?', answer: '"개혁된 교회는 항상 개혁되어야 한다"' },
+                { id: 's3-10', text: '종교의 사사화(privatization)는 (1) 무슨 의미이며 (2) 이것의 문제점은 무엇인가?', answer: '의미 - 공적 세계에서 분리되어 사적 세계로 편입 | 문제점 - 교회 메시지를 삶의 투쟁으로부터 소외' },
+                { id: 's3-11', text: '칼뱅의 이중은총(double grace)은 무엇과 무엇을 가리키는가?', answer: '칭의와 성화' },
+                { id: 's3-12', text: '밀리오리는 그리스도인의 삶의 주관적 측면 3가지를 믿음, 사랑, 소망으로 구별하는데, 각각에 해당하는 객관적 측면 3가지는?', answer: '1) 칭의 2) 성화 3) 소명' },
+                { id: 's3-13', text: '교회를 가리키는 에클레시아(ecclesia)의 본질적 의미는 무엇인가?', answer: '하나님의 부르심을 받은 이들' },
+                { id: 's3-14', text: '밀리오리의 삼위일체적 교회론의 두 가지 기둥은 무엇과 무엇인가?', answer: '1) 교제(Koinonia) 2) 선교(Missio)' },
+
+                // 2022-1 B반 - 단답형
+                { id: 's4-1', text: '성경본문(text)과 상황(context)관계에서 상황의 두 가지 의미는 무엇인가?', answer: '1) 성경 안의 상황 2) 독자의 상황' },
+                { id: 's4-2', text: '밀리오리의 "삼위일체적 교제의 교회론"에 관하여 간단히 설명하시오.', answer: '교회는 삼위일체 하나님의 교제(koinonia)와 선교(missio)에 참여한다' },
+                { id: 's4-3', text: '"필리오케(filioque)"에 관해 간략히 설명하시오.', answer: '필리오케 - 성령의 이중출현(from the Father and from the Son)' },
+                { id: 's4-4', text: '신묵시주의(neo-apocalypticism)에 대한 밀리오리의 비판은?', answer: '1) 성경 왜곡 2) 결정주의 3) 우리와 그들 분리 4) 휴거 지향 5) 예수 사역 신학 부재' },
+                { id: 's4-5', text: '성례의 효력과 관련하여 사효론(事效論, ex opere operato)과 인효론(人效論, ex opere operantis)은?', answer: '사효론 - 성례 자체로 효력 | 인효론 - 집례자의 성덕 또는 의도가 중요' },
+                { id: 's4-6', text: '"밀리오리에 따르면 세례는 연대의 성례"인데 무슨 의미인가?', answer: '3가지 차원의 연대: 1) 세상과 하나님의 연대 2) 인간 상호 연대 3) 인간과 창조세계 연대' },
+                { id: 's4-7', text: '애버리 덜레스의 교회의 5가지/4가지 모형/모델 중 4가지는?', answer: '1) 구원의 제도 2) 성령의 엘리트 공동체 3) 구원의 성례 4) 복음의 전달자 5) 섬기는 종' },
+                { id: 's4-8', text: '(John Hick)종교에서 존 힉의 신중심주의(theocentricism)는 무엇을 주장하는가?', answer: '"산정상으로 가는 길은 여러 가지이다" - 다원주의 입장' },
+                { id: 's4-9', text: '(double grace)칼뱅의 이중은총은 무엇과 무엇을 가리키며 이 둘의 관계는?', answer: '칭의와 성화, 구별될 수 있지만 분리될 수 없다' },
+                { id: 's4-10', text: '(transubstantiation)천주교의 화체설에 관하여 간단히 설명하시오.', answer: '포도주와 떡의 실체가 그리스도의 몸과 피로 변화' },
+                { id: 's4-11', text: '성례에 대한 아우구스티누스의 정의는?', answer: '비가시적 은혜에 대한 가시적 표지들' },
+                { id: 's4-12', text: '"(advent/parousia)파루시아"는 무슨 뜻인가?', answer: '재림(parousia), 도래(advent)' },
+
+                // 2022-1 1학년 - 단답형
+                { id: 's5-1', text: '밀리오리에 따르면, 교회에 대한 신약의 이미지들 네 가지는?', answer: '1) 하나님의 백성 2) 그리스도의 몸 3) 섬기는 백성 4) 성령의 공동체' },
+                { id: 's5-2', text: '신학적인 의미에서 성자/성령의 "파송(missions)"과 "출원/발출(processions)"은?', answer: '파송 - 구원 경륜 안에서의 사역 | 출원 - 하나님 내의 영원한 삶' },
+                { id: 's5-3', text: '성만찬에서 에피클레시스(epic(k)lesis)는?', answer: '성령의 임재를 요청하는 기도' },
+                { id: 's5-4', text: '칼뱅이 말한 교회의 참된 표지들은?', answer: '1) 말씀의 순수한 선포 2) 성례의 올바른 집행(+권징)' },
+                { id: 's5-5', text: '선교학자 앤드류 월스가 말하는 복음 전파에 존재하는 "번역의 원리"는?', answer: '성육신을 통한 하나님의 자기전달은 탁월한 번역' },
+                { id: 's5-6', text: '기독교적 종교신학에서 "둘레길 이론"은?', answer: '둘레길을 올라갈 사람이 반드시 산정상(예수)에 올라갈 마음이 있는 건 아님' },
+                { id: 's5-7', text: '기독교-이슬람 대화에서 "공통의 말씀(Common Word)"은?', answer: '1) 경전에 대한 태도 2) 신의 일치성 3) 사랑' },
+                { id: 's5-8', text: '1952년 빌링겐 세계선교대회에서 공식화된 "하나님의 선교(missio Dei)"는?', answer: '선교의 주체는 삼위일체 하나님' },
+                { id: 's5-9', text: '종말(eschaton)의 두 가지 의미는?', answer: '1) 끝 2) 목적' },
+                { id: 's5-10', text: '"에클레시아(ecclesia) = 교회"의 핵심/본질은?', answer: '하나님의 부르심을 받은 이들' },
+                { id: 's5-11', text: '밀리오리에 따르면 "성만찬은 나눔의 성례"인데?', answer: '3차원의 나눔: 1) 하나님의 삶 나눔 2) 인간 상호간 나눔 3) 인간과 자연의 나눔' },
+                { id: 's5-12', text: '"칭의 교리에 대한 공동선언서(JDDJ)"는?', answer: '루터교회와 로마교회의 칭의 관련 공동 선언' },
+
+                // 뒷부분 단답형 (11-13페이지)
+                // 11페이지 (중간고사 예상문제) 단답형
+                { id: 's6-1', text: '칼케돈 공의회에서 결정한 기독론과 4가지 부정적 규정은?', answer: '양성기독론, 4가지: 혼동, 변화, 분리, 분할' },
+                { id: 's6-2', text: '밀리오리에 따르면, 타락한 인간에게서 하나님과의 관계가 깨어져 어떤 모습들이 나타나는가?', answer: '1) 적극적 자아 중심적 우상숭배 2) 수동적 타자 중심적 우상숭배' },
+                { id: 's6-3', text: '칼뱅의 "하나님의 공동성의 원리(Calvin\'s Principle of the Triune Togetherness)"에 관하여 설명하시오.', answer: '성부 하나님과 성자 하나님과 성령 하나님이 함께 존재하시고 함께 활동하신다' },
+                { id: 's6-4', text: '칼 바르트는 그리스도의 삼중직론을 다루면서 3가지를 각각 어떻게 표현하였는가?', answer: '1) 종으로서의 주님 2) 주님으로서의 종 3) 참된 증인' },
+                { id: 's6-5', text: '기독론과 관련하여 알렉산드리아 학파와 안디옥 학파의 입장은 각각 무엇인가?', answer: '알렉산드리아: 말씀-육신 기독론 | 안디옥: 말씀-인간 기독론' },
+
+                // 12페이지 (22년도 B반) 단답형
+                { id: 's7-1', text: '325년 니케아 공의회에서 반대한 "유사본질(homoiousia)"은 무슨 뜻인가?', answer: '예수님이 하나님과 유사하지만, 동등하지 않다' },
+                { id: 's7-2', text: '신학에서 하나님의 파토스(pathos)는 무슨 뜻인가?', answer: '하나님의 감동성, 고통을 느끼신다' },
+                { id: 's7-3', text: '밀리오리가 말하는 (1) 체념의 죄와 (2) 교만한 추정의 죄는 각각 무슨 의미인가?', answer: '1) 체념의 죄 - 하나님의 자비를 순전히 신뢰하지 못함 2) 교만한 추정의 죄 - 자신의 능력을 과신함' },
+                { id: 's7-4', text: '기독론에서 알렉산드리아 학파와 안디옥 학파의 다양성(차이점)은 무엇인가?', answer: '알렉산드리아: 말씀-육신 기독론 | 안디옥: 말씀-인간 기독론' },
+                { id: 's7-5', text: '하나님의 형상으로서의 인간이 예수 그리스도 안에서 새로워진 모습과 관련하여 3가지 설명하시오.', answer: '1) 믿음 - 하나님의 자비를 신뢰함 2) 사랑 - 타자와 함께하는 것 3) 소망 - 미래의 약속을 기대함' },
+
+                // 13페이지 (22년도 A반) 단답형
+                { id: 's8-1', text: '칼케돈 공의회에서 결정한 핵심적 기독론 내용은 무엇인가?', answer: '양성기독론, 한 위격 안에 두 본성이 있되, 혼동, 변화, 분리, 분할 없다' },
+                { id: 's8-2', text: '몰트만에 따르면 십자가 사건에서 성부, 성자, 성령은 각각 어떻게 고통과 연결되는가?', answer: '성부 - 아들의 죽음 경험 | 성자 - 십자가의 고통 | 성령 - 아버지와 아들 사이의 분리 경험' },
+                { id: 's8-3', text: '기독론에서 "속성의 교류"는 무엇을 의미하는지 간단히 설명하시오.', answer: '신성과 인성 간의 교류, 신의 속성이 인성에, 인의 상태가 신에 적용됨' },
+                { id: 's8-4', text: '칼뱅의 "그리스도의 삼중직론(munus triplex)"에서 3가지 직무를 설명하시오.', answer: '1) 왕 2) 제사장 3) 선지자' }
+            ]
         };
-        
-        function setFilter(filter) {
-            state.filter = filter;
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
+
+        function selectType(type) {
+            selectedType = type;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
-            updateSliderMax();
+            updateSliderRange();
         }
-        
-        function updateSliderMax() {
-            const filtered = getFiltered();
-            const slider = document.getElementById('countSlider');
-            const max = Math.max(5, filtered.length);
-            slider.max = max;
-            if (parseInt(slider.value) > max) {
-                slider.value = max;
-                updateCount(max);
+
+        function updateSliderRange() {
+            const slider = document.getElementById('problemSlider');
+            const allQuestionsList = selectedType === 'all' 
+                ? [...questionsData.multiple, ...questionsData.short]
+                : selectedType === 'multiple'
+                ? questionsData.multiple
+                : questionsData.short;
+            
+            const maxCount = allQuestionsList.length;
+            slider.max = maxCount;
+            if (parseInt(slider.value) > maxCount) {
+                slider.value = Math.min(20, maxCount);
             }
+            updateSize(slider.value);
         }
-        
-        function updateCount(value) {
-            document.getElementById('countDisplay').textContent = value;
+
+        function updateSize(value) {
+            const allQuestionsList = selectedType === 'all' 
+                ? [...questionsData.multiple, ...questionsData.short]
+                : selectedType === 'multiple'
+                ? questionsData.multiple
+                : questionsData.short;
+            
+            const maxCount = allQuestionsList.length;
+            const displayValue = Math.min(parseInt(value), maxCount);
+            document.getElementById('sizeDisplay').textContent = displayValue + '문';
+            document.getElementById('problemSlider').max = maxCount;
+            selectedCount = displayValue;
         }
-        
-        function getFiltered() {
-            if (state.filter === 'mc') {
-                return QUESTIONS.filter(q => q.type === 'MC');
-            } else if (state.filter === 'sa') {
-                return QUESTIONS.filter(q => q.type === 'SA');
-            }
-            return QUESTIONS;
-        }
-        
+
         function startQuiz() {
-            const filtered = getFiltered();
-            const count = parseInt(document.getElementById('countSlider').value);
-            const selected = [];
-            const indices = Array.from({length: filtered.length}, (_, i) => i);
+            const allQuestionsList = selectedType === 'all' 
+                ? [...questionsData.multiple, ...questionsData.short]
+                : selectedType === 'multiple'
+                ? questionsData.multiple
+                : questionsData.short;
             
-            for (let i = 0; i < Math.min(count, filtered.length); i++) {
-                const randIdx = Math.floor(Math.random() * indices.length);
-                selected.push(filtered[indices[randIdx]]);
-                indices.splice(randIdx, 1);
-            }
+            // 랜덤 선택
+            selectedQuestions = [];
+            const shuffled = [...allQuestionsList].sort(() => Math.random() - 0.5);
+            selectedQuestions = shuffled.slice(0, selectedCount);
             
-            state.selectedQuestions = selected;
-            state.currentIndex = 0;
-            state.answers = {};
+            currentIndex = 0;
+            userAnswers = {};
             
-            document.getElementById('home').style.display = 'none';
-            document.getElementById('quiz').style.display = 'block';
-            document.getElementById('result').style.display = 'none';
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('quizScreen').classList.add('active');
             
-            document.getElementById('totalNum').textContent = selected.length;
             showQuestion();
         }
-        
+
         function showQuestion() {
-            const q = state.selectedQuestions[state.currentIndex];
-            const progress = ((state.currentIndex + 1) / state.selectedQuestions.length) * 100;
+            const q = selectedQuestions[currentIndex];
+            const isMultiple = questionsData.multiple.some(m => m.id === q.id);
             
-            document.getElementById('progressFill').style.width = progress + '%';
-            document.getElementById('currentNum').textContent = state.currentIndex + 1;
+            document.getElementById('questionNumber').textContent = `질문 ${currentIndex + 1}) ${isMultiple ? '[객관식]' : '[단답형]'}`;
+            document.getElementById('questionText').textContent = q.text;
             
-            let html = '<div class="question-container">';
-            html += '<div class="question-header">';
-            html += '<span class="q-number">Q' + (state.currentIndex + 1) + '</span>';
-            html += '<span class="q-type">' + (q.type === 'MC' ? '객관식' : '단답형') + '</span>';
-            html += '</div>';
-            html += '<div class="question-text">' + q.answer + '</div>';
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
             
-            if (q.type === 'MC') {
-                html += '<div class="choices" id="choicesArea"></div>';
+            if (isMultiple) {
+                const optionLetters = ['①', '②', '③', '④'];
+                q.options.forEach((opt, idx) => {
+                    const optDiv = document.createElement('div');
+                    optDiv.className = 'option';
+                    optDiv.textContent = optionLetters[idx] + ' ' + opt;
+                    optDiv.onclick = () => selectAnswer(idx, q);
+                    optionsContainer.appendChild(optDiv);
+                });
             } else {
-                html += '<div class="answer-display"><div class="answer-label">정답:</div>' + q.answer + '</div>';
-            }
-            
-            html += '<div class="nav-buttons">';
-            if (state.currentIndex > 0) {
-                html += '<button class="btn btn-secondary" onclick="previousQuestion()">이전</button>';
-            }
-            html += '<button class="btn btn-primary" onclick="nextQuestion()">다음</button>';
-            html += '</div>';
-            html += '</div>';
-            
-            document.getElementById('questionArea').innerHTML = html;
-            
-            if (q.type === 'MC') {
-                renderChoices();
-            }
-        }
-        
-        function renderChoices() {
-            const choices = ['①', '②', '③', '④'];
-            let html = '';
-            choices.forEach((choice, idx) => {
-                html += '<button class="choice" onclick="selectChoice(' + idx + ')">' + choice + '</button>';
-            });
-            document.getElementById('choicesArea').innerHTML = html;
-        }
-        
-        function selectChoice(idx) {
-            const q = state.selectedQuestions[state.currentIndex];
-            state.answers[state.currentIndex] = idx;
-            
-            const choices = document.querySelectorAll('.choice');
-            choices.forEach(c => c.classList.remove('selected', 'correct', 'incorrect'));
-            
-            const selectedBtn = choices[idx];
-            selectedBtn.classList.add('selected');
-            
-            if (q.answer === ['①', '②', '③', '④'][idx]) {
-                selectedBtn.classList.add('correct');
-            } else {
-                selectedBtn.classList.add('incorrect');
-            }
-        }
-        
-        function nextQuestion() {
-            if (state.currentIndex < state.selectedQuestions.length - 1) {
-                state.currentIndex++;
-                showQuestion();
-                document.querySelector('.quiz-header').scrollIntoView();
-            } else {
-                showResult();
-            }
-        }
-        
-        function previousQuestion() {
-            if (state.currentIndex > 0) {
-                state.currentIndex--;
-                showQuestion();
-                document.querySelector('.quiz-header').scrollIntoView();
-            }
-        }
-        
-        function showResult() {
-            let correct = 0;
-            state.selectedQuestions.forEach((q, idx) => {
-                if (q.type === 'MC') {
-                    const selected = state.answers[idx];
-                    if (selected !== undefined && q.answer === ['①', '②', '③', '④'][selected]) {
-                        correct++;
+                const wrapper = document.createElement('div');
+                wrapper.style.display = 'flex';
+                wrapper.style.gap = '10px';
+                wrapper.style.alignItems = 'stretch';
+                
+                const textInput = document.createElement('input');
+                textInput.type = 'text';
+                textInput.placeholder = '답을 입력하세요...';
+                textInput.className = 'option';
+                textInput.style.padding = '12px';
+                textInput.style.cursor = 'text';
+                textInput.style.color = 'white';
+                textInput.style.background = 'rgba(255, 255, 255, 0.05)';
+                textInput.style.border = '2px solid rgba(255, 255, 255, 0.1)';
+                textInput.style.flex = '1';
+                textInput.style.margin = '0';
+                textInput.id = 'shortAnswerInput';
+                textInput.onkeypress = (e) => {
+                    if (e.key === 'Enter') {
+                        checkShortAnswer(q);
                     }
-                }
-            });
-            
-            const total = state.selectedQuestions.filter(q => q.type === 'MC').length;
-            const percent = total > 0 ? Math.round((correct / total) * 100) : 0;
-            
-            document.getElementById('resultScore').textContent = correct + '/' + total;
-            document.getElementById('resultDetail').textContent = '객관식 정답률: ' + percent + '%';
-            
-            let reviewHtml = '<div class="review-title">오답 검토</div>';
-            let hasWrong = false;
-            
-            state.selectedQuestions.forEach((q, idx) => {
-                if (q.type === 'MC') {
-                    const selected = state.answers[idx];
-                    const isCorrect = selected !== undefined && q.answer === ['①', '②', '③', '④'][selected];
-                    
-                    if (!isCorrect) {
-                        hasWrong = true;
-                        const selectedLabel = selected !== undefined ? ['①', '②', '③', '④'][selected] : '미응답';
-                        reviewHtml += '<div class="review-item incorrect">';
-                        reviewHtml += '<div class="review-question">Q' + (idx + 1) + ' (오답)</div>';
-                        reviewHtml += '<div class="review-answer">선택: ' + selectedLabel + ' → 정답: ' + q.answer + '</div>';
-                        reviewHtml += '</div>';
-                    }
-                }
-            });
-            
-            if (!hasWrong) {
-                reviewHtml += '<div style="color: #10b981; padding: 20px; text-align: center;">모든 객관식 문제를 맞추셨습니다! 🎉</div>';
+                };
+                
+                const confirmBtn = document.createElement('button');
+                confirmBtn.textContent = '확인';
+                confirmBtn.className = 'btn next-btn';
+                confirmBtn.style.flex = '0 0 80px';
+                confirmBtn.style.padding = '12px';
+                confirmBtn.style.margin = '0';
+                confirmBtn.onclick = () => checkShortAnswer(q);
+                
+                wrapper.appendChild(textInput);
+                wrapper.appendChild(confirmBtn);
+                optionsContainer.appendChild(wrapper);
             }
             
-            document.getElementById('reviewSection').innerHTML = reviewHtml;
+            document.getElementById('answerSection').classList.remove('show');
+            document.getElementById('answerText').textContent = '';
             
-            document.getElementById('home').style.display = 'none';
-            document.getElementById('quiz').style.display = 'none';
-            document.getElementById('result').style.display = 'block';
+            updateButtonGroup(q);
+            updateProgress();
         }
-        
-        function goHome() {
-            document.getElementById('home').style.display = 'flex';
-            document.getElementById('quiz').style.display = 'none';
-            document.getElementById('result').style.display = 'none';
-            state.currentIndex = 0;
-            state.answers = {};
+
+        function selectAnswer(idx, q) {
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            const options = document.querySelectorAll('.option');
+            const isCorrect = idx === q.correct;
+            
+            if (isCorrect) {
+                options[idx].classList.add('selected', 'correct');
+            } else {
+                options[idx].classList.add('selected', 'incorrect');
+                options[q.correct].classList.add('correct');
+            }
+            
+            userAnswers[q.id] = { selected: idx, isCorrect };
+            
+            showAnswerAndButtons(q, isCorrect);
+        }
+
+        function checkShortAnswer(q) {
+            const input = document.getElementById('shortAnswerInput');
+            const userAnswer = input.value.trim();
+            const isCorrect = userAnswer.length > 0; // 단답형은 입력하면 정답으로 처리
+            
+            userAnswers[q.id] = { selected: userAnswer, isCorrect };
+            
+            input.disabled = true;
+            input.style.opacity = '0.6';
+            
+            showAnswerAndButtons(q, true);
+        }
+
+        function showAnswerAndButtons(q, isCorrect) {
+            const answerSection = document.getElementById('answerSection');
+            const answerText = document.getElementById('answerText');
+            
+            answerText.textContent = q.answer;
+            answerSection.classList.add('show');
+            
+            updateButtonGroup(q, true);
+        }
+
+        function updateButtonGroup(q, answered = false) {
+            const buttonGroup = document.getElementById('buttonGroup');
+            buttonGroup.innerHTML = '';
+            
+            if (answered) {
+                if (currentIndex < selectedQuestions.length - 1) {
+                    const nextBtn = document.createElement('button');
+                    nextBtn.className = 'btn next-btn';
+                    nextBtn.textContent = '다음 문제';
+                    nextBtn.onclick = () => {
+                        currentIndex++;
+                        showQuestion();
+                    };
+                    buttonGroup.appendChild(nextBtn);
+                } else {
+                    const completeBtn = document.createElement('button');
+                    completeBtn.className = 'btn next-btn';
+                    completeBtn.textContent = '완료';
+                    completeBtn.onclick = () => exitQuiz();
+                    buttonGroup.appendChild(completeBtn);
+                }
+            }
+        }
+
+        function exitQuiz() {
+            document.getElementById('quizScreen').classList.remove('active');
+            document.getElementById('startScreen').style.display = 'flex';
+            currentIndex = 0;
+            selectedQuestions = [];
+            userAnswers = {};
+        }
+
+        function updateProgress() {
+            const answered = Object.keys(userAnswers).length;
+            const total = selectedQuestions.length;
+            const percent = (answered / total) * 100;
+            
+            document.getElementById('progressText').textContent = `${currentIndex + 1} / ${total}`;
+            document.getElementById('progressBar').style.width = percent + '%';
         }
     </script>
 </body>

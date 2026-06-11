@@ -132,9 +132,9 @@
 
         .slider {
             width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            background: linear-gradient(to right, #5dade2 0%, #5dade2 var(--value), #4a5568 var(--value), #4a5568 100%);
+            height: 8px;
+            border-radius: 4px;
+            background: #4a5568;
             outline: none;
             -webkit-appearance: none;
             appearance: none;
@@ -144,8 +144,8 @@
         .slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             background: #5dade2;
             cursor: pointer;
@@ -153,13 +153,24 @@
         }
 
         .slider::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             background: #5dade2;
             cursor: pointer;
             border: none;
             box-shadow: 0 0 8px rgba(93, 173, 226, 0.5);
+        }
+        
+        .slider::-moz-range-track {
+            background: transparent;
+            border: none;
+        }
+        
+        .slider::-moz-range-progress {
+            background: #5dade2;
+            height: 8px;
+            border-radius: 4px;
         }
 
         .start-btn {
@@ -770,22 +781,46 @@
 
         function selectAnswer(idx, q) {
             document.querySelectorAll('.option').forEach(opt => {
-                opt.classList.remove('selected', 'correct', 'incorrect');
+                opt.classList.remove('selected');
             });
             
             const options = document.querySelectorAll('.option');
-            const isCorrect = idx === q.correct;
+            options[idx].classList.add('selected');
+            
+            userAnswers[q.id] = { selected: idx, isCorrect: null }; // 아직 제출 전
+            
+            // 정답 제출 버튼 표시
+            updateButtonGroupForSubmit(q, idx);
+        }
+        
+        function submitAnswer(q, selectedIdx) {
+            const options = document.querySelectorAll('.option');
+            const isCorrect = selectedIdx === q.correct;
+            
+            // 정답과 오답 표시
+            options.forEach(opt => opt.classList.remove('correct', 'incorrect'));
             
             if (isCorrect) {
-                options[idx].classList.add('selected', 'correct');
+                options[selectedIdx].classList.add('correct');
             } else {
-                options[idx].classList.add('selected', 'incorrect');
+                options[selectedIdx].classList.add('incorrect');
                 options[q.correct].classList.add('correct');
             }
             
-            userAnswers[q.id] = { selected: idx, isCorrect };
+            userAnswers[q.id].isCorrect = isCorrect;
             
-            showAnswerAndButtons(q, isCorrect);
+            showAnswerAndButtons(q, true);
+        }
+        
+        function updateButtonGroupForSubmit(q, selectedIdx) {
+            const buttonGroup = document.getElementById('buttonGroup');
+            buttonGroup.innerHTML = '';
+            
+            const submitBtn = document.createElement('button');
+            submitBtn.className = 'btn next-btn';
+            submitBtn.textContent = '정답 제출';
+            submitBtn.onclick = () => submitAnswer(q, selectedIdx);
+            buttonGroup.appendChild(submitBtn);
         }
 
         function checkShortAnswer(q) {

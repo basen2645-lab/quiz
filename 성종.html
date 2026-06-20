@@ -273,9 +273,7 @@ function renderQ(){
   const q=quiz[cur];
   document.getElementById('qProgress').textContent=`${cur+1} / ${quiz.length}`;
   document.getElementById('pfill').style.width=`${((cur+1)/quiz.length)*100}%`;
-  const tClass=q.t==='구약'?'tag-ot':'tag-nt';
-  let meta=`<span class="tag ${tClass}">${q.t}</span><span class="tag tag-book">${q.book}</span>`;
-  if(qtype==='sa') meta+=`<span class="tag tag-sa">주관식</span>`;
+  let meta = qtype==='sa' ? `<span class="tag tag-sa">주관식</span>` : '';
   document.getElementById('qMeta').innerHTML=meta;
   document.getElementById('qText').textContent=q.q;
 

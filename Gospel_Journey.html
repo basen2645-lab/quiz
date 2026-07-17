@@ -1,4 +1,19 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gospel Journey</title>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<style>html,body{margin:0;padding:0;overflow:hidden;}#root{width:100vw;height:100vh;}</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useMemo, useRef } = React;
 
 /* ============================================================
    Gospel Journey — 수련회 협력 퀴즈 게임
@@ -10,7 +25,7 @@ import React, { useState, useEffect, useMemo, useRef } from "react";
       answers 배열에 빈칸 순서대로 정답 단어를 넣으면 끝!
    3) 10번(피날레 퍼즐): 개역개정 기준으로 구절-단어를 배정해 두었습니다.
       진행 전에 실물 성경으로 1분만 검증해 주세요 (어절 = 띄어쓰기 단위).
-      완성 문장: "꿈이 있는 교회 청소년부 사랑한다"
+      완성 문장: "꿈이 있는 교회 청소년부 사랑함"
    ------------------------------------------------------------
    조작: 스페이스(다음 단계) · H(힌트) · 1~7(조 통과 토글) · M(지도)
    ============================================================ */
@@ -128,13 +143,13 @@ const QUESTIONS = [
     // 개역개정 기준 배정 (진행 전 실물 성경으로 1분 검증 권장)
     // 완성 문장: "꿈이 있는 교회 청소년부 사랑함"
     assignments: [
-      { ref: "전도서 5:3", wordIndex: "3번째 단어", word: "꿈이" },                       // 걱정이 많으면 꿈이 생기고 …
+       { ref: "전도서 5:3", wordIndex: "3번째 단어", word: "꿈이" },                       // 걱정이 많으면 꿈이 생기고 …
       { ref: "로마서 8:1", wordIndex: "6번째 단어", word: "있는" },                       // 그러므로 이제 그리스도 예수 안에 있는 …
-      { ref: "사도행전 20:17", wordIndex: "6번째 단어", word: "교회" }, // … 내 교회를 세우리니 …
+      { ref: "사도행전 20:17", wordIndex: "6번째 단어", word: "교회" }, //
       { ref: "전도서 11:9", wordIndex: "1번째 단어의 첫 글자", word: "청" },              // 청년이여 네 어린 때를 즐거워하며 …
       { ref: "이사야 40:30", wordIndex: "1번째 단어의 앞 두 글자", word: "소년" },        // 소년이라도 피곤하며 곤비하며 …
       { ref: "요한복음 11:25", wordIndex: "4번째 단어의 첫 글자", word: "부" },           // 예수께서 이르시되 나는 부활이요 …
-      { ref: "사사기 16:15", wordIndex: "12번째 단어", word: "사랑한다" },     // 우리가 사랑함은 그가 먼저 …
+      { ref: "사사기 16:15", wordIndex: "12번째 단어", word: "사랑한다" },     //
     ],
     hints: ["단어를 찾으면 스케치북에 아주 크게! 뒤에서도 보이게!"],
   },
@@ -814,7 +829,7 @@ function FinaleScreen({ onRestart }) {
 }
 
 /* ---------------- 메인 앱 ---------------- */
-export default function App() {
+function App() {
   const [screen, setScreen] = useState("title"); // title | map | question | finale
   const [cleared, setCleared] = useState(0);
   const [qstate, setQstate] = useState({}); // stage -> {revealed, hint, passed:[], shuffle}
@@ -979,3 +994,8 @@ export default function App() {
     </div>
   );
 }
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

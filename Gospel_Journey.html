@@ -1,0 +1,981 @@
+import React, { useState, useEffect, useMemo, useRef } from "react";
+
+/* ============================================================
+   Gospel Journey — 수련회 협력 퀴즈 게임
+   ------------------------------------------------------------
+   ★ 진행자 수정 가이드
+   1) 아래 QUESTIONS 배열의 텍스트만 바꾸면 됩니다.
+   2) 8번(찬양가사빈칸): lyrics_with_blanks 에 가사를 넣고,
+      빈칸 자리는 ____ (언더바 4개)로 표시하세요.
+      answers 배열에 빈칸 순서대로 정답 단어를 넣으면 끝!
+   3) 10번(피날레 퍼즐): 개역개정 기준으로 구절-단어를 배정해 두었습니다.
+      진행 전에 실물 성경으로 1분만 검증해 주세요 (어절 = 띄어쓰기 단위).
+      완성 문장: "꿈이 있는 교회 청소년부 사랑함"
+   ------------------------------------------------------------
+   조작: 스페이스(다음 단계) · H(힌트) · 1~7(조 통과 토글) · M(지도)
+   ============================================================ */
+
+const TEAMS = [
+  { name: "빨강", color: "#FF6B6B" },
+  { name: "주황", color: "#FFA94D" },
+  { name: "노랑", color: "#FFD43B" },
+  { name: "초록", color: "#69DB7C" },
+  { name: "파랑", color: "#4DABF7" },
+  { name: "남색", color: "#5C7CFA" },
+  { name: "보라", color: "#B197FC" },
+];
+
+const SECTIONS = [
+  { name: "창조", color: "#BDEAD1", text: "#2B7A4B", stages: [0, 1] },
+  { name: "타락", color: "#FFE0B8", text: "#A9622A", stages: [2, 3] },
+  { name: "구속", color: "#FFD3DC", text: "#B04A66", stages: [4, 5, 6, 7], cross: true },
+  { name: "회복", color: "#CFE3FF", text: "#3B62A8", stages: [8, 9] },
+];
+
+const FINALE_SENTENCE = ["꿈이", "있는", "교회", "청", "소년", "부", "사랑함"];
+
+const QUESTIONS = [
+  {
+    type: "ox",
+    label: "O / X 퀴즈",
+    question: "하나님은 사람을\n하나님의 형상대로 창조하셨다",
+    answer: "O",
+    ref: "창세기 1:27",
+    hints: ["창세기 1장, 창조의 여섯째 날을 떠올려 보세요"],
+  },
+  {
+    type: "image",
+    label: "그림 퀴즈",
+    question: "여섯째 날까지 창조를 마치신\n하나님이 하신 말씀은?",
+    answer: "보시기에 심히 좋았더라",
+    ref: "창세기 1:31",
+    hints: ["창세기 1장의 맨 마지막 절이에요", "하나님이 지으신 모든 것을 '보시고' 하신 말씀"],
+  },
+  {
+    type: "chosung",
+    label: "초성 퀴즈",
+    letters: "ㅅㅇㄱㄴㅁ",
+    answer: "선악과나무",
+    hints: ["에덴동산에 있어요", "먹지 말라고 하신 것이에요"],
+  },
+  {
+    type: "address",
+    label: "말씀 주소 찾기",
+    verse: "모든 사람이 죄를 범하였으매\n하나님의 영광에 이르지 못하더니",
+    instruction: "조별로 성경(개역개정)에서 이 말씀을 찾아\n주소를 스케치북에 크게 적어 주세요!",
+    answer: "로마서 3:23",
+    hints: ["신약 서신서에 있어요", "바울이 로마 교회에 쓴 편지예요"],
+  },
+  {
+    type: "order",
+    label: "순서 배열",
+    question: "예수님의 생애 6가지 사건,\n일어난 순서대로 배열해 보세요!",
+    // 올바른 순서대로 작성 (화면에는 뒤섞여 나옵니다)
+    items: [
+      "베들레헴 탄생",
+      "세례 요한에게 세례 받으심",
+      "광야 40일 시험",
+      "오병이어 기적",
+      "예루살렘 입성",
+      "십자가와 부활",
+    ],
+    hints: ["세례가 광야 시험보다 먼저예요"],
+  },
+  {
+    type: "blank",
+    label: "말씀 빈칸",
+    text: "그리스도 예수 안에 있는 속량으로 말미암아 하나님의 ____로 값 없이 ____다 하심을 얻은 자 되었느니라",
+    answers: ["은혜", "의롭"],
+    ref: "로마서 3:24", // 정답 공개 후에만 표시됩니다
+    hints: ["복음의 핵심 단어! 값 없이 주시는 선물이에요"],
+  },
+  {
+    type: "search",
+    label: "성경 탐색",
+    question: "요한복음에서 예수님이\n\u201C나는 ~이다\u201D라고 선언하신 것을\n5개 이상 찾아 스케치북에 적어 주세요!",
+    answers: [
+      { text: "생명의 떡", ref: "요 6:35" },
+      { text: "세상의 빛", ref: "요 8:12" },
+      { text: "양의 문", ref: "요 10:7" },
+      { text: "선한 목자", ref: "요 10:11" },
+      { text: "부활이요 생명", ref: "요 11:25" },
+      { text: "길이요 진리요 생명", ref: "요 14:6" },
+      { text: "참포도나무", ref: "요 15:1" },
+    ],
+    hints: ["6장부터 15장 사이에 있어요", "\u201C나는 ~요 ~이다\u201D 형태도 있어요"],
+  },
+  {
+    type: "lyrics",
+    label: "찬양 가사 빈칸",
+    // ★ 여기에 1절 가사를 입력하세요. 빈칸 자리는 ____ (언더바 4개)
+    lyrics_with_blanks:
+      "여기에 1절 가사를 입력하세요 ____ 표시가\n빈칸으로 바뀌어요 ____ 줄바꿈도 그대로\n반영됩니다 ____ 그리고 ____ 아래\nanswers 배열에 ____ 순서대로 ____ 넣으세요",
+    // ★ 빈칸 순서대로 정답 단어 입력 (빈칸 개수와 같아야 해요)
+    answers: ["정답1", "정답2", "정답3", "정답4", "정답5", "정답6"],
+    hints: ["함께 불렀던 그 찬양을 떠올려 보세요"],
+  },
+  {
+    type: "anagram",
+    label: "철자 재배열",
+    question: "뒤섞인 알파벳 카드를 순서대로 배열하면\n어떤 문장이 나타날까요?",
+    answer: "THE REAL GOOD NEWS",
+    hints: ["모두 4단어예요", "첫 단어는 THE"],
+  },
+  {
+    type: "finale",
+    label: "일곱 조각 말씀 퍼즐",
+    question: "각 조의 카드에 적힌 성경 구절(개역개정)에서\n지시대로 단어(또는 글자)를 찾아 스케치북에 크게 적고,\n일곱 조가 순서대로 들어 올리면 문장 완성!",
+    // 개역개정 기준 배정 (진행 전 실물 성경으로 1분 검증 권장)
+    // 완성 문장: "꿈이 있는 교회 청소년부 사랑함"
+    assignments: [
+      { ref: "전도서 5:3", wordIndex: "3번째 단어", word: "꿈이" },                       // 걱정이 많으면 꿈이 생기고 …
+      { ref: "로마서 8:1", wordIndex: "6번째 단어", word: "있는" },                       // 그러므로 이제 그리스도 예수 안에 있는 …
+      { ref: "마태복음 16:18", wordIndex: "'세우리니' 바로 앞 단어의 앞 두 글자", word: "교회" }, // … 내 교회를 세우리니 …
+      { ref: "전도서 11:9", wordIndex: "1번째 단어의 첫 글자", word: "청" },              // 청년이여 네 어린 때를 즐거워하며 …
+      { ref: "이사야 40:30", wordIndex: "1번째 단어의 앞 두 글자", word: "소년" },        // 소년이라도 피곤하며 곤비하며 …
+      { ref: "요한복음 11:25", wordIndex: "4번째 단어의 첫 글자", word: "부" },           // 예수께서 이르시되 나는 부활이요 …
+      { ref: "요한일서 4:19", wordIndex: "2번째 단어의 앞 세 글자", word: "사랑함" },     // 우리가 사랑함은 그가 먼저 …
+    ],
+    hints: ["단어를 찾으면 스케치북에 아주 크게! 뒤에서도 보이게!"],
+  },
+];
+
+/* ---------------- 유틸 ---------------- */
+const shuffleArr = (arr) => {
+  const a = arr.map((v, i) => ({ v, i }));
+  for (let k = a.length - 1; k > 0; k--) {
+    const j = Math.floor(Math.random() * (k + 1));
+    [a[k], a[j]] = [a[j], a[k]];
+  }
+  return a;
+};
+
+const rainbowGrad = "linear-gradient(90deg,#FF6B6B,#FFA94D,#FFD43B,#69DB7C,#4DABF7,#5C7CFA,#B197FC)";
+const sectionOf = (stage) => SECTIONS.find((s) => s.stages.includes(stage));
+
+/* 지도 스테이션 좌표 (%) */
+const STATIONS = [
+  { x: 8, y: 78 }, { x: 22, y: 62 }, { x: 38, y: 74 }, { x: 54, y: 62 },
+  { x: 68, y: 76 }, { x: 84, y: 60 }, { x: 76, y: 38 }, { x: 58, y: 28 },
+  { x: 38, y: 36 }, { x: 18, y: 22 },
+];
+
+/* ---------------- 손그림 SVG 아이콘 ---------------- */
+function CloudIcon({ size = 70, style }) {
+  return (
+    <svg width={size} height={size * 0.6} viewBox="0 0 100 60" style={style}>
+      <ellipse cx="30" cy="40" rx="24" ry="16" fill="#fff" />
+      <ellipse cx="55" cy="30" rx="24" ry="19" fill="#fff" />
+      <ellipse cx="77" cy="42" rx="18" ry="13" fill="#fff" />
+      <ellipse cx="52" cy="48" rx="40" ry="10" fill="#fff" />
+      <ellipse cx="52" cy="52" rx="34" ry="5" fill="#EDF4FF" />
+    </svg>
+  );
+}
+
+function MountainIcon({ size = 80, style }) {
+  return (
+    <svg width={size} height={size * 0.7} viewBox="0 0 100 70" style={style}>
+      <path d="M48 70 L74 30 L98 70 Z" fill="#69B58A" />
+      <path d="M2 70 L38 14 L72 70 Z" fill="#8CC9A3" />
+      <path d="M30 27 L38 14 L46 27 L42 24 L38 29 L34 24 Z" fill="#fff" />
+    </svg>
+  );
+}
+
+function CrossIcon({ size = 36, glow = false, color = "#C98A3D", style }) {
+  return (
+    <svg width={size} height={size * 1.15} viewBox="0 0 60 70" style={style}>
+      {glow && <circle cx="30" cy="30" r="28" fill="#FFE9A8" opacity="0.75" />}
+      {glow && <circle cx="30" cy="30" r="20" fill="#FFF4CE" opacity="0.9" />}
+      <rect x="24" y="6" width="12" height="60" rx="6" fill={color} />
+      <rect x="8" y="20" width="44" height="12" rx="6" fill={color} />
+    </svg>
+  );
+}
+
+function WaveIcon({ size = 70, style }) {
+  return (
+    <svg width={size} height={size * 0.4} viewBox="0 0 100 40" style={style}>
+      <path d="M4 28 Q16 10 30 22 Q26 14 34 12 M38 30 Q52 10 66 24 Q62 14 70 13 M70 32 Q82 18 94 28"
+        fill="none" stroke="#7FBFEA" strokeWidth="7" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function TentIcon({ size = 64, style }) {
+  return (
+    <svg width={size} height={size * 0.8} viewBox="0 0 100 80" style={style}>
+      <path d="M6 74 L50 12 L94 74 Z" fill="#E0AA6C" />
+      <path d="M6 74 L50 12 L60 26 L26 74 Z" fill="#EFC28C" />
+      <path d="M38 74 L50 50 L62 74 Z" fill="#9C6B3F" />
+      <rect x="47" y="2" width="6" height="14" rx="3" fill="#9C6B3F" />
+    </svg>
+  );
+}
+
+function BookIcon({ size = 40, style }) {
+  return (
+    <svg width={size} height={size * 0.75} viewBox="0 0 100 75" style={style}>
+      <path d="M50 14 Q28 2 8 10 L8 62 Q28 54 50 66 Z" fill="#fff" stroke="#D8B98A" strokeWidth="5" strokeLinejoin="round" />
+      <path d="M50 14 Q72 2 92 10 L92 62 Q72 54 50 66 Z" fill="#FFF7E8" stroke="#D8B98A" strokeWidth="5" strokeLinejoin="round" />
+      <path d="M20 24 Q32 20 42 25 M20 36 Q32 32 42 37 M58 25 Q68 20 80 24 M58 37 Q68 32 80 36" stroke="#E5CFA6" strokeWidth="4" fill="none" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function PencilIcon({ size = 40, style }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" style={style}>
+      <g transform="rotate(45 50 50)">
+        <rect x="40" y="8" width="20" height="56" rx="4" fill="#FFA94D" />
+        <rect x="40" y="8" width="20" height="12" rx="4" fill="#FF8FA3" />
+        <path d="M40 64 L50 86 L60 64 Z" fill="#F5D9A8" />
+        <path d="M46 78 L50 86 L54 78 Z" fill="#5B4636" />
+      </g>
+    </svg>
+  );
+}
+
+function BulbIcon({ size = 26, style }) {
+  return (
+    <svg width={size} height={size * 1.2} viewBox="0 0 60 72" style={{ verticalAlign: "middle", ...style }}>
+      <circle cx="30" cy="26" r="20" fill="#FFD43B" />
+      <circle cx="24" cy="20" r="6" fill="#FFF0B3" />
+      <rect x="22" y="46" width="16" height="8" rx="3" fill="#C9A34A" />
+      <rect x="24" y="55" width="12" height="6" rx="3" fill="#C9A34A" />
+      <path d="M30 0 L30 6 M8 10 L13 15 M52 10 L47 15" stroke="#FFC93B" strokeWidth="5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function NoteIcon({ size = 44, style }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" style={style}>
+      <ellipse cx="26" cy="78" rx="14" ry="10" fill="#B197FC" transform="rotate(-18 26 78)" />
+      <ellipse cx="70" cy="70" rx="14" ry="10" fill="#B197FC" transform="rotate(-18 70 70)" />
+      <path d="M38 76 L38 20 L82 12 L82 68" stroke="#B197FC" strokeWidth="8" fill="none" strokeLinecap="round" />
+      <path d="M38 20 L82 12 L82 26 L38 34 Z" fill="#B197FC" />
+    </svg>
+  );
+}
+
+function RainbowIcon({ size = 110, style }) {
+  const rs = [46, 40, 34, 28, 22, 16, 10];
+  return (
+    <svg width={size} height={size * 0.58} viewBox="0 0 100 58" style={style}>
+      {rs.map((r, i) => (
+        <path key={i} d={"M " + (50 - r) + " 54 A " + r + " " + r + " 0 0 1 " + (50 + r) + " 54"}
+          fill="none" stroke={TEAMS[i].color} strokeWidth="6" strokeLinecap="round" />
+      ))}
+    </svg>
+  );
+}
+
+function RainbowFlag({ size = 44 }) {
+  return (
+    <div style={{ width: size, height: size, position: "relative", filter: "drop-shadow(0 3px 3px rgba(0,0,0,0.2))" }}>
+      <div style={{ position: "absolute", left: size * 0.12, top: 0, width: size * 0.08, height: size, background: "#8B6B4A", borderRadius: 4 }} />
+      <div style={{ position: "absolute", left: size * 0.2, top: size * 0.05, width: size * 0.75, height: size * 0.55, borderRadius: "0 10px 10px 0", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+        {TEAMS.map((t) => (
+          <div key={t.name} style={{ flex: 1, background: t.color }} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* 창조 장면 속 동물/나무 (그림 퀴즈용) */
+function CreationScene() {
+  return (
+    <svg viewBox="0 0 520 230" style={{ width: 540, maxWidth: "92%", borderRadius: 28, background: "linear-gradient(#CDEBFF 58%, #BDEAD1 58%)", boxShadow: "0 8px 0 rgba(0,0,0,0.06)" }}>
+      {/* 해 */}
+      <circle cx="440" cy="48" r="26" fill="#FFD43B" />
+      {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+        <line key={i} x1="440" y1="48" x2={440 + 42 * Math.cos((i * Math.PI) / 4)} y2={48 + 42 * Math.sin((i * Math.PI) / 4)} stroke="#FFD43B" strokeWidth="5" strokeLinecap="round" />
+      ))}
+      {/* 구름 */}
+      <g transform="translate(56,28)"><ellipse cx="24" cy="20" rx="22" ry="13" fill="#fff" /><ellipse cx="48" cy="14" rx="20" ry="14" fill="#fff" /><ellipse cx="66" cy="22" rx="15" ry="10" fill="#fff" /></g>
+      {/* 산 */}
+      <path d="M0 133 L86 66 L172 133 Z" fill="#8CC9A3" />
+      <path d="M74 84 L86 66 L98 84 L92 80 L86 88 L80 80 Z" fill="#fff" />
+      <path d="M108 133 L206 54 L304 133 Z" fill="#69B58A" />
+      {/* 땅과 바다 */}
+      <rect x="0" y="133" width="520" height="97" fill="#BDEAD1" />
+      <path d="M300 168 q30 -18 60 0 q30 18 60 0 q30 -18 60 0 q22 13 40 4 v58 h-220 Z" fill="#8FCBEF" />
+      <path d="M318 186 q10 -8 20 0 M368 194 q10 -8 20 0 M430 184 q10 -8 20 0" stroke="#DFF1FC" strokeWidth="4" fill="none" strokeLinecap="round" />
+      {/* 나무 */}
+      <g transform="translate(228,72)">
+        <rect x="20" y="34" width="12" height="30" rx="5" fill="#9C6B3F" />
+        <circle cx="14" cy="26" r="16" fill="#5FA873" />
+        <circle cx="38" cy="26" r="16" fill="#69B58A" />
+        <circle cx="26" cy="12" r="17" fill="#7FC492" />
+        <circle cx="16" cy="20" r="3.4" fill="#FF8A8A" />
+        <circle cx="34" cy="16" r="3.4" fill="#FF8A8A" />
+      </g>
+      {/* 사자 */}
+      <g transform="translate(44,158)">
+        <ellipse cx="34" cy="34" rx="18" ry="12" fill="#E8A560" />
+        <rect x="22" y="40" width="6" height="12" rx="3" fill="#D18B44" />
+        <rect x="40" y="40" width="6" height="12" rx="3" fill="#D18B44" />
+        <path d="M50 32 q12 2 10 12" stroke="#D18B44" strokeWidth="5" fill="none" strokeLinecap="round" />
+        <circle cx="16" cy="24" r="14" fill="#D18B44" />
+        <circle cx="16" cy="24" r="9" fill="#F5C98E" />
+        <circle cx="13" cy="22" r="1.7" fill="#5B4636" />
+        <circle cx="19" cy="22" r="1.7" fill="#5B4636" />
+        <ellipse cx="16" cy="27" rx="2.6" ry="1.8" fill="#B4692E" />
+        <circle cx="8" cy="14" r="3.4" fill="#D18B44" />
+        <circle cx="24" cy="14" r="3.4" fill="#D18B44" />
+      </g>
+      {/* 양 */}
+      <g transform="translate(128,172)">
+        <ellipse cx="26" cy="20" rx="20" ry="13" fill="#fff" />
+        <circle cx="12" cy="12" r="8" fill="#fff" />
+        <circle cx="28" cy="8" r="9" fill="#fff" />
+        <circle cx="42" cy="13" r="8" fill="#fff" />
+        <rect x="14" y="30" width="5" height="10" rx="2.5" fill="#8A8AA0" />
+        <rect x="34" y="30" width="5" height="10" rx="2.5" fill="#8A8AA0" />
+        <circle cx="48" cy="18" r="7.5" fill="#8A8AA0" />
+        <circle cx="50" cy="16" r="1.5" fill="#fff" />
+        <ellipse cx="44" cy="12" rx="3" ry="2" fill="#8A8AA0" transform="rotate(-30 44 12)" />
+      </g>
+      {/* 비둘기 */}
+      <g transform="translate(186,120)">
+        <ellipse cx="20" cy="14" rx="16" ry="9" fill="#fff" transform="rotate(-12 20 14)" />
+        <circle cx="34" cy="8" r="6" fill="#fff" />
+        <path d="M40 8 L46 10 L40 12 Z" fill="#FFA94D" />
+        <circle cx="35.5" cy="6.6" r="1.3" fill="#5B4636" />
+        <path d="M16 12 q-2 -12 10 -14 q-6 8 0 12" fill="#EDEDF5" />
+        <path d="M6 16 q-6 2 -8 6 q6 0 10 -2" fill="#EDEDF5" />
+      </g>
+      {/* 물고기 */}
+      <g transform="translate(360,182)">
+        <ellipse cx="20" cy="12" rx="16" ry="9" fill="#5FA8D8" />
+        <path d="M34 12 L46 4 L46 20 Z" fill="#4E90BE" />
+        <circle cx="10" cy="10" r="2" fill="#fff" />
+        <circle cx="10" cy="10" r="1" fill="#2B4A63" />
+        <path d="M18 4 q4 -4 8 0" stroke="#4E90BE" strokeWidth="3" fill="none" />
+      </g>
+    </svg>
+  );
+}
+
+function Pill({ bg, children, style }) {
+  return (
+    <span style={{
+      display: "inline-block", background: bg, color: "#fff", fontWeight: 700,
+      padding: "8px 22px", borderRadius: 999, fontSize: 20, letterSpacing: 1,
+      boxShadow: "0 4px 0 rgba(0,0,0,0.08)", ...style,
+    }}>{children}</span>
+  );
+}
+
+function Confetti({ count = 36 }) {
+  const pieces = useMemo(() =>
+    Array.from({ length: count }, (_, i) => ({
+      left: Math.random() * 100,
+      delay: Math.random() * 2,
+      dur: 3 + Math.random() * 2.5,
+      color: TEAMS[i % 7].color,
+      size: 8 + Math.random() * 8,
+      rot: Math.random() * 360,
+    })), [count]);
+  return (
+    <div style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none" }}>
+      {pieces.map((p, i) => (
+        <div key={i} style={{
+          position: "absolute", left: p.left + "%", top: -20, width: p.size, height: p.size * 0.6,
+          background: p.color, borderRadius: 3, transform: "rotate(" + p.rot + "deg)",
+          animation: "gjFall " + p.dur + "s linear " + p.delay + "s infinite",
+        }} />
+      ))}
+    </div>
+  );
+}
+
+function AnswerBadge({ children, ref_ }) {
+  return (
+    <div style={{ textAlign: "center", animation: "gjPop .5s cubic-bezier(.2,1.6,.4,1)" }}>
+      <div style={{
+        display: "inline-block", background: "#fff", border: "6px solid #FFD43B",
+        borderRadius: 32, padding: "26px 48px", boxShadow: "0 10px 24px rgba(255,169,77,0.35)",
+      }}>
+        <div style={{ fontSize: 54, fontWeight: 900, color: "#5B4636", fontFamily: "'Jua', sans-serif" }}>{children}</div>
+        {ref_ && <div style={{ marginTop: 8, fontSize: 26, color: "#B08850", fontWeight: 700 }}>{ref_}</div>}
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- 문제 유형별 본문 ---------------- */
+function QuestionBody({ q, revealed, shuffle }) {
+  const bigText = { fontSize: 52, fontWeight: 800, color: "#5B4636", lineHeight: 1.5, whiteSpace: "pre-line", textAlign: "center", fontFamily: "'Jua', sans-serif" };
+
+  if (q.type === "ox") {
+    return (
+      <div style={{ textAlign: "center" }}>
+        <div style={bigText}>{q.question}</div>
+        <div style={{ display: "flex", gap: 40, justifyContent: "center", marginTop: 40 }}>
+          {["O", "X"].map((v) => (
+            <div key={v} style={{
+              width: 170, height: 170, borderRadius: 44, display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 96, fontWeight: 900, fontFamily: "'Jua', sans-serif",
+              background: revealed && q.answer === v ? (v === "O" ? "#69DB7C" : "#FF6B6B") : "#FFF6EE",
+              color: revealed && q.answer === v ? "#fff" : v === "O" ? "#69DB7C" : "#FF8787",
+              border: "6px solid " + (v === "O" ? "#69DB7C" : "#FF8787"),
+              boxShadow: "0 8px 0 rgba(0,0,0,0.06)",
+              transform: revealed && q.answer === v ? "scale(1.12)" : "scale(1)",
+              transition: "all .4s cubic-bezier(.2,1.6,.4,1)",
+            }}>{v}</div>
+          ))}
+        </div>
+        {revealed && <div style={{ marginTop: 30 }}><AnswerBadge ref_={q.ref}>정답은 {q.answer}!</AnswerBadge></div>}
+      </div>
+    );
+  }
+
+  if (q.type === "image") {
+    return (
+      <div style={{ textAlign: "center" }}>
+        <CreationScene />
+        <div style={{ ...bigText, fontSize: 44, marginTop: 24 }}>{q.question}</div>
+        {revealed && <div style={{ marginTop: 22 }}><AnswerBadge ref_={q.ref}>{"\u201C" + q.answer + "\u201D"}</AnswerBadge></div>}
+      </div>
+    );
+  }
+
+  if (q.type === "chosung") {
+    return (
+      <div style={{ textAlign: "center" }}>
+        <div style={{ display: "flex", gap: 20, justifyContent: "center", flexWrap: "wrap" }}>
+          {q.letters.split("").map((ch, i) => (
+            <div key={i} style={{
+              width: 120, height: 140, borderRadius: 28, background: "#fff",
+              border: "5px solid #FFB4C6", display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 76, fontWeight: 900, color: "#E06A8A", fontFamily: "'Jua', sans-serif",
+              boxShadow: "0 8px 0 rgba(224,106,138,0.15)",
+            }}>
+              {revealed ? q.answer[i] : ch}
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop: 34, fontSize: 34, color: "#B08850", fontWeight: 700 }}>
+          {revealed ? "" : "초성을 보고 단어를 맞혀 보세요!"}
+        </div>
+        {revealed && <AnswerBadge>{q.answer}</AnswerBadge>}
+      </div>
+    );
+  }
+
+  if (q.type === "address") {
+    return (
+      <div style={{ textAlign: "center" }}>
+        <div style={{
+          background: "#FFF9EC", border: "5px dashed #E8C98A", borderRadius: 32,
+          padding: "36px 50px", margin: "0 auto", maxWidth: 900,
+        }}>
+          <div style={{ marginBottom: 10 }}><BookIcon size={64} /></div>
+          <div style={{ ...bigText, fontSize: 46 }}>{"\u201C" + q.verse + "\u201D"}</div>
+        </div>
+        <div style={{ marginTop: 24, fontSize: 30, color: "#B08850", fontWeight: 700, whiteSpace: "pre-line" }}>{q.instruction}</div>
+        {revealed && <div style={{ marginTop: 24 }}><AnswerBadge>{q.answer}</AnswerBadge></div>}
+      </div>
+    );
+  }
+
+  if (q.type === "order") {
+    const disp = shuffle || q.items.map((v, i) => ({ v, i }));
+    const H = 84;
+    return (
+      <div style={{ textAlign: "center" }}>
+        <div style={{ ...bigText, fontSize: 40, marginBottom: 28 }}>{q.question}</div>
+        <div style={{ position: "relative", height: H * 6 + 10, maxWidth: 720, margin: "0 auto" }}>
+          {disp.map((item, dispIdx) => {
+            const pos = revealed ? item.i : dispIdx;
+            return (
+              <div key={item.i} style={{
+                position: "absolute", left: 0, right: 0, top: pos * H,
+                height: H - 14, borderRadius: 24, background: "#fff",
+                border: "4px solid #A5C8F5", display: "flex", alignItems: "center",
+                padding: "0 28px", gap: 20, boxShadow: "0 6px 0 rgba(92,124,250,0.12)",
+                transition: "top .9s cubic-bezier(.4,1.4,.4,1)",
+              }}>
+                <div style={{
+                  width: 46, height: 46, borderRadius: 999, background: revealed ? "#5C7CFA" : "#DCE7FB",
+                  color: revealed ? "#fff" : "#7C93C9", fontWeight: 900, fontSize: 26,
+                  display: "flex", alignItems: "center", justifyContent: "center", transition: "all .5s",
+                }}>{revealed ? item.i + 1 : "?"}</div>
+                <div style={{ fontSize: 34, fontWeight: 800, color: "#4A5B7C", fontFamily: "'Jua', sans-serif" }}>{item.v}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  if (q.type === "blank") {
+    const parts = q.text.split("____");
+    return (
+      <div style={{ textAlign: "center" }}>
+        <div style={{ ...bigText, fontSize: 46, maxWidth: 980, margin: "0 auto" }}>
+          {parts.map((p, i) => (
+            <React.Fragment key={i}>
+              {p}
+              {i < parts.length - 1 && (
+                <span style={{
+                  display: "inline-block", minWidth: 130, margin: "0 8px", padding: "2px 18px",
+                  borderBottom: "6px solid #FFA94D", borderRadius: 8,
+                  background: revealed ? "#FFF1DE" : "transparent",
+                  color: "#E8862E", transition: "all .5s",
+                }}>{revealed ? q.answers[i] : "\u00A0\u00A0\u00A0"}</span>
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+        {/* 말씀 주소는 정답 공개 후에만 표시 */}
+        {revealed && (
+          <div style={{ marginTop: 24, fontSize: 28, color: "#B08850", fontWeight: 700, animation: "gjPop .4s both" }}>{q.ref}</div>
+        )}
+      </div>
+    );
+  }
+
+  if (q.type === "search") {
+    return (
+      <div style={{ textAlign: "center" }}>
+        <div style={{ ...bigText, fontSize: 42 }}>{q.question}</div>
+        {revealed && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 16, justifyContent: "center", marginTop: 34, maxWidth: 980, marginLeft: "auto", marginRight: "auto" }}>
+            {q.answers.map((a, i) => (
+              <div key={i} style={{
+                background: "#fff", border: "4px solid " + TEAMS[i].color, borderRadius: 999,
+                padding: "14px 26px", fontSize: 28, fontWeight: 800, color: "#5B4636",
+                animation: "gjPop .5s " + i * 0.15 + "s both cubic-bezier(.2,1.6,.4,1)",
+                fontFamily: "'Jua', sans-serif",
+              }}>
+                {a.text} <span style={{ fontSize: 20, color: "#B08850" }}>({a.ref})</span>
+              </div>
+            ))}
+          </div>
+        )}
+        {!revealed && (
+          <div style={{ marginTop: 26, display: "flex", gap: 14, alignItems: "center", justifyContent: "center" }}>
+            <BookIcon size={52} /><PencilIcon size={44} />
+            <span style={{ fontSize: 30, color: "#B08850", fontWeight: 700 }}>스케치북에 적어 주세요!</span>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (q.type === "lyrics") {
+    const parts = q.lyrics_with_blanks.split("____");
+    let blankNo = -1;
+    return (
+      <div style={{ textAlign: "center" }}>
+        <div style={{ marginBottom: 14 }}><NoteIcon size={54} /></div>
+        <div style={{ ...bigText, fontSize: 40, maxWidth: 980, margin: "0 auto" }}>
+          {parts.map((p, i) => {
+            const isBlank = i < parts.length - 1;
+            if (isBlank) blankNo++;
+            const bn = blankNo;
+            return (
+              <React.Fragment key={i}>
+                {p}
+                {isBlank && (
+                  <span style={{
+                    display: "inline-block", minWidth: 120, margin: "0 6px", padding: "2px 16px",
+                    borderBottom: "6px solid #B197FC", borderRadius: 8,
+                    background: revealed ? "#F1EBFF" : "transparent", color: "#7B5FD1",
+                    animation: revealed ? "gjPop .45s " + bn * 0.5 + "s both cubic-bezier(.2,1.6,.4,1)" : "none",
+                  }}>{revealed ? (q.answers[bn] || "?") : "\u00A0\u00A0\u00A0"}</span>
+                )}
+              </React.Fragment>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  if (q.type === "anagram") {
+    const words = q.answer.split(" ");
+    return (
+      <div style={{ textAlign: "center" }}>
+        <div style={{ ...bigText, fontSize: 40, marginBottom: 32 }}>{q.question}</div>
+        {!revealed && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 14, justifyContent: "center", maxWidth: 900, margin: "0 auto" }}>
+            {(shuffle || []).map((item, i) => (
+              <div key={i} style={{
+                width: 72, height: 88, borderRadius: 20, background: "#fff",
+                border: "4px solid " + TEAMS[i % 7].color, display: "flex", alignItems: "center",
+                justifyContent: "center", fontSize: 46, fontWeight: 900, color: "#5B4636",
+                fontFamily: "'Jua', sans-serif", boxShadow: "0 6px 0 rgba(0,0,0,0.06)",
+                transform: "rotate(" + (((i * 37) % 13) - 6) + "deg)",
+              }}>{item.v}</div>
+            ))}
+          </div>
+        )}
+        {revealed && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 28, justifyContent: "center" }}>
+            {words.map((w, wi) => (
+              <div key={wi} style={{ display: "flex", gap: 10 }}>
+                {w.split("").map((ch, ci) => (
+                  <div key={ci} style={{
+                    width: 72, height: 88, borderRadius: 20, background: "#fff",
+                    border: "4px solid #FFA94D", display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 46, fontWeight: 900, fontFamily: "'Jua', sans-serif",
+                    color: "#E8862E", boxShadow: "0 6px 0 rgba(232,134,46,0.15)",
+                    animation: "gjFlyIn .6s " + (wi * 4 + ci) * 0.09 + "s both cubic-bezier(.2,1.4,.4,1)",
+                  }}>{ch}</div>
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (q.type === "finale") {
+    return (
+      <div style={{ textAlign: "center" }}>
+        <div style={{ ...bigText, fontSize: 34, marginBottom: 26 }}>{q.question}</div>
+        {!revealed && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 16, justifyContent: "center", maxWidth: 1080, margin: "0 auto" }}>
+            {q.assignments.map((a, i) => (
+              <div key={i} style={{
+                width: 250, borderRadius: 24, background: "#fff", overflow: "hidden",
+                border: "4px solid " + TEAMS[i].color, boxShadow: "0 6px 0 rgba(0,0,0,0.06)",
+              }}>
+                <div style={{ background: TEAMS[i].color, color: "#fff", fontWeight: 800, padding: "8px 0", fontSize: 22 }}>{TEAMS[i].name} 조 · {i + 1}번</div>
+                <div style={{ padding: "16px 12px" }}>
+                  <div style={{ fontSize: 26, fontWeight: 800, color: "#5B4636", fontFamily: "'Jua', sans-serif" }}>{a.ref}</div>
+                  <div style={{ fontSize: 20, color: "#B08850", fontWeight: 700, marginTop: 6, lineHeight: 1.4 }}>{a.wordIndex}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        {revealed && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 14, justifyContent: "center", alignItems: "center", maxWidth: 1080, margin: "0 auto" }}>
+            {q.assignments.map((a, i) => (
+              <div key={i} style={{
+                background: TEAMS[i].color, color: "#fff", borderRadius: 24,
+                padding: "20px 26px", fontSize: 42, fontWeight: 900, fontFamily: "'Jua', sans-serif",
+                boxShadow: "0 8px 0 rgba(0,0,0,0.1)",
+                animation: "gjFlyIn .7s " + i * 0.45 + "s both cubic-bezier(.2,1.4,.4,1)",
+              }}>{a.word}</div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+  return null;
+}
+
+/* ---------------- 화면들 ---------------- */
+function TitleScreen({ onStart }) {
+  return (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 34, position: "relative" }}>
+      <CloudIcon size={110} style={{ position: "absolute", top: "12%", left: "12%", animation: "gjFloat 4s ease-in-out infinite" }} />
+      <CloudIcon size={80} style={{ position: "absolute", top: "22%", right: "14%", animation: "gjFloat 5s ease-in-out 1s infinite" }} />
+      <MountainIcon size={110} style={{ position: "absolute", bottom: "12%", left: "13%" }} />
+      <CrossIcon size={64} glow style={{ position: "absolute", bottom: "12%", right: "13%" }} />
+      <RainbowFlag size={90} />
+      <h1 style={{
+        margin: 0, fontFamily: "'Jua', sans-serif", fontSize: "clamp(64px, 10vw, 130px)",
+        background: rainbowGrad, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+        backgroundClip: "text", letterSpacing: 2, textAlign: "center",
+        filter: "drop-shadow(0 5px 0 rgba(0,0,0,0.08))",
+      }}>Gospel Journey</h1>
+      <Pill bg="#5C7CFA" style={{ fontSize: 26, padding: "12px 34px" }}>함께 걷는 길</Pill>
+      <button onClick={onStart} style={{
+        marginTop: 16, border: "none", cursor: "pointer", fontFamily: "'Jua', sans-serif",
+        fontSize: 36, color: "#fff", background: "linear-gradient(180deg,#FF8FA3,#FF6B8A)",
+        padding: "20px 70px", borderRadius: 999, boxShadow: "0 8px 0 #D95677",
+      }}>여정 시작하기 ▶</button>
+      <div style={{ color: "#C79A8C", fontSize: 18, fontWeight: 700 }}>스페이스 · H 힌트 · 1~7 조 통과 · M 지도</div>
+    </div>
+  );
+}
+
+function MapScreen({ cleared, onOpen }) {
+  const current = Math.min(cleared, 9);
+  const pathD = useMemo(() => {
+    const pts = STATIONS.map((s) => [s.x * 11.5, s.y * 6]);
+    let d = "M " + pts[0][0] + " " + pts[0][1];
+    for (let i = 1; i < pts.length; i++) {
+      const x0 = pts[i - 1][0], y0 = pts[i - 1][1], x1 = pts[i][0], y1 = pts[i][1];
+      d += " C " + (x0 + (x1 - x0) / 2) + " " + y0 + ", " + (x0 + (x1 - x0) / 2) + " " + y1 + ", " + x1 + " " + y1;
+    }
+    return d;
+  }, []);
+
+  return (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", padding: "20px 30px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 20 }}>
+        <h2 style={{
+          margin: 0, fontFamily: "'Jua', sans-serif", fontSize: 44,
+          background: rainbowGrad, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+        }}>Gospel Journey</h2>
+        <Pill bg="#5C7CFA" style={{ fontSize: 18 }}>함께 걷는 길</Pill>
+      </div>
+      <div style={{ display: "flex", justifyContent: "center", gap: 14, marginTop: 12 }}>
+        {SECTIONS.map((s) => (
+          <span key={s.name} style={{ background: s.color, color: s.text, fontWeight: 800, borderRadius: 999, padding: "6px 20px", fontSize: 18, display: "inline-flex", alignItems: "center", gap: 6 }}>
+            {s.cross && <CrossIcon size={14} color={s.text} />}
+            {s.name}
+          </span>
+        ))}
+      </div>
+      <div style={{ flex: 1, position: "relative", margin: "10px auto 0", width: "min(1150px, 96%)" }}>
+        <CloudIcon size={80} style={{ position: "absolute", top: "5%", left: "4%", animation: "gjFloat 5s ease-in-out infinite" }} />
+        <CloudIcon size={64} style={{ position: "absolute", top: "10%", right: "6%", animation: "gjFloat 6s ease-in-out 1.2s infinite" }} />
+        <WaveIcon size={80} style={{ position: "absolute", bottom: "5%", right: "30%" }} />
+        <MountainIcon size={86} style={{ position: "absolute", top: "44%", left: "1%" }} />
+        <TentIcon size={62} style={{ position: "absolute", top: "1%", left: "30%" }} />
+        <CrossIcon size={44} glow style={{ position: "absolute", top: "38%", right: "3%" }} />
+        <svg viewBox="0 0 1150 600" style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}>
+          <path d={pathD} fill="none" stroke="#FFFFFF" strokeWidth="26" strokeLinecap="round" opacity="0.9" />
+          <path d={pathD} fill="none" stroke="#F7C8D4" strokeWidth="16" strokeDasharray="2 26" strokeLinecap="round" />
+        </svg>
+        {STATIONS.map((s, i) => {
+          const sec = sectionOf(i);
+          const done = i < cleared;
+          const isCur = i === current && cleared < 10;
+          return (
+            <div key={i} onClick={() => isCur && onOpen()} style={{
+              position: "absolute", left: s.x + "%", top: s.y + "%", transform: "translate(-50%,-50%)",
+              cursor: isCur ? "pointer" : "default", textAlign: "center",
+            }}>
+              <div style={{
+                width: 74, height: 74, borderRadius: 999, background: done ? sec.color : "#fff",
+                border: "6px solid " + (done ? sec.text : sec.color),
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: done ? 34 : 30, fontWeight: 900, color: sec.text, fontFamily: "'Jua', sans-serif",
+                boxShadow: "0 6px 0 rgba(0,0,0,0.08)",
+                animation: isCur ? "gjPulse 1.6s ease-in-out infinite" : "none",
+              }}>
+                {done ? "✓" : i + 1}
+              </div>
+              {sec.cross && <div style={{ position: "absolute", top: -18, right: -14 }}><CrossIcon size={18} /></div>}
+            </div>
+          );
+        })}
+        <div style={{
+          position: "absolute", left: STATIONS[current].x + "%", top: STATIONS[current].y + "%",
+          transform: "translate(-50%,-120%)", transition: "left 1.1s cubic-bezier(.4,1.4,.5,1), top 1.1s cubic-bezier(.4,1.4,.5,1)",
+          animation: "gjBounce 1.4s ease-in-out infinite", pointerEvents: "none",
+        }}>
+          <RainbowFlag size={56} />
+        </div>
+      </div>
+      {cleared < 10 && (
+        <div style={{ textAlign: "center", paddingBottom: 8 }}>
+          <button onClick={onOpen} style={{
+            border: "none", cursor: "pointer", fontFamily: "'Jua', sans-serif", fontSize: 28, color: "#fff",
+            background: "linear-gradient(180deg,#8FB7FA,#5C7CFA)", padding: "14px 50px", borderRadius: 999,
+            boxShadow: "0 6px 0 #4257C9",
+          }}>스테이션 {current + 1} 시작 ▶</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function FinaleScreen({ onRestart }) {
+  return (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 28, position: "relative" }}>
+      <Confetti count={50} />
+      <RainbowIcon size={190} />
+      <h1 style={{
+        margin: 0, fontFamily: "'Jua', sans-serif", fontSize: "clamp(50px,7vw,92px)",
+        background: rainbowGrad, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+      }}>여정 완주!</h1>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 14, justifyContent: "center", maxWidth: 1080 }}>
+        {FINALE_SENTENCE.map((w, i) => (
+          <div key={i} style={{
+            background: TEAMS[i].color, color: "#fff", borderRadius: 24, padding: "18px 26px",
+            fontSize: 44, fontWeight: 900, fontFamily: "'Jua', sans-serif",
+            boxShadow: "0 8px 0 rgba(0,0,0,0.1)", animation: "gjPop .6s " + i * 0.25 + "s both cubic-bezier(.2,1.6,.4,1)",
+          }}>{w}</div>
+        ))}
+      </div>
+      <Pill bg="#5C7CFA" style={{ fontSize: 24, padding: "12px 30px" }}>내 삶에 꺼지지 않는 복음 · 롬 1:16</Pill>
+      <button onClick={onRestart} style={{
+        border: "none", cursor: "pointer", fontFamily: "'Jua', sans-serif", fontSize: 22, color: "#C79A8C",
+        background: "transparent", textDecoration: "underline",
+      }}>처음으로</button>
+    </div>
+  );
+}
+
+/* ---------------- 메인 앱 ---------------- */
+export default function App() {
+  const [screen, setScreen] = useState("title"); // title | map | question | finale
+  const [cleared, setCleared] = useState(0);
+  const [qstate, setQstate] = useState({}); // stage -> {revealed, hint, passed:[], shuffle}
+  const [celebrating, setCelebrating] = useState(false);
+  const celebTimer = useRef(null);
+
+  const stage = Math.min(cleared, 9);
+  const q = QUESTIONS[stage];
+  const cur = qstate[stage] || { revealed: false, hint: 0, passed: [], shuffle: null };
+
+  const setCur = (patch) => setQstate((s) => ({ ...s, [stage]: { ...cur, ...patch } }));
+
+  const openQuestion = () => {
+    if (cleared >= 10) return;
+    if (!qstate[stage]) {
+      let shuffle = null;
+      if (q.type === "order") shuffle = shuffleArr(q.items);
+      if (q.type === "anagram") shuffle = shuffleArr(q.answer.replace(/ /g, "").split(""));
+      setQstate((s) => ({ ...s, [stage]: { revealed: false, hint: 0, passed: [], shuffle } }));
+    }
+    setScreen("question");
+  };
+
+  const togglePass = (i) => {
+    if (screen !== "question" || celebrating) return;
+    const passed = cur.passed.includes(i) ? cur.passed.filter((p) => p !== i) : [...cur.passed, i];
+    setCur({ passed });
+    if (passed.length === 7) {
+      setCelebrating(true);
+      celebTimer.current = setTimeout(() => {
+        setCelebrating(false);
+        const done = cleared + 1;
+        setCleared(done);
+        setScreen(done >= 10 ? "finale" : "map");
+      }, 2600);
+    }
+  };
+
+  const nextStep = () => {
+    if (screen === "title") { setScreen("map"); return; }
+    if (screen === "map") { openQuestion(); return; }
+    if (screen === "question" && !cur.revealed) setCur({ revealed: true });
+  };
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.code === "Space") { e.preventDefault(); nextStep(); }
+      else if (e.key === "h" || e.key === "H" || e.key === "ㅗ") {
+        if (screen === "question" && q.hints && cur.hint < q.hints.length) setCur({ hint: cur.hint + 1 });
+      } else if (e.key === "m" || e.key === "M" || e.key === "ㅡ") {
+        if (screen === "question") setScreen("map");
+        else if (screen === "map" && cleared < 10) openQuestion();
+      } else if (/^[1-7]$/.test(e.key)) togglePass(Number(e.key) - 1);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
+  useEffect(() => () => clearTimeout(celebTimer.current), []);
+
+  const sec = sectionOf(stage);
+
+  return (
+    <div style={{
+      width: "100vw", height: "100vh", overflow: "hidden", userSelect: "none",
+      background: "linear-gradient(160deg, #FFE9EF 0%, #FFF2E6 55%, #FFEFF5 100%)",
+      fontFamily: "'Gowun Dodum', 'Noto Sans KR', sans-serif", position: "relative",
+    }}>
+      <style>{"@import url('https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap');" +
+        "@keyframes gjPop { 0% { transform: scale(0.3); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }" +
+        "@keyframes gjFlyIn { 0% { transform: translateY(-120px) rotate(-14deg); opacity: 0; } 100% { transform: translateY(0) rotate(0); opacity: 1; } }" +
+        "@keyframes gjFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }" +
+        "@keyframes gjBounce { 0%,100% { margin-top: 0; } 50% { margin-top: -12px; } }" +
+        "@keyframes gjPulse { 0%,100% { box-shadow: 0 6px 0 rgba(0,0,0,0.08), 0 0 0 0 rgba(255,140,170,0.5); } 50% { box-shadow: 0 6px 0 rgba(0,0,0,0.08), 0 0 0 16px rgba(255,140,170,0); } }" +
+        "@keyframes gjFall { 0% { transform: translateY(-20px) rotate(0); } 100% { transform: translateY(110vh) rotate(540deg); } }" +
+        "button:active { transform: translateY(3px); }"}</style>
+
+      {screen === "title" && <TitleScreen onStart={() => setScreen("map")} />}
+      {screen === "map" && <MapScreen cleared={cleared} onOpen={openQuestion} />}
+      {screen === "finale" && <FinaleScreen onRestart={() => { setScreen("title"); setCleared(0); setQstate({}); }} />}
+
+      {screen === "question" && (
+        <div style={{ height: "100%", display: "flex", flexDirection: "column", padding: "20px 34px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <span style={{ background: sec.color, color: sec.text, fontWeight: 800, borderRadius: 999, padding: "8px 22px", fontSize: 20, display: "inline-flex", alignItems: "center", gap: 6 }}>
+              {sec.cross && <CrossIcon size={16} color={sec.text} />}
+              {sec.name} 구간
+            </span>
+            <Pill bg="#FF8FA3" style={{ fontSize: 20 }}>{stage + 1}번 · {q.label}</Pill>
+            <div style={{ flex: 1 }} />
+            <RainbowFlag size={40} />
+          </div>
+
+          <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", overflow: "auto", padding: "10px 0" }}>
+            <QuestionBody q={q} revealed={cur.revealed} shuffle={cur.shuffle} />
+          </div>
+
+          {cur.hint > 0 && (
+            <div style={{ textAlign: "center", marginBottom: 12 }}>
+              {q.hints.slice(0, cur.hint).map((h, i) => (
+                <div key={i} style={{
+                  display: "inline-flex", alignItems: "center", gap: 8, margin: "4px 8px",
+                  background: "#FFF6D6", border: "3px solid #FFD43B",
+                  borderRadius: 999, padding: "8px 24px", fontSize: 24, fontWeight: 700, color: "#8A6D1F",
+                  animation: "gjPop .4s both",
+                }}><BulbIcon size={22} /> 힌트 {i + 1}: {h}</div>
+              ))}
+            </div>
+          )}
+
+          <div style={{ display: "flex", justifyContent: "center", gap: 14, marginBottom: 10 }}>
+            {TEAMS.map((t, i) => {
+              const on = cur.passed.includes(i);
+              return (
+                <button key={t.name} onClick={() => togglePass(i)} style={{
+                  border: "4px solid " + t.color, background: on ? t.color : "#fff",
+                  color: on ? "#fff" : t.color, borderRadius: 999, width: 88, height: 56,
+                  fontSize: 20, fontWeight: 900, cursor: "pointer", fontFamily: "'Jua', sans-serif",
+                  boxShadow: on ? "0 0 18px " + t.color + "88" : "0 4px 0 rgba(0,0,0,0.06)",
+                  transition: "all .25s",
+                }}>{t.name}</button>
+              );
+            })}
+          </div>
+
+          <div style={{ display: "flex", justifyContent: "center", gap: 12, opacity: 0.55, fontSize: 14 }}>
+            <button onClick={nextStep} style={{ border: "none", background: "#fff", borderRadius: 999, padding: "6px 16px", cursor: "pointer", color: "#B08850", fontWeight: 700 }}>
+              {cur.revealed ? "정답 공개됨" : "정답 공개 (Space)"}
+            </button>
+            <button onClick={() => q.hints && cur.hint < q.hints.length && setCur({ hint: cur.hint + 1 })} style={{ border: "none", background: "#fff", borderRadius: 999, padding: "6px 16px", cursor: "pointer", color: "#B08850", fontWeight: 700 }}>
+              힌트 (H) {cur.hint}/{q.hints ? q.hints.length : 0}
+            </button>
+            <button onClick={() => setScreen("map")} style={{ border: "none", background: "#fff", borderRadius: 999, padding: "6px 16px", cursor: "pointer", color: "#B08850", fontWeight: 700 }}>
+              지도 (M)
+            </button>
+          </div>
+        </div>
+      )}
+
+      {celebrating && (
+        <div style={{
+          position: "absolute", inset: 0, background: "rgba(255,240,246,0.92)",
+          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 22, zIndex: 50,
+        }}>
+          <Confetti count={40} />
+          <RainbowIcon size={150} style={{ animation: "gjPop .5s both" }} />
+          <div style={{
+            fontFamily: "'Jua', sans-serif", fontSize: 90, fontWeight: 900,
+            background: rainbowGrad, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+            animation: "gjPop .6s .1s both cubic-bezier(.2,1.6,.4,1)",
+          }}>함께 통과!</div>
+          <div style={{ display: "flex", gap: 10 }}>
+            {TEAMS.map((t, i) => (
+              <div key={i} style={{
+                width: 34, height: 34, borderRadius: 999, background: t.color,
+                animation: "gjBounce 1s " + i * 0.1 + "s ease-in-out infinite",
+              }} />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

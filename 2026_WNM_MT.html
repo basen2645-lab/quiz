@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>예배와 음악 OX 퀴즈</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700;900&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F4F8; --surface:#FFFFFF; --ink:#211C2E; --muted:#6B6578; --line:#E2DFEA;
+  --violet:#4B2C73; --violet-soft:#ECE6F4; --o:#1F6E48; --o-soft:#E3F1E9; --x:#A3302B; --x-soft:#F7E4E2;
+  --gold:#9A7417; --on-v:#FFFFFF;
+  --serif:"Noto Serif KR","Nanum Myeongjo",Georgia,serif;
+  --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#17141F; --surface:#221E2C; --ink:#EDEAF3; --muted:#A49DB3; --line:#36304A;
+  --violet:#B79AE0; --violet-soft:#2F2742; --o:#5CC593; --o-soft:#1B3328; --x:#EE8079; --x-soft:#3A2020; --gold:#D9B24E; --on-v:#17141F;}}
+:root[data-theme="dark"]{
+  --bg:#17141F; --surface:#221E2C; --ink:#EDEAF3; --muted:#A49DB3; --line:#36304A;
+  --violet:#B79AE0; --violet-soft:#2F2742; --o:#5CC593; --o-soft:#1B3328; --x:#EE8079; --x-soft:#3A2020; --gold:#D9B24E; --on-v:#17141F;}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,input:focus-visible{outline:3px solid var(--violet);outline-offset:2px}
+.wrap{max-width:620px;margin:0 auto;padding:28px 20px 48px}
+.hidden{display:none!important}
+
+/* home */
+.title{font-family:var(--serif);font-weight:900;font-size:clamp(2.1rem,8vw,2.9rem);line-height:1.15;letter-spacing:-.02em}
+.title .ox{display:inline-flex;gap:.12em;margin-left:.2em;vertical-align:-.04em}
+.title .ox i{font-style:normal;display:inline-grid;place-items:center;width:1em;height:1em;border-radius:50%;font-size:.78em;font-family:var(--sans);font-weight:600;color:#fff}
+.title .ox i:first-child{background:var(--o)}.title .ox i:last-child{background:var(--x);border-radius:.18em}
+.sub{color:var(--muted);margin-top:10px;font-size:.95rem}
+.season{display:flex;height:6px;border-radius:3px;overflow:hidden;margin:22px 0 28px}
+.season span{flex:1}
+h2{font-size:.95rem;font-weight:600;margin:26px 0 10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:8px 14px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);font-size:.92rem;transition:background .15s,border-color .15s}
+.chip small{color:var(--muted);margin-left:4px}
+.chip[aria-pressed="true"]{background:var(--violet);border-color:var(--violet);color:var(--on-v)}
+.chip[aria-pressed="true"] small{color:inherit;opacity:.8}
+.range{display:flex;align-items:center;gap:14px}
+.range input{flex:1;accent-color:var(--violet);height:28px}
+.range output{font-family:var(--serif);font-weight:700;font-size:1.4rem;min-width:2.6em;text-align:right}
+.toggle{display:flex;align-items:center;gap:10px;margin-top:18px;font-size:.95rem}
+.toggle input{width:20px;height:20px;accent-color:var(--violet)}
+.primary{display:block;width:100%;margin-top:30px;padding:16px;border-radius:14px;background:var(--violet);color:var(--on-v);font-weight:600;font-size:1.05rem}
+.ghost{display:block;width:100%;margin-top:10px;padding:14px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);font-weight:500}
+.primary:disabled{opacity:.4;cursor:not-allowed}
+.legend{margin-top:22px;font-size:.85rem;color:var(--muted)}
+
+/* quiz */
+.bar{display:flex;align-items:center;gap:12px;font-size:.88rem;color:var(--muted)}
+.bar .quit{padding:6px 10px;margin-left:-10px;border-radius:8px}
+.bar .count{margin-left:auto;font-variant-numeric:tabular-nums}
+.progress{height:4px;background:var(--line);border-radius:2px;margin:10px 0 26px;overflow:hidden}
+.progress div{height:100%;background:var(--violet);transition:width .25s}
+.meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.82rem;color:var(--muted)}
+.tag{padding:2px 9px;border-radius:6px;background:var(--violet-soft);color:var(--violet);font-weight:500}
+.tag.star{background:transparent;color:var(--gold);padding:2px 0;font-weight:600}
+.tag.jeon{background:transparent;border:1px solid var(--line);color:var(--muted)}
+.qnum{font-family:var(--serif);font-weight:700;color:var(--muted);margin-top:18px;font-size:.95rem}
+.qtext{font-family:var(--serif);font-weight:700;font-size:clamp(1.25rem,5vw,1.5rem);line-height:1.65;margin-top:6px;min-height:4.9em;word-break:keep-all}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:26px}
+.ans{aspect-ratio:1/0.78;border-radius:22px;background:var(--surface);border:2px solid var(--line);display:grid;place-items:center;transition:transform .08s,background .15s,border-color .15s,opacity .15s}
+.ans:active{transform:scale(.97)}
+.ans svg{width:46%;height:auto}
+.ans.o svg{stroke:var(--o)}.ans.x svg{stroke:var(--x)}
+.ans.o:hover:not(:disabled){border-color:var(--o)}.ans.x:hover:not(:disabled){border-color:var(--x)}
+.ans:disabled{cursor:default}
+.ans.right{background:var(--o-soft);border-color:var(--o)}
+.ans.wrong{background:var(--x-soft);border-color:var(--x)}
+.ans.x.right{background:var(--o-soft);border-color:var(--o)}
+.ans.dim{opacity:.35}
+.fb{margin-top:20px;border-radius:16px;padding:18px 20px;background:var(--surface);border-left:5px solid var(--o)}
+.fb.bad{border-left-color:var(--x)}
+.fb .verdict{font-weight:600;font-size:1.02rem}
+.fb.good .verdict{color:var(--o)}.fb.bad .verdict{color:var(--x)}
+.fb .exp{margin-top:8px;font-size:.96rem;line-height:1.75;word-break:keep-all}
+.fb .exp li{list-style:none;padding-left:1em;text-indent:-1em;margin-top:3px}
+.fb .exp ul{padding:0;margin-top:6px}
+.hint{text-align:center;color:var(--muted);font-size:.8rem;margin-top:14px}
+@media (hover:none){.hint{display:none}}
+
+/* result */
+.score{text-align:center;padding:20px 0 6px}
+.score .emoji{font-size:3.4rem;line-height:1}
+.score .big{font-family:var(--serif);font-weight:900;font-size:3.6rem;line-height:1.1;margin-top:10px}
+.score .big small{font-size:1.4rem;color:var(--muted);font-weight:700}
+.score p{color:var(--muted);margin-top:4px}
+.wlist{margin-top:10px}
+.witem{background:var(--surface);border-radius:14px;padding:16px 18px;margin-top:10px;border:1px solid var(--line)}
+.witem .wq{font-family:var(--serif);font-weight:700;line-height:1.6;word-break:keep-all}
+.witem .wa{margin-top:6px;font-size:.88rem;color:var(--muted)}
+.witem .wa b{font-weight:600}
+.witem details{margin-top:6px;font-size:.92rem}
+.witem summary{cursor:pointer;color:var(--violet);font-weight:500}
+.witem .exp{margin-top:6px;line-height:1.7;word-break:keep-all}
+.witem .exp li{list-style:none;padding-left:1em;text-indent:-1em;margin-top:3px}
+.witem .exp ul{padding:0;margin-top:6px}
+.empty{text-align:center;color:var(--muted);padding:20px 0}
+
+/* table */
+.tablebox{overflow-x:auto;margin-top:14px;background:var(--surface);border-radius:14px;border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;font-size:.9rem;font-variant-numeric:tabular-nums}
+th,td{padding:10px 12px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-weight:600;background:var(--violet-soft);color:var(--violet)}
+tr:last-child td{border-bottom:0}
+tr.now td{background:var(--violet-soft);font-weight:600}
+.note{font-size:.9rem;color:var(--muted);margin-top:12px;line-height:1.7}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<section id="home">
+  <h1 class="title">예배와 음악<span class="ox" aria-hidden="true"><i>O</i><i>X</i></span></h1>
+  <p class="sub">이상일 교수 · 1~7주차 · OX 50문항</p>
+  <div class="season" aria-hidden="true"><span style="background:#5B2E86"></span><span style="background:#EDE9DF"></span><span style="background:#2F7A4C"></span><span style="background:#5B2E86"></span><span style="background:#EDE9DF"></span><span style="background:#B3302B"></span></div>
+
+  <h2>어디서 낼까요</h2>
+  <div class="chips" id="scope"></div>
+
+  <h2>몇 문제</h2>
+  <div class="range"><input type="range" id="cnt" min="5" max="50" step="1" aria-label="문항 수"><output id="cntOut"></output></div>
+
+  <label class="toggle"><input type="checkbox" id="shuf" checked> 순서 섞기</label>
+
+  <button class="primary" id="start">시작하기</button>
+  <button class="ghost" id="toAdvent">대림절 날짜 계산표 보기</button>
+  <p class="legend">★ 교수님 강조·출제 언급 &nbsp; 수업 발언 = 강의안이 아니라 전사본 기준</p>
+</section>
+
+<section id="quiz" class="hidden">
+  <div class="bar"><button class="quit" id="quit">← 처음으로</button><span class="count" id="count"></span></div>
+  <div class="progress"><div id="prog"></div></div>
+  <div class="meta" id="meta"></div>
+  <p class="qnum" id="qnum"></p>
+  <p class="qtext" id="qtext"></p>
+  <div class="answers">
+    <button class="ans o" id="bO" aria-label="O, 맞다"><svg viewBox="0 0 100 100" fill="none" stroke-width="13"><circle cx="50" cy="50" r="38"/></svg></button>
+    <button class="ans x" id="bX" aria-label="X, 틀리다"><svg viewBox="0 0 100 100" fill="none" stroke-width="13" stroke-linecap="round"><path d="M18 18 82 82M82 18 18 82"/></svg></button>
+  </div>
+  <div id="fb" class="fb hidden" role="status" aria-live="polite"><p class="verdict" id="verdict"></p><div class="exp" id="exp"></div></div>
+  <button class="primary hidden" id="next">다음 문제</button>
+  <p class="hint">키보드: O / X 로 답하고 Enter로 넘어가기</p>
+</section>
+
+<section id="result" class="hidden">
+  <div class="score"><div class="emoji" id="emoji"></div><div class="big" id="big"></div><p id="msg"></p></div>
+  <button class="primary" id="retryWrong">틀린 문제만 다시 풀기</button>
+  <button class="ghost" id="again">같은 범위 새로 풀기</button>
+  <button class="ghost" id="home2">처음으로</button>
+  <h2 style="margin-top:34px">오답노트</h2>
+  <div class="wlist" id="wlist"></div>
+</section>
+
+<section id="advent" class="hidden">
+  <div class="bar"><button class="quit" id="advBack">← 처음으로</button></div>
+  <h1 class="title" style="font-size:1.9rem;margin-top:10px">대림절 날짜 계산표</h1>
+  <p class="note">대림절 넷째(마지막) 주일은 성탄절 직전의 주일이고, 거기서 1주씩 역산한다. 성탄절이 주일이면 성탄절 당일은 대림절이 아니므로 한 주 전 주일이 넷째 주일이 된다.</p>
+  <div class="tablebox"><table>
+    <thead><tr><th>성탄절 요일</th><th>넷째</th><th>셋째</th><th>둘째</th><th>첫째</th></tr></thead>
+    <tbody>
+    <tr><td>주일</td><td>12/18</td><td>12/11</td><td>12/4</td><td>11/27</td></tr>
+    <tr><td>월요일</td><td>12/24</td><td>12/17</td><td>12/10</td><td>12/3</td></tr>
+    <tr><td>화요일</td><td>12/23</td><td>12/16</td><td>12/9</td><td>12/2</td></tr>
+    <tr><td>수요일</td><td>12/22</td><td>12/15</td><td>12/8</td><td>12/1</td></tr>
+    <tr><td>목요일</td><td>12/21</td><td>12/14</td><td>12/7</td><td>11/30</td></tr>
+    <tr class="now"><td>금요일 (2026)</td><td>12/20</td><td>12/13</td><td>12/6</td><td>11/29</td></tr>
+    <tr><td>토요일</td><td>12/19</td><td>12/12</td><td>12/5</td><td>11/28</td></tr>
+    </tbody></table></div>
+  <p class="note">첫째 주일(교회력 시작)은 항상 11/27에서 12/3 사이에 온다.</p>
+</section>
+</main>
+<script>
+const PARTS=["예배의 본질","구약·시편·초대교회","교회력","예배 순서","예배 구조·모형","예배 계획"];
+const PRIORITY=[19,20,22,24,15,14,17,41,42,47,48,50,35,37];
+const Q=[
+[1,0,1,0,"레이투르기아(leitourgia)는 '하나님의 일'이라는 뜻이다.","X","레이투르기아는 '사람들의 일'이라는 뜻이고, 영어 liturgy의 어원이다. 7주차에서도 \"예배는 몇몇 인도자의 일이 아니라 회중의 일\"이라는 근거로 다시 다뤘다. '하나님의 일'은 Opus Dei이다."],
+[2,0,1,0,"예배는 하나님의 일(Opus Dei)이며, 예배의 주도권은 하나님께 있다.","O","김대혁 교수의 인용이다. 하나님이 먼저 우리를 섬겨 주셨기에 우리가 하나님을 섬긴다. 예배가 하나님의 일이 아니라면 설교는 자아 성취, 기도는 자기 확장, 찬송은 자아도취의 수단이 된다."],
+[3,0,1,0,"리프블래드의 도식에서 하나님은 주연, 회중은 관객이다.","X","리프블래드 도식에서 하나님은 주연 배우, 회중은 조연 배우, 예배 인도자는 도우미다. 회중을 관객으로 보는 것은 '일반적 오해'에 해당한다."],
+[4,0,0,0,"키에르케고르의 도식에서 하나님은 관객이다.","O","키에르케고르 도식에서 하나님은 관객, 회중은 배우, 인도자는 도우미다. 세 도식을 정리하면 이렇다.\n• 일반적 오해: 하나님 = 도우미, 회중 = 관객, 인도자 = 배우\n• 키에르케고르: 하나님 = 관객, 회중 = 배우, 인도자 = 도우미\n• 리프블래드: 하나님 = 주연, 회중 = 조연, 인도자 = 도우미"],
+[5,0,0,0,"하나님은 훌륭한 예배 순서와 음악, 설교를 찾으신다.","X","요 4:23에 따르면 하나님은 '참된 예배자'를 찾으신다. 악기, 예배 스타일, 예배당 디자인은 비본질이다. 교수님 표현으로는 \"부대만 바꾸지 말고 포도주(예배자의 심령)가 바뀌어야 한다.\""],
+[6,0,0,0,"하나님 아닌 다른 신을 예배하는 것은 '헛된(vain) 예배'다.","X","하나님 아닌 다른 신을 예배하는 것(우상숭배)은 '그릇된(false) 예배'다. '헛된(vain) 예배'는 하나님을 예배하되 잘못된 방법으로 예배하는 것이다. 마음 없는 예배, 자기 방법대로의 예배, 고백하지 않은 죄, 모순된 일상, 깨진 형제 관계가 여기에 해당한다."],
+[7,0,0,0,"\"영과 진리로\"는 권면이 아니라 반드시 해야 하는 명령이다.","O","요 4:24의 \"영과 진리로 예배할지니라\"는 강한 명령(must)이다. 강의안도 \"영과 진리로 예배하라고 말씀하시는 하나님의 준엄한 명령\"이라고 표현한다. 교수님 표현으로는 \"우리는 아는 만큼 예배한다.\""],
+[8,1,1,0,"예배에서 노래와 반주 음악이 본격적으로 사용된 것은 다윗 시대다.","O","다윗의 장막 예배의 첫째 특징이 '음악 사용'이다. 다윗의 가장 큰 공헌은 레위인 전문 음악인을 조직한 것이다. 그 전의 성막·제사 중심 예배에는 노래 반주 음악이 없었다(9번 나팔 참고)."],
+[9,1,0,0,"나팔은 모세가 제정한 유일한 공예배용 악기였고, 노래 반주용이 아니라 신호용이었다.","O","나팔(hazozerah)은 하나님의 명령으로 모세가 제정한 유일한 공예배용 악기다. 은을 두들겨 만들었고(민 10:2), 제사장만 불었다. 용도는 반주가 아니라 신호(민 10:3~7)였다. 제금, 수금, 비파는 다윗이 제정했다."],
+[10,1,0,0,"회당은 바벨론 포로기에 출현했고, 회당 예배는 쇼파르 외에는 악기를 쓰지 않았다.","O","포로기에는 희생 제사가 불가능해 개인 예배가 강조되고 회당이 출현했다. 회당 예배의 3요소는 찬양, 기도, 가르침(말씀)이다. 성전 예배와 비교하면 이렇다.\n• 성전 예배: 제사 중심, 악기 사용, 전문 음악인 있음\n• 회당 예배: 말씀 중심, 악기 사용 안 함(쇼파르 외), 영창 외의 음악 없음"],
+[11,1,0,0,"레위 음악인은 다른 일을 하지 않고 자기 직분에 전념했다(대상 9:33).","O","대상 9:33에 따르면 그들은 \"주야로 자기 직분에 전념하므로 다른 일은 하지 아니하였다.\" 레위 음악인은 영적 지도자와 음악 지도자의 결합이었고, 철저하게 조직되었으며(4,000명), 전임으로 일했고, 노래에 익숙했다(대상 15:22 그나냐). 이것이 오늘날 음악 사역자의 모델이다."],
+[12,1,1,1,"시편에서 가장 많은 유형은 찬양시다.","X","가장 많은 유형은 탄식시(개인의 탄식, 공동체의 탄식)다. 교수님은 시편에 탄식이 가장 많은데 오늘날 예배에서는 탄식이 거의 불리지 않는다고 강조하셨다. 7주차의 \"예배에 눈물이 있어야 한다\"는 메시지와도 연결된다."],
+[13,1,0,0,"시편 표제의 '인도자'는 예배 인도자를 뜻한다.","X","표제의 '인도자'는 합창 지휘자다. 시편 55편의 표제에 이 표현이 나온다."],
+[14,1,1,0,"인도자가 1·3절, 회중이 2·4절을 부르는 방식은 교창이다.","X","이 방식은 응창(responsorial)이다. 교수님이 퀴즈로 정리해 주신 부분이다.\n• 응창: 한 사람(인도자)과 회중이 교대로 부른다.\n• 교창(antiphonal): 회중을 둘로 나누거나 두 찬양대가 교대로 부른다."],
+[15,1,1,0,"칸티클은 성경 구절에 새로 곡을 붙여 만든 노래다.","X","칸티클은 \"시편 외의 다른 성경에 나오는 노래\"다. 성경 구절로 새로 작곡한 노래가 아니라, 그 구절 자체가 원래 노래였다. 구약 칸티클은 Lesser Canticles(예: 출 15장 모세의 노래, 삼상 2장 한나의 노래), 신약 칸티클은 Greater Canticles라고 부른다."],
+[16,1,1,0,"신약의 4대 칸티클은 모두 누가복음 1~2장에 나온다.","O","마리아의 노래(눅 1:46~55), 사가랴의 노래(눅 1:68~79), 천사들의 노래(눅 2:14), 시므온의 노래(눅 2:29~32)가 모두 예수님 탄생 전후 장면에 나온다."],
+[17,1,1,0,"시므온의 노래의 라틴어 명칭은 Magnificat이다.","X","시므온의 노래는 Nunc dimittis다. 라틴어 명칭은 라틴어 성경 본문의 첫 단어에서 왔다.\n• 마리아의 노래 = Magnificat\n• 사가랴의 노래 = Benedictus\n• 천사들의 노래 = Gloria in excelsis Deo\n• 시므온의 노래 = Nunc dimittis"],
+[18,1,0,0,"초대교회 예배는 성전 예배 전통에 성만찬을 더한 형태다.","X","초대교회의 기본 예배 형태는 '회당 예배 전통 + 성만찬'이다. 말씀과 성찬이라는 두 기둥에 입례와 폐회가 더해져 사중구조로 발전했다."],
+[19,2,1,0,"교회력의 시작은 성탄절이다.","X","교회력의 시작은 대림절(Advent)이다. 성탄절도, 부활절도 아니다. 반면 교회력이 생겨난 근거는 부활절이다. 초대교회가 부활절을 준비하는 기간을 마련하면서 교회력이 시작되었다."],
+[20,2,1,0,"절기의 순서는 대림절 → 성탄절 → 주현절 → 사순절 → 부활절 → 성령강림절이다.","O","교회력은 두 주기로 나뉜다.\n• 성탄절 주기: 대림절(준비), 성탄절·주현절(축하)\n• 부활절 주기: 사순절(준비), 부활절·승천일·성령강림절(축하)"],
+[21,2,0,0,"대림절은 성탄절 전 4주이며, 기다리는 '오심'에는 재림도 포함된다.","O","대림절이 기다리는 오심은 세 가지다. 아기로 오심(초림), 믿는 자의 마음에 오심, 심판하러 다시 오심(재림)이다. 교수님은 재림이 대림절의 주된 주제라고 강조하셨다."],
+[22,2,1,1,"성탄절이 월요일이면 대림절 넷째 주일은 12월 24일이다.","O","대림절 넷째 주일은 성탄절 직전의 주일이다. 성탄절이 월요일이면 바로 전날인 12/24가 넷째 주일이 된다. 거기서 한 주씩 역산하면 셋째 12/17, 둘째 12/10, 첫째 12/3이다. 교수님이 \"기말고사에 낼 거예요\"라고 하신 유형이다(대림절 표 참고)."],
+[23,2,1,1,"성탄절이 주일이면 성탄절 당일이 대림절 넷째 주일이 된다.","X","성탄절 당일은 대림절이 아니다. 성탄절이 주일이면 넷째 주일은 한 주 전인 12/18이고, 첫째 주일은 11/27이다."],
+[24,2,1,0,"사순절은 부활절 전, 주일을 포함한 40일이다.","X","강의안 원문은 \"주일을 뺀, 부활절 전의 40일간\"이다. 주일은 예수님이 부활하신 기쁜 날이라 제외한다. 교수님이 7주차 쉬는 시간에 \"이건 아셔야 돼요\"라고 직접 언급하셨다."],
+[25,2,0,0,"사순절은 항상 수요일(재의 수요일)에 시작한다.","O","주일을 빼고 주 6일씩 40일을 역산하면 항상 수요일에 시작한다. 재의 수요일(Ash Wednesday)에는 회개의 표시로 이마에 재를 바른다. 부활절 날짜가 매년 바뀌므로 사순절 시작일도 매년 바뀐다."],
+[26,2,0,0,"부활절은 춘분 후 첫 보름달 다음 첫 주일이며, 325년 니케아 공의회에서 정했다.","O","춘분(3/21) 이후 음력 보름날 다음에 오는 첫 주일이 부활절이다. 보름날이 주일과 겹치면 그다음 주일이 된다. 따라서 부활절은 3/22에서 4/25 사이에 오고, 부활절 기간은 7주(49일)다."],
+[27,2,0,0,"삼위일체주일은 유일하게 특정 교리와 관계된 절기다.","O","삼위일체주일은 성령강림주일 바로 다음 주일이다. 성령강림절의 색은 빨강이지만, 삼위일체주일에는 흰색을 사용한다."],
+[28,2,0,0,"주현절의 색은 흰색이다.","X","주현절의 색은 녹색(새 생명)이다. 기간은 1/6부터 사순절 직전의 화요일(Fat Tuesday)까지다. 절기별 색은 다음과 같다.\n• 대림절·사순절: 보라\n• 성탄절·부활절: 흰색\n• 주현절: 녹색\n• 성령강림절: 빨강"],
+[29,3,0,0,"사죄의 확신은 목회자의 권위로 이뤄지는 면죄의 선언이다.","X","강의안 원문은 \"목회자의 권위로 이뤄지는 면죄의 선언이 아니라, 자비와 긍휼의 하나님이 우리의 죄를 용서하셨음을 목회자가 선언하는 것\"이다. 사죄의 확신 뒤에는 영광송(Gloria Patri)이나 감사 찬양으로 응답한다."],
+[30,3,0,0,"성경 봉독은 설교를 위한 부수적인 순서다.","X","성경 봉독은 살아 계신 하나님의 말씀을 듣는 중요하고 독자적인 사건이다. 초대교회는 구약, 서신서, 복음서 세 군데를 봉독했다. 교수님은 \"설교보다 성경 봉독이 더 엄중하다\"고 하셨다."],
+[31,3,0,0,"설교는 예배의 중심이자 예배의 목표다.","X","설교는 예배의 중심이지만, 예배의 목표나 유일한 하이라이트가 아니라 예배 흐름의 한 부분이다. 찬양을 설교 전의 워밍업으로 여기는 것도 잘못이다."],
+[32,3,0,0,"교회 소식은 예배의 일부이므로 설교 전에 하는 것이 좋다.","X","교회 소식은 예배의 부분이 아니므로 예배 시작 전이나 강복 선언(축도) 후에 하는 것이 바람직하다. 교수님은 익산 교회 사례에서도 광고를 예배 전에 배치하셨다."],
+[33,3,0,0,"소영광송(Gloria Patri)은 찬송가 3, 4, 7장이다.","O","Gloria Patri는 2세기경부터 사용된 가장 대표적인 영광송이다. \"성부와 성자와 성령께 영광…\"으로 시작하고, 짧아서 '소'영광송이라 부른다."],
+[34,4,0,0,"교단 예식서 주일예배 모범의 가장 전형적인 구조는 사중구조다.","O","교단마다 명칭은 달라도 가장 전형적인 구조는 모임(입례) → 말씀 → 성찬 → 파송의 사중구조다. 통합 측 예배예식서 주일예배 1번도 사중구조다."],
+[35,4,1,0,"미사의 통상문은 절기에 따라 내용이 바뀌는 부분이다.","X","통상문(Ordinary)은 절기와 상관없이 항상 같은 부분이고, 미사곡은 이 부분으로 작곡한다. 절기에 따라 바뀌는 부분은 고유문(Proper)이다. 미사 통상문은 Kyrie, Gloria, Credo, Sanctus, Agnus Dei 5부분이다."],
+[36,4,0,1,"미사 통상문의 Credo는 사도신경이다.","X","미사의 Credo는 니케아 신경이다. 참고로 Sanctus(거룩송)의 가사는 이사야 6장과 요한계시록 4장이 중심이다."],
+[37,4,1,0,"대영광송은 미사의 Gloria이고, 소영광송은 Gloria Patri다.","O","대영광송은 미사의 Gloria in excelsis Deo로, 길어서 '대'라고 부른다. 소영광송은 Gloria Patri(찬송가 3, 4, 7장)로, 짧아서 '소'라고 부른다. 둘을 바꿔 내기 쉬운 부분이다."],
+[38,4,0,0,"빈야드 모형의 성경적 근거는 시편 100편이다.","X","빈야드 모형의 근거는 시편 95편이다. 시편 100편(4절 \"감사함으로 그의 문에 들어가며…\")은 성막 모형의 근거다.\n• 빈야드 5단계: 초대 → 동참 → 높임 → 경배 → 친밀함\n• 성막 모형 5단계: 문밖 → 문(감사) → 궁정(찬송) → 성소(경배) → 지성소(임재)"],
+[39,4,0,0,"빈야드 모형 '초대' 단계의 가사 방향은 하나님을 향한다.","X","초대 단계의 가사 방향은 하나님이 아니라 사람이고, 분위기는 경쾌하다. 동참 단계부터 가사가 수직적(하나님을 향함)으로 바뀐다. 높임 단계는 초월성을, 경배 단계는 내재성을 강조하고, 친밀함 단계에서 '우리'가 '나'로 바뀐다."],
+[40,4,1,1,"축복송은 엄밀한 의미에서 찬양이 아니다.","O","찬양은 대상(하나님)의 아름답고 위대하심을 크게 기리고 드러내는 것이다. 교수님은 \"축복송은 찬양이 아니다\", 결단·헌신의 노래는 설교 후에 와야 한다고 비판하셨다."],
+[41,4,1,0,"이사야 6장 모형에서 참회와 간구는 하나님의 행위다.","X","참회와 간구는 우리의 행위다. 8단계를 행위 주체로 나누면 이렇다.\n• 하나님의 행위: 계시, 사죄, 선포, 위임\n• 우리의 행위: 경배, 참회, 헌신, 간구\n• 4장 구성: 1장(6:1~4) 계시→경배 / 2장(6:5~7) 참회→사죄 / 3장(6:8) 선포→헌신 / 4장(6:9~10) 간구→위임"],
+[42,4,1,0,"이사야 6장 모형의 제안자는 브루스 리프블래드이며, 4장 8단계로 구성된다.","O","브루스 리프블래드(Bruce H. Leafblad)의 도식이다. 장점은 8가지다. 성경적이다, 종합적이다, 하나님 중심이다, 회중을 관객에 머물지 않게 한다, 대화 구조다, 논리적이다, 스타일·문화·시대에 제한되지 않는다, 변화와 창의력의 기회를 준다."],
+[43,5,0,1,"이사야 6장 모형은 찬양 시간을 충분히 확보할 수 있다는 장점이 있다.","O","교수님이 강의안의 8가지 장점에 덧붙이신 내용이다. 역사적 사중구조는 '모임' 부분이 짧게 지나가지만, 이사야 6장 모형에는 독립된 경배 단계가 있다. 교수님은 60분 예배 중 약 10분을 경배 단계에 배정하셨다."],
+[44,5,0,0,"세글러는 설교 준비 시간의 절반을 예배 계획에 쓰라고 했다.","X","프랭클린 세글러는 설교에 바치는 시간의 10분의 1이라도 예배 계획에 쓴다면 예배가 훨씬 강렬하게 체험될 것이라고 했다."],
+[45,5,0,0,"\"예배는 노동이다\"라고 말한 사람은 박해정이다.","O","박해정 교수(감신대)의 말이다. 교수님은 \"찬송하는 것도, 예배 기획하는 것도 노동이다. 머리를 많이 쓰고 자료를 많이 찾아봐야 한다\"고 덧붙이셨다."],
+[46,5,1,0,"회중찬송은 음악적 완성도를 위해 다소 어려워도 괜찮다.","X","교수님 표현으로 \"회중찬송은 쉬워야 된다. 누구나 부를 수 있어야.\" 70대 이상도 부를 수 있어야 하고, 음악이 어려워 찬양을 못 하면 안 된다."],
+[47,5,1,1,"예배 계획의 3요소(Story, Structure, Style) 중 가장 중요한 것은 Style이다.","X","Style은 사실 부수적인 요소인데, 많은 교회가 스타일을 가지고 다툰다. Story(성경 이야기, 그리스도의 구원 이야기)와 Structure(그 이야기를 담는 구조)가 더 중요하다. 3요소는 Inga & Ronald Freyer Nicholas가 제시했다."],
+[48,5,1,0,"Story, Structure, Style 3요소에 Soli Deo Gloria를 덧붙인 사람은 교수님이다.","O","Nicholas가 제시한 것은 3요소다. 교수님이 네 번째로 Soli Deo Gloria를 덧붙이셨다. 예배의 대상, 이유, 목적이 잘못되면 구조와 음악과 설교가 아무리 훌륭해도 하나님 보시기에 헛된 예배라는 뜻이다."],
+[49,5,0,0,"대화 구조를 위해 사람의 응답 순서를 연달아 배치하는 것이 좋다.","X","사람의 순서나 하나님의 순서를 연달아 배치하면 대화가 끊기고 독백이 된다. 하나님의 순서와 사람의 순서가 지그재그로 오가게 해야 한다. 예: 참회로의 부름(하나님) → 참회의 기도(사람) → 사죄의 확신(하나님) → 감사의 응답(사람)."],
+[50,5,1,0,"예배 계획자가 할 수 있는 것은 하나님과 회중 사이의 대화가 이루어질 '기회와 재료'를 제공하는 것뿐이다.","O","강의안 원문 그대로다. 즉흥성을 배제하지 않되 최선을 다해 꼼꼼히 계획해야 한다. 하나님은 질서의 하나님이시기 때문이다. 계획이 끝나면 성령님을 의지해 기도할 뿐이다."]
+].map(r=>({n:r[0],p:r[1],star:!!r[2],jeon:!!r[3],q:r[4],a:r[5],e:r[6]}));
+const $=id=>document.getElementById(id);
+const scopes=[
+  {k:"all",l:"전체",f:()=>true},
+  {k:"star",l:"★ 강조",f:q=>q.star},
+  {k:"pri",l:"우선순위",f:q=>PRIORITY.includes(q.n)},
+  ...PARTS.map((p,i)=>({k:"p"+i,l:p,f:q=>q.p===i}))
+];
+let scope="all", pool=[], deck=[], idx=0, wrong=[], answered=false, right=0;
+function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function expHTML(e){const lines=e.split("\n");const head=esc(lines[0]);const rest=lines.slice(1);return "<p>"+head+"</p>"+(rest.length?"<ul>"+rest.map(l=>"<li>"+esc(l)+"</li>").join("")+"</ul>":"")}
+function show(id){["home","quiz","result","advent"].forEach(s=>$(s).classList.toggle("hidden",s!==id));window.scrollTo(0,0)}
+function renderScopes(){
+  $("scope").innerHTML=scopes.map(s=>{const n=Q.filter(s.f).length;return `<button class="chip" data-k="${s.k}" aria-pressed="${s.k===scope}">${esc(s.l)}<small>${n}</small></button>`}).join("");
+}
+$("scope").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;scope=b.dataset.k;renderScopes();syncRange()});
+function syncRange(){
+  pool=Q.filter(scopes.find(s=>s.k===scope).f);
+  const r=$("cnt");const max=pool.length;r.max=max;r.min=Math.min(5,max);r.value=max;$("cntOut").textContent=max;
+}
+$("cnt").addEventListener("input",e=>$("cntOut").textContent=e.target.value);
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function begin(list){deck=list;idx=0;wrong=[];right=0;show("quiz");renderQ()}
+$("start").onclick=()=>{let list=$("shuf").checked?shuffle(pool):pool.slice();begin(list.slice(0,+$("cnt").value))};
+function renderQ(){
+  const q=deck[idx];answered=false;
+  $("count").textContent=`${idx+1} / ${deck.length}`;
+  $("prog").style.width=(idx/deck.length*100)+"%";
+  $("meta").innerHTML=`<span class="tag">Part ${q.p+1} ${esc(PARTS[q.p])}</span>`+(q.star?'<span class="tag star">★ 강조</span>':"")+(q.jeon?'<span class="tag jeon">수업 발언</span>':"");
+  $("qnum").textContent=`${q.n}번`;
+  $("qtext").textContent=q.q;
+  ["bO","bX"].forEach(b=>{const el=$(b);el.disabled=false;el.className="ans "+(b==="bO"?"o":"x")});
+  $("fb").classList.add("hidden");$("next").classList.add("hidden");
+}
+function answer(c){
+  if(answered)return;answered=true;
+  const q=deck[idx];const ok=c===q.a;
+  if(ok)right++;else wrong.push(q);
+  const pick=c==="O"?$("bO"):$("bX"), other=c==="O"?$("bX"):$("bO");
+  $("bO").disabled=$("bX").disabled=true;
+  pick.classList.add(ok?"right":"wrong");
+  if(!ok)other.classList.add("right");else other.classList.add("dim");
+  const fb=$("fb");fb.className="fb "+(ok?"good":"bad");
+  $("verdict").textContent=ok?`맞았어요. 정답 ${q.a}`:`틀렸어요. 정답은 ${q.a}`;
+  $("exp").innerHTML=expHTML(q.e);
+  $("next").textContent=idx===deck.length-1?"결과 보기":"다음 문제";
+  $("next").classList.remove("hidden");
+  $("prog").style.width=((idx+1)/deck.length*100)+"%";
+  $("next").focus({preventScroll:true});
+  fb.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+$("bO").onclick=()=>answer("O");$("bX").onclick=()=>answer("X");
+$("next").onclick=()=>{if(idx<deck.length-1){idx++;renderQ();window.scrollTo(0,0)}else finish()};
+document.addEventListener("keydown",e=>{
+  if($("quiz").classList.contains("hidden"))return;
+  const k=e.key.toLowerCase();
+  if(!answered&&(k==="o"||k==="ㅐ"||k==="0"))answer("O");
+  else if(!answered&&(k==="x"||k==="ㅌ"))answer("X");
+  else if(answered&&k==="enter"&&document.activeElement!==$("next")){e.preventDefault();$("next").click()}
+});
+function finish(){
+  const n=deck.length,pct=Math.round(right/n*100);
+  const em=pct===100?"🏆":pct>=90?"🎉":pct>=80?"😊":pct>=60?"🙂":pct>=40?"😅":"📖";
+  const msg=pct===100?"만점이에요. 이대로 시험장에 가면 됩니다.":pct>=80?"거의 다 왔어요. 오답만 한 번 더 보세요.":pct>=60?"절반은 넘었어요. 오답노트를 꼭 훑어보세요.":"오답노트부터 천천히 다시 읽어 보세요.";
+  $("emoji").textContent=em;
+  $("big").innerHTML=`${right}<small> / ${n}</small>`;
+  $("msg").textContent=`${pct}% · ${msg}`;
+  $("retryWrong").classList.toggle("hidden",!wrong.length);
+  $("wlist").innerHTML=wrong.length?wrong.map(q=>`<div class="witem"><p class="wq">${q.n}. ${esc(q.q)}</p><p class="wa">정답 <b>${q.a}</b>${q.star?" · ★":""}</p><details><summary>풀이 보기</summary><div class="exp">${expHTML(q.e)}</div></details></div>`).join(""):'<p class="empty">틀린 문제가 없어요.</p>';
+  show("result");
+}
+$("retryWrong").onclick=()=>begin(shuffle(wrong));
+$("again").onclick=()=>$("start").click();
+$("home2").onclick=$("quit").onclick=$("advBack").onclick=()=>show("home");
+$("toAdvent").onclick=()=>show("advent");
+renderScopes();syncRange();
+</script>
+</body></html>

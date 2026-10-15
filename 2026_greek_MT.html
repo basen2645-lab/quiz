@@ -124,6 +124,8 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 .opt.gkopt{font-family:var(--greek);font-size:22px;line-height:1.25}
 .opt.small{font-size:15px}
 .fbline{margin-top:2px}
+.reveal{width:100%;min-height:120px;border:2px dashed var(--line);border-radius:14px;background:var(--bg);color:var(--accent);font-size:17px;font-weight:700}
+.reveal:active{background:var(--soft)}
 .pos{display:inline-block;margin-top:8px;font-size:13px;font-weight:500;color:var(--accent);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1px 8px}
 .fbline.dim{color:var(--muted);font-size:14px}
 @media (prefers-reduced-motion:reduce){.bar i{transition:none}}
@@ -218,6 +220,7 @@ function genderNote(w){
   if(g==="n") return "제2변화 중성 명사예요.";
   return "제1변화 여성 명사예요.";
 }
+WORDS.forEach(w=>{ if(w.p && w.p.startsWith("동사")) w.m="내가 "+w.m; });
 const VBANK = [];
 WORDS.forEach((w,i)=>{
   VBANK.push({id:"sa"+i, type:"sa", l:w.l, word:w.h, ans:w.m, pos:w.p, tag:`${w.l}과 · 뜻 쓰기`, revSub:`${w.l}과 · 뜻`});
@@ -413,15 +416,19 @@ function render(){
     const n=q.opts.length;
     h+=`<p class="ask">${q.ask}</p><div class="opts ${n===3?"cols3":"cols4"}">`;
     q.opts.forEach(o=>h+=`<button class="opt ${q.optCls||""}" data-v="${esc(o.v)}" aria-pressed="false">${o.html}</button>`);
-    h+=`</div><div id="fb"></div><div class="actions"><button class="primary" id="actBtn" disabled>정답 제출</button></div>`;
+    const instant = q.src!=="p";
+    h+=`</div><div id="fb"></div><div class="actions${instant?" hidden":""}"><button class="primary" id="actBtn" disabled>정답 제출</button></div>`;
     $("#card").innerHTML=h;
-    let pick=null;
+    let pick=null, done=false;
     document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+      if(done) return;
       pick=b.dataset.v;
       document.querySelectorAll(".opt").forEach(x=>x.setAttribute("aria-pressed",x===b));
       $("#actBtn").disabled=false;
+      if(instant) submit();
     });
-    $("#actBtn").onclick=()=>{
+    const submit=()=>{
+      done=true; $(".actions").classList.remove("hidden");
       const ok=pick===q.ans;
       document.querySelectorAll(".opt").forEach(b=>{
         b.disabled=true;
@@ -433,19 +440,16 @@ function render(){
       $("#fb").innerHTML=`<div class="feedback ${ok?"ok":"no"}"><div class="verdict">${ok?"정답이에요.":(q.src==="p"?"오답이에요. 정답: "+esc(q.ansTxt):"정답은 "+esc(q.ansTxt)+"예요.")}</div>${q.fb}</div>`;
       nextBtn();
     };
+    $("#actBtn").onclick=submit;
   } else {
-    h+=`<p class="ask">뜻을 써 보세요</p><div class="sa"><input id="saIn" type="text" autocomplete="off" placeholder="뜻 입력 (비워 두고 확인해도 돼요)" aria-label="뜻 입력"></div><div id="fb"></div><div class="actions"><button class="primary" id="actBtn">확인</button></div>`;
+    h+=`<p class="ask">뜻을 떠올려 보세요</p><div id="fb"><button class="reveal" id="revealBtn">탭해서 정답 보기</button></div>`;
     $("#card").innerHTML=h;
-    const inp=$("#saIn"); inp.focus({preventScroll:true});
-    inp.onkeydown=e=>{if(e.key==="Enter"&&!e.isComposing){e.preventDefault();$("#actBtn").click()}};
-    $("#actBtn").onclick=()=>{
-      const mine=inp.value.trim(); inp.disabled=true;
-      const hit = mine && matches(mine,q.ans);
-      $("#fb").innerHTML=`<div class="feedback neutral"><div class="verdict">정답</div><div class="entry">${esc(q.word)}</div><div>${esc(q.ans)}</div>${posLine(q.pos)}<div class="mine">내 답: ${mine?esc(mine):"(비워 둠)"}</div>${hit?`<div class="match">입력한 답이 정답 중 하나와 일치해요.</div>`:""}<div class="selfgrade"><button class="y" id="yBtn">맞았어요</button><button class="n" id="nBtn">틀렸어요</button></div></div>`;
-      $(".actions").remove();
-      const grade=ok=>{log.push({q,ok,mine:mine||"(비워 둠)"}); advance()};
+    $("#revealBtn").focus({preventScroll:true});
+    $("#revealBtn").onclick=()=>{
+      $("#fb").innerHTML=`<div class="feedback neutral"><div class="verdict">정답</div><div>${esc(q.ans)}</div>${posLine(q.pos)}<div class="selfgrade"><button class="y" id="yBtn">맞았어요</button><button class="n" id="nBtn">틀렸어요</button></div></div>`;
+      const grade=ok=>{log.push({q,ok,mine:""}); advance()};
       $("#yBtn").onclick=()=>grade(true); $("#nBtn").onclick=()=>grade(false);
-      (hit?$("#yBtn"):$("#nBtn")).focus({preventScroll:true});
+      $("#yBtn").focus({preventScroll:true});
     };
   }
 }
@@ -480,7 +484,7 @@ function finish(){
         h+=`<li><div class="q">${esc(q.revWord)}<small>${esc(q.revSub)}</small></div><div class="a">정답: ${esc(q.ansTxt)}</div><div class="m">내 답: ${esc(mine)}</div></li>`;
       } else {
         const ans = q.type==="mc"? q.ansTxt : q.ans;
-        h+=`<li><div class="q">${esc(q.word)}<small>${esc(q.revSub)}${q.pos?" · "+esc(q.pos):""}</small></div><div class="a">정답: ${esc(ans)}</div>${q.revExtra?`<div class="m">${esc(q.revExtra)}</div>`:""}<div class="m">내 답: ${esc(mine)}</div></li>`;
+        h+=`<li><div class="q">${esc(q.word)}<small>${esc(q.revSub)}${q.pos?" · "+esc(q.pos):""}</small></div><div class="a">정답: ${esc(ans)}</div>${q.revExtra?`<div class="m">${esc(q.revExtra)}</div>`:""}${q.type==="mc"?`<div class="m">내 답: ${esc(mine)}</div>`:""}</li>`;
       }
     });
     h+="</ol>";
